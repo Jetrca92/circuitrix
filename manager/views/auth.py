@@ -2,12 +2,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.dispatch import receiver
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
