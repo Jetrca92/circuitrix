@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-#from allauth.account.signals import user_signed_up
+from allauth.account.signals import user_signed_up
 from manager.helpers import random_password
 from manager.models import User, Manager
 
@@ -118,18 +118,16 @@ def register(request):
 
     
 # Sends welcome email if user signs up with google acc    
-#@receiver(user_signed_up)
-#def send_google_registration_email(request, user, **kwargs):
-#    if user.socialaccount_set.filter(provider='google').exists():
- #       # Create users resident model, warehouse
-  #      create_resident_and_warehouse(user)
-#
- #       email = user.email
-  #      send_mail(
-   #         'Dobrodošel v eSloveniji!',
-    #        'Pozdravljen! Uspešno si se registriral na portal. Vse dobro!',
-     #       'settings.EMAIL_HOST_USER',
-      #      [f"{email}"],
-       #     fail_silently=True
-        #)
-    #return HttpResponseRedirect(reverse("first_login"))
+@receiver(user_signed_up)
+def send_google_registration_email(request, user, **kwargs):
+    if user.socialaccount_set.filter(provider='google').exists():
+
+        email = user.email
+        send_mail(
+            'Dobrodošel v eSloveniji!',
+            'Pozdravljen! Uspešno si se registriral na portal. Vse dobro!',
+            'settings.EMAIL_HOST_USER',
+            [f"{email}"],
+            fail_silently=True
+        )
+    return HttpResponseRedirect(reverse("index"))

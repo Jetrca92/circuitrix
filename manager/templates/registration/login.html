@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-
+{% load socialaccount %}
 
     <div class="modal modal-signin position-static d-block py-5" tabindex="-1" role="dialog" id="modalSignin">
         <div class="modal-dialog" role="document">
@@ -34,7 +34,7 @@
                         <hr class="my-4">
                         <h2 class="fs-5 fw-bold mb-3">Or use a third-party</h2>
                         <button class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3" type="submit">
-                            
+                            <a class="list-group-item list-group-item-action" href="{% provider_login_url 'google'%}?next=/"><img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />Login with Google</a>
                         </button>
                     </form>
                 </div>
