@@ -25,6 +25,14 @@ SECRET_KEY = 'django-insecure-f)(x)*1w^pj5wc*pzlk5(e!s^*bwo)6$g%b7yd09mcxhx6zy_=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Email settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'circuitrix.game@gmail.com'
+EMAIL_HOST_PASSWORD = 'etcwychyclyxdoyw'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 ALLOWED_HOSTS = []
 
 
@@ -122,3 +130,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'manager.User'
+
+
