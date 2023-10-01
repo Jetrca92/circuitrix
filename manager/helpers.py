@@ -1,10 +1,8 @@
-import random
-import string
-
-from django.contrib.contenttypes.models import ContentType
+import secrets
 
 
-def random_password():
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(8))
-    return result_str
+RANDOM_STRING_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+
+def random_password(length, allowed_chars=RANDOM_STRING_CHARS):
+    return "".join(secrets.choice(allowed_chars) for i in range(length))
