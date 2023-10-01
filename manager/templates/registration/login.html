@@ -17,7 +17,7 @@
                     {% if message %}
                         <p>{{ message }}</p>
                     {% endif %}
-                    <form action="{% url 'login' %}" method="post" role="form" class="row gy-2 gx-2">
+                    <form action="{% url 'registration:login' %}" method="post" role="form" class="row gy-2 gx-2">
                         {% csrf_token %}
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control rounded-3" name="username" placeholder="Username">
@@ -29,7 +29,7 @@
                         </div>
                         <button class="w-100 mb-2 btn btn-lg rounded-3 btn-secondary" type="submit">Login</button>
                         <div class="text-center">
-                            <a class="list-group-item list-group-item-action" href="{% url 'forgot_password' %}">Forgot your password?</a>
+                            <a class="list-group-item list-group-item-action" href="{% url 'registration:password_reset' %}">Forgot your password?</a>
                         </div>
                         <hr class="my-4">
                         <h2 class="fs-5 fw-bold mb-3">Or use a third-party</h2>

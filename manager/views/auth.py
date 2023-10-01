@@ -122,8 +122,8 @@ def send_google_registration_email(request, user, **kwargs):
 
         email = user.email
         send_mail(
-            'Dobrodošel v eSloveniji!',
-            'Pozdravljen! Uspešno si se registriral na portal. Vse dobro!',
+            'Welcome to Circuitrix!',
+            'Greetings! You have successfully registered on our portal. Good luck!',
             'settings.EMAIL_HOST_USER',
             [f"{email}"],
             fail_silently=True

@@ -2,6 +2,7 @@ from django.urls import include, path
 
 from .views import generic, auth
 
+app_name = "manager"
 
 auth_patterns = [
     path("login", auth.login_view, name="login"),
@@ -17,5 +18,5 @@ generic_patterns = [
 
 urlpatterns = [
     path("", include(generic_patterns)),
-    path("auth/", include(auth_patterns)),
+    path("accounts/", include("django.contrib.auth.urls")),
 ]

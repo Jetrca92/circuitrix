@@ -40,6 +40,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'manager',
+    'registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -165,3 +166,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'manager:index'
+LOGOUT_REDIRECT_URL = 'manager:index'
