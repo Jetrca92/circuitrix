@@ -15,7 +15,7 @@
                 </div>
                 <div class="modal-body p-5 pt-0">
                     {% if message %}
-                        <div>{{ message }}</div>
+                    <div class="text-danger fw-bold">{{ message }}</div>
                     {% endif %}
                     <form action="{% url 'registration:register' %}" method="post" role="form" class="row gy-2 gx-2">
                         {% csrf_token %}
