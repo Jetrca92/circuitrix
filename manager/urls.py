@@ -1,15 +1,8 @@
 from django.urls import include, path
 
-from .views import generic, auth
+from .views import generic
 
 app_name = "manager"
-
-auth_patterns = [
-    path("login", auth.login_view, name="login"),
-    path("forgot-password", auth.forgot_password, name="forgot_password"),
-    path("logout", auth.logout_view, name="logout"),
-    path("register", auth.register, name="register"),
-]
 
 
 generic_patterns = [
