@@ -144,11 +144,11 @@
                     {% else %}
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'registration:login' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Login
                             </a>
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'registration:register' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Register
                             </a>
