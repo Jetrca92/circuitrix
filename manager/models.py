@@ -16,3 +16,15 @@ class Manager(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+    
+
+class Team(models.Model):
+    owner = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    
+    total_fans = models.PositiveIntegerField(default=0)
+    
+
+    def __str__(self):
+        return self.name
