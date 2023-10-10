@@ -21,8 +21,8 @@ Create a Team
                     {{ form.team_country.label_tag }}
                     {{ form.team_country }}
                 </div>
-                {% if form.errors %}
-                <div class="mb-3">
+                {% if form.errors or message %}
+                <div class="mb-3 fw-bold text-danger">
                     {{ message }}
                 </div>
                 {% endif %}

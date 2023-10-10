@@ -48,7 +48,7 @@ class CreateTeamView(View):
     
     def post(self, request):
         team_name = request.POST.get("team_name")
-        team_country = request.POST.get("team_country")
+        team_country = int(request.POST.get("team_country"))
         manager = Manager.objects.get(user=request.user)
 
         if not team_name:
@@ -60,7 +60,7 @@ class CreateTeamView(View):
         if team_country == "selected":
             return self.render_error(self.request, "Select a country!")
 
-        team_country_object = Country.objects.get(name=team_country)
+        team_country_object = Country.objects.get(id=team_country)
         team = Team(name=team_name, location=team_country_object, owner=manager)
         team.save()
 
@@ -77,6 +77,7 @@ class CreateTeamView(View):
         return HttpResponseRedirect(reverse("index"))
 
     def render_error(self, request, message):
+        form = NewTeamForm()
         countries = Country.objects.all()
-        return render(request, "manager/create_team.html", {"message": message, "countries": countries})
+        return render(request, "manager/create_team.html", {"message": message, "countries": countries, "form": form})
     

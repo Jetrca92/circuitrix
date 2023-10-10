@@ -23,7 +23,10 @@ class Team(models.Model):
     owner = models.ForeignKey(Manager, on_delete=models.CASCADE)
     name = models.CharField(max_length=30, unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    
+    location = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
+    drivers = models.ManyToManyField('Driver', blank=True, related_name="team_drivers")
+    lead_designer = models.ForeignKey('LeadDesigner', blank=True, null=True, on_delete=models.CASCADE, related_name="team_designer")
+    race_mechanics = models.ManyToManyField('RaceMechanic', blank=True, related_name="team_race_mechanics")
     total_fans = models.PositiveIntegerField(default=0)
     
 
