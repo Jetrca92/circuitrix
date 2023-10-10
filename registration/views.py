@@ -1,4 +1,5 @@
 from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.dispatch import receiver
@@ -9,7 +10,7 @@ from django.views import View
 
 from allauth.account.signals import user_signed_up
 from manager.models import User
-from registration.forms import RegistrationForm
+from registration.forms import RegistrationForm, LoginForm
 
 
 class RegisterView(View):
@@ -118,3 +119,5 @@ def send_google_registration_email(request, user, **kwargs):
     return HttpResponseRedirect(reverse("manager:index"))
 
 
+class CustomLoginView(LoginView):
+    form_class = LoginForm

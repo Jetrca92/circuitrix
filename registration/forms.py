@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from manager.models import User
 
 class RegistrationForm(UserCreationForm):
@@ -47,3 +47,27 @@ class RegistrationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Define attributes
+        field_attributes = {
+            'username': {
+                'class': 'form-control rounded-3',
+                'id': 'username',
+                'placeholder': 'Username',
+            },
+            'password': {
+                'class': 'form-control rounded-3',
+                'id': 'password',
+                'placeholder': 'Password',
+            },
+        }
+
+        # Set attributes
+        for field_name, attributes in field_attributes.items():
+            for attribute_name, attribute_value in attributes.items():
+                self.fields[field_name].widget.attrs[attribute_name] = attribute_value
