@@ -1,5 +1,5 @@
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.dispatch import receiver
@@ -10,7 +10,7 @@ from django.views import View
 
 from allauth.account.signals import user_signed_up
 from manager.models import User
-from registration.forms import RegistrationForm, LoginForm
+from registration.forms import RegistrationForm, LoginForm, CustomPasswordResetForm, CustomSetPasswordForm
 
 
 class RegisterView(View):
@@ -121,3 +121,11 @@ def send_google_registration_email(request, user, **kwargs):
 
 class CustomLoginView(LoginView):
     form_class = LoginForm
+
+
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
