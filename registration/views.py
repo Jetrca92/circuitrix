@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView, PasswordRese
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.dispatch import receiver
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
@@ -22,38 +22,32 @@ class RegisterView(View):
 
     @transaction.atomic
     def post(self, request):
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password1")
-        confirmation = request.POST.get("password2")
-
-        # Check for password matching and duplicate emails
-        if password != confirmation:
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data["password1"]
+            email = form.cleaned_data["email"]
+            username = form.cleaned_data["username"]
+            try:
+                with transaction.atomic():
+                    user = User.objects.create_user(username, email, password)
+                    user.save()
+                    
+                    # Create users manager model ...
+                    # TO DO
+                    
+                    # Log user in and Send welcome email
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    self.send_welcome_email(email)
+                return HttpResponseRedirect(reverse("manager:index"))
+            except IntegrityError:
+                return render(request, self.template_name, {
+                    "message": "Integrity Error!"
+                })
+        else:
+            # Handle the case when the form is not valid
             return render(request, self.template_name, {
-                "message": "Passwords must match!"
-            })
-        if User.objects.filter(email=email).exists():
-            return render(request, self.template_name, {
-                "message": "Email address is already in use!"
-            })
-
-        try:
-            with transaction.atomic():
-                user = User.objects.create_user(username, email, password)
-                user.save()
-                
-                # Create users manager model ...
-                # TO DO
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-
-                # Send welcome email
-                self.send_welcome_email(email)
-
-            return HttpResponseRedirect(reverse("manager:index"))
-        except IntegrityError:
-            return render(request, self.template_name, {
-                "message": "Username already taken!"
-            })
+                "form": form,
+                })
 
     def send_welcome_email(self, email):
         subject = 'Welcome to Circuitrix!'

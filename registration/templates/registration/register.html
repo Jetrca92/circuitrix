@@ -14,9 +14,11 @@
                     <h1 class="fw-bold mb-0 fs-2">Register</h1>
                 </div>
                 <div class="modal-body p-5 pt-0">
-                    {% if message %}
-                    <div class="text-danger fw-bold">{{ message }}</div>
-                    {% endif %}
+                    {% for error in form.errors.values %}
+                        <div class="text-danger fw-bold mb-3">
+                        {{ error|join:", " }}
+                        </div>
+                    {% endfor %}
                     <form action="{% url 'registration:register' %}" method="post" role="form" class="row gy-2 gx-2">
                         {% csrf_token %}
                         <div class="form-floating mb-3">
@@ -48,13 +50,3 @@
     </div>
 
 {% endblock %}
-
-
-<div class="form-floating mb-3">
-    <input type="text" name="username" maxlength="150" autofocus="" class="form-control" id="username" required="">
-    <label for="username">Username:</label>
-</div>
-<div class="form-floating mb-3">
-    <input type="text" class="form-control rounded-3" name="username" placeholder="Username" required="required">
-    <label for="username">Username</label>
-</div>
