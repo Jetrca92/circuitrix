@@ -11,12 +11,13 @@
         <title>{% block title %} {% endblock %} | FM</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="{% static 'manager/styles.css' %}" rel="stylesheet" />
+        <script src="{% static 'manager/scripts.js' %}"></script>
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="{% url 'index' %}">Formula Manager</a>
+            <a class="navbar-brand ps-3" href="{% url 'manager:index' %}">Formula Manager</a>
             <!-- Sidebar Toggle-->
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
             <!-- Navbar Search-->
@@ -35,12 +36,12 @@
                         <li><a class="dropdown-item" href="#!">Profile</a></li>
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="">Logout</a></li>
+                        <li><a class="dropdown-item" href="{% url 'registration:logout' %}">Logout</a></li>
                     </ul>
                     {% else %}
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="">Login</a></li>
-                        <li><a class="dropdown-item" href="">Register</a></li>
+                        <li><a class="dropdown-item" href="{% url 'registration:login' %}">Login</a></li>
+                        <li><a class="dropdown-item" href="{% url 'registration:register' %}">Register</a></li>
                     </ul>
                     {% endif %}
                 </li>
@@ -143,11 +144,11 @@
                     {% else %}
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'registration:login' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Login
                             </a>
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'registration:register' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Register
                             </a>
