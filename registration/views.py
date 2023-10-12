@@ -1,6 +1,5 @@
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
-from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from django.http import HttpResponseRedirect, HttpResponse
@@ -11,6 +10,7 @@ from django.views import View
 from allauth.account.signals import user_signed_up
 from manager.models import User
 from registration.forms import RegistrationForm, LoginForm, CustomPasswordResetForm, CustomSetPasswordForm
+from registration.helpers import send_welcome_email
 
 
 class RegisterView(View):
@@ -37,7 +37,7 @@ class RegisterView(View):
                     
                     # Log user in and Send welcome email
                     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                    self.send_welcome_email(email)
+                    send_welcome_email(email)
                 return HttpResponseRedirect(reverse("manager:index"))
             except IntegrityError:
                 return render(request, self.template_name, {
@@ -48,24 +48,16 @@ class RegisterView(View):
             return render(request, self.template_name, {
                 "form": form,
                 })
-
-    def send_welcome_email(self, email):
-        subject = 'Welcome to Circuitrix!'
-        message = 'Greetings! You have successfully registered on our portal. Good luck!'
-        from_email = 'settings.EMAIL_HOST_USER'
-        recipient_list = [email]
-        send_mail(subject, message, from_email, recipient_list, fail_silently=True)
-
     
+
 # Sends welcome email if user signs up with google acc    
 @receiver(user_signed_up)
 def send_google_registration_email(request, user, **kwargs):
     if user.socialaccount_set.filter(provider='google').exists():
-        subject = 'Welcome to Circuitrix!'
-        message = 'Greetings! You have successfully registered on our portal. Good luck!'
-        from_email = 'settings.EMAIL_HOST_USER'
         email = user.email
-        send_mail(subject, message, from_email, [email], fail_silently=True)
+        send_welcome_email(email)
+        # Create users manager model ...
+        # TO DO
     return HttpResponseRedirect(reverse("manager:index"))
 
 
