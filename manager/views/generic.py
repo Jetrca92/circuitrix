@@ -1,6 +1,4 @@
-import random
-
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -23,13 +21,14 @@ class IndexView(View):
                 # TO DO Handle if manager doesn't exist
                 return render(self.request, self.template_name)
             except Team.DoesNotExist:
+                return HttpResponseRedirect(reverse("manager:create_team"))
                 # TO DO Handle if team doesn't exist
                 return render(request, self.template_name)
 
         return render(request, self.template_name)
     
 
-class CreateTeamView(View):
+class CreateTeamView(LoginRequiredMixin, View):
     
     def get(self, request):
         user = request.user
@@ -46,7 +45,6 @@ class CreateTeamView(View):
         }
         return render(request, "manager/create_team.html", context)
 
-    
     def post(self, request):
         team_name = request.POST.get("team_name")
         team_country = int(request.POST.get("team_country"))
@@ -72,7 +70,7 @@ class CreateTeamView(View):
         generate_car(team)
         team.save()
         
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("manager:index"))
 
     def render_error(self, request, message):
         form = NewTeamForm()
