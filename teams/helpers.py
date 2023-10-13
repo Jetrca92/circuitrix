@@ -2,13 +2,14 @@ import random
 
 from datetime import datetime, timedelta
 
-from manager.constants import gb_names, gb_surnames
+from teams.constants import uk_names, uk_surnames, us_names, us_surnames, fr_names, fr_surnames, es_names, es_surnames, mc_names, mc_surnames, it_names, it_surnames, at_names, at_surnames, be_names, be_surnames, de_names, de_surnames, jp_names, jp_surnames
 from manager.models import Country, Driver, Car, LeadDesigner, RaceMechanic
 
 
-def generate_driver_name():
-    name = random.choice(gb_names)
-    surname = random.choice(gb_surnames)
+def generate_driver_name(country):
+    country_code = country.short_name.lower()
+    name = random.choice(country_code + "_names")
+    surname = random.choice(country_code + "_surnames")
     return name, surname
 
 
@@ -18,7 +19,7 @@ def generate_driver_skills(overall):
 
     while True:
         try:
-            # Generate a list of random integers based on the weighted distribution
+            # Generate a list of random integers based on weights
             skills = random.choices(range(1, 11), weights=skill_weights, k=num_skills)
 
             # Calculate the remaining sum and add it to the highest-value skill

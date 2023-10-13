@@ -36,8 +36,8 @@ class Team(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=30)
-    #short_name = models.CharField(max_length=3)
-    #logo_location = models.CharField(max_length=50, default="manager/united_kingdom.png")
+    short_name = models.CharField(max_length=3, null=True)
+    logo_location = models.CharField(max_length=50, default="manager/flags/blank.png")
     def __str__(self):
         return self.name  
     

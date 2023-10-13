@@ -1,13 +1,12 @@
 from django.urls import include, path
 
-from manager.views.generic import IndexView, CreateTeamView
+from manager.views.generic import IndexView
 
 app_name = "manager"
 
 
 generic_patterns = [
     path("", IndexView.as_view(), name="index"),
-    path("create_team", CreateTeamView.as_view(), name="create_team"),
 ]
 
 
