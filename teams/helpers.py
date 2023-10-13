@@ -6,10 +6,25 @@ from teams.constants import uk_names, uk_surnames, us_names, us_surnames, fr_nam
 from manager.models import Country, Driver, Car, LeadDesigner, RaceMechanic
 
 
+country_name_surname_lists = {
+    'UK': (uk_names, uk_surnames),
+    'US': (us_names, us_surnames),
+    'FR': (fr_names, fr_surnames),
+    'ES': (es_names, es_surnames),
+    'MC': (mc_names, mc_surnames),
+    'IT': (it_names, it_surnames),
+    'AT': (at_names, at_surnames),
+    'BE': (be_names, be_surnames),
+    'DE': (de_names, de_surnames),
+    'JP': (jp_names, jp_surnames),
+}
+
+
 def generate_driver_name(country):
-    country_code = country.short_name.lower()
-    name = random.choice(country_code + "_names")
-    surname = random.choice(country_code + "_surnames")
+    country_code = country.short_name
+    name_list, surname_list = country_name_surname_lists[country_code]
+    name = random.choice(name_list)
+    surname = random.choice(surname_list)
     return name, surname
 
 
@@ -30,7 +45,8 @@ def generate_driver_skills(overall):
             # Check if any skill is negative
             if any(skill < 0 for skill in skills):
                 raise ValueError("Negative skill generated")
-
+            if any(skill > 7 for skill in skills):
+                raise ValueError("Single skill too high!")
             # Shuffle the list and assign the skills to named variables
             random.shuffle(skills)
             racecraft, pace, focus, car_management, feedback = skills
@@ -45,8 +61,8 @@ def generate_driver_skills(overall):
 
 def generate_drivers(team):
     # Generate names and birthdate
-    driver1_name, driver1_surname = generate_driver_name()
-    driver2_name, driver2_surname = generate_driver_name()
+    driver1_name, driver1_surname = generate_driver_name(team.location)
+    driver2_name, driver2_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
     now = datetime.now()
     delta1 = timedelta(days=random.randint(1512, 1900))
@@ -92,7 +108,7 @@ def generate_drivers(team):
 
 def generate_lead_designer(team):
     # Generate lead designers name and birthdate
-    lead_designer_name, lead_designer_surname = generate_driver_name()
+    lead_designer_name, lead_designer_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
     delta3 = timedelta(days=random.randint(2100, 2900))
     now = datetime.now()
@@ -112,8 +128,8 @@ def generate_lead_designer(team):
 
 def generate_race_mechanics(team):
     # Generate mechanics names and birthdays
-    race_mechanic1_name, race_mechanic1_surname = generate_driver_name()
-    race_mechanic2_name, race_mechanic2_surname = generate_driver_name()
+    race_mechanic1_name, race_mechanic1_surname = generate_driver_name(team.location)
+    race_mechanic2_name, race_mechanic2_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
     delta4 = timedelta(days=random.randint(2100,2900))
     delta5 = timedelta(days=random.randint(2100,2900))

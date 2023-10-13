@@ -47,7 +47,7 @@ class RegisterView(View):
             # Handle the case when the form is not valid
             return render(request, self.template_name, {
                 "form": form,
-                })
+            })
     
 
 # Sends welcome email if user signs up with google acc    

@@ -18,7 +18,7 @@ class IndexView(View):
                 # TO DO Handle if manager doesn't exist
                 return render(self.request, self.template_name)
             except Team.DoesNotExist:
-                return HttpResponseRedirect(reverse("manager:create_team"))
+                return HttpResponseRedirect(reverse("teams:create_team"))
                 # TO DO Handle if team doesn't exist
                 return render(request, self.template_name)
 
