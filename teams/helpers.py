@@ -161,4 +161,4 @@ def generate_race_mechanics(team):
 def generate_car(team):
     car = Car(owner=team)
     car.save()
-    team.car = car
+    team.car.add(car)

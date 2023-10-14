@@ -7,6 +7,28 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
 
 
+class Staff(models.Model):
+    name = models.CharField(max_length=20)
+    surname = models.CharField(max_length=20)
+    country = models.ForeignKey('Country', on_delete=models.CASCADE)
+    date_of_birth = models.DateTimeField()
+
+    class Meta:
+        abstract = True
+
+    # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
+    def age(self):
+        now = timezone.now()
+        birth_date = self.date_of_birth
+        age_days = (now - birth_date).days
+        age_years = int (age_days / 84)
+        age_days = age_days % 84
+        return f"{age_years} years, {age_days} days"
+
+    def __str__(self):
+        return self.name
+
+
 class Manager(models.Model):
     name = models.CharField(null=True, max_length=20, default=None, unique=True)
     avatar = models.CharField(default="manager/avatar.png", max_length=100)
@@ -27,6 +49,7 @@ class Team(models.Model):
     drivers = models.ManyToManyField('Driver', blank=True, related_name="team_drivers")
     lead_designer = models.ForeignKey('LeadDesigner', blank=True, null=True, on_delete=models.CASCADE, related_name="team_designer")
     race_mechanics = models.ManyToManyField('RaceMechanic', blank=True, related_name="team_race_mechanics")
+    car = models.ManyToManyField('Car', blank=True, related_name="team_car")
     total_fans = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -41,11 +64,7 @@ class Country(models.Model):
         return self.name  
     
 
-class Driver(models.Model):
-    name = models.CharField(max_length=20)
-    surname = models.CharField(max_length=20)
-    country = models.ForeignKey('Country', on_delete=models.CASCADE)
-    date_of_birth = models.DateTimeField()
+class Driver(Staff):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="driver_team")
     experience = models.PositiveIntegerField(default=0)
     skill_overall = models.PositiveIntegerField()
@@ -54,24 +73,9 @@ class Driver(models.Model):
     skill_focus = models.PositiveIntegerField()
     skill_car_management = models.PositiveIntegerField()
     skill_feedback = models.PositiveIntegerField()
-
-    def age(self):
-        now = timezone.now()
-        birth_date = self.date_of_birth
-        age_days = (now - birth_date).days
-        age_years = int (age_days / 84)
-        age_days = age_days % 84
-        return f"{age_years} years, {age_days} days"
-
-    def __str__(self):
-        return self.name
     
 
-class LeadDesigner(models.Model):
-    name = models.CharField(max_length=20)
-    surname = models.CharField(max_length=20)
-    country = models.ForeignKey('Country', on_delete=models.CASCADE)
-    date_of_birth = models.DateTimeField()
+class LeadDesigner(Staff):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="lead_designer_team")
     skill = models.PositiveIntegerField(default=5)
 
@@ -87,24 +91,9 @@ class LeadDesigner(models.Model):
         return self.name
 
 
-class RaceMechanic(models.Model):
-    name = models.CharField(max_length=20)
-    surname = models.CharField(max_length=20)
-    country = models.ForeignKey('Country', on_delete=models.CASCADE)
-    date_of_birth = models.DateTimeField()
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="race_mechanic")
+class RaceMechanic(Staff):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="race_mechanic_team")
     skill = models.PositiveIntegerField(default=5)
-
-    def age(self):
-        now = timezone.now()
-        birth_date = self.date_of_birth
-        age_days = (now - birth_date).days
-        age_years = int (age_days / 84)
-        age_days = age_days % 84
-        return f"{age_years} years, {age_days} days"
-
-    def __str__(self):
-        return self.name
 
 
 class Car(models.Model):
