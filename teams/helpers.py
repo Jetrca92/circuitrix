@@ -63,11 +63,6 @@ def generate_drivers(team):
     driver1_name, driver1_surname = generate_driver_name(team.location)
     driver2_name, driver2_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
-    now = datetime.now()
-    delta1 = timedelta(days=random.randint(1512, 1900))
-    driver1_birth_date = now - delta1
-    delta2 = timedelta(days=random.randint(1512, 1900))
-    driver2_birth_date = now - delta2
 
     # Generate driver skills
     racecraft, pace, focus, car_management, feedback = generate_driver_skills(25)
@@ -77,7 +72,7 @@ def generate_drivers(team):
         name=driver1_name, 
         surname=driver1_surname, 
         country=team_country_object,                    
-        date_of_birth=driver1_birth_date, 
+        date_of_birth=driver_random_birth_date(), 
         team=team, 
         skill_overall=25, 
         skill_racecraft=racecraft, 
@@ -91,8 +86,9 @@ def generate_drivers(team):
         name=driver2_name, 
         surname=driver2_surname, 
         country=team_country_object, 
-        date_of_birth=driver2_birth_date, 
-        team=team, skill_overall=25, 
+        date_of_birth=driver_random_birth_date(), 
+        team=team, 
+        skill_overall=25, 
         skill_racecraft=racecraft1, 
         skill_pace=pace1, 
         skill_focus=focus1, 
@@ -105,19 +101,30 @@ def generate_drivers(team):
     team.drivers.add(driver1, driver2)
 
 
+def driver_random_birth_date():
+    now = datetime.now()
+    delta = timedelta(days=random.randint(1512, 1900))
+    driver_birth_date = now - delta
+    return driver_birth_date
+
+
+def staff_random_birth_date():
+    now = datetime.now()
+    delta = timedelta(days=random.randint(2100, 2900))
+    staff_birth_date = now - delta
+    return staff_birth_date
+
+
 def generate_lead_designer(team):
     # Generate lead designers name and birthdate
     lead_designer_name, lead_designer_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
-    delta3 = timedelta(days=random.randint(2100, 2900))
-    now = datetime.now()
-    lead_designer_birth_date = now - delta3
 
     lead_designer = LeadDesigner(
         name=lead_designer_name, 
         surname=lead_designer_surname, 
         country=team_country_object,
-        date_of_birth=lead_designer_birth_date, 
+        date_of_birth=staff_random_birth_date(), 
         team=team
     )
 
@@ -130,17 +137,12 @@ def generate_race_mechanics(team):
     race_mechanic1_name, race_mechanic1_surname = generate_driver_name(team.location)
     race_mechanic2_name, race_mechanic2_surname = generate_driver_name(team.location)
     team_country_object = Country.objects.get(id=team.location.id)
-    delta4 = timedelta(days=random.randint(2100,2900))
-    delta5 = timedelta(days=random.randint(2100,2900))
-    now = datetime.now()
-    race_mechanic1_birth_date = now - delta4
-    race_mechanic2_birth_date = now - delta5
 
     race_mechanic1 = RaceMechanic(
         name=race_mechanic1_name, 
         surname=race_mechanic1_surname, 
         country=team_country_object,
-        date_of_birth=race_mechanic1_birth_date, 
+        date_of_birth=staff_random_birth_date(), 
         team=team
     )
 
@@ -148,7 +150,7 @@ def generate_race_mechanics(team):
         name=race_mechanic2_name, 
         surname=race_mechanic2_surname, 
         country=team_country_object,
-        date_of_birth=race_mechanic2_birth_date, 
+        date_of_birth=staff_random_birth_date(), 
         team=team
     )
     
