@@ -18,6 +18,7 @@ from teams.helpers import (
 
 class CreateTeamView(LoginRequiredMixin, View):
     template_name = "teams/create_team.html"
+
     def get(self, request):
         user = request.user
         manager = Manager.objects.get(user=user)
@@ -32,6 +33,7 @@ class CreateTeamView(LoginRequiredMixin, View):
 
     def post(self, request):
         form = NewTeamForm(request.POST)
+        countries = Country.objects.all()
         if form.is_valid():
             team_name = form.cleaned_data["team_name"]
             team_country = form.cleaned_data["team_country"]
@@ -55,9 +57,6 @@ class CreateTeamView(LoginRequiredMixin, View):
         else:
             return render(request, self.template_name, {
                 "form": form,
+                "manager": manager,
+                "countries": countries,
             })
-
-    def render_error(self, request, message):
-        form = NewTeamForm()
-        countries = Country.objects.all()
-        return render(request, "teams/create_team.html", {"message": message, "countries": countries, "form": form})
