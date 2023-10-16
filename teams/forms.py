@@ -19,7 +19,9 @@ class NewTeamForm(forms.Form):
         return team_name
 
     def clean_team_country(self):
-        team_country = self.cleaned_data.get("team_country")
-        if team_country == "selected":
+        team_id = self.cleaned_data.get("team_country")
+        if team_id == "selected":
             raise forms.ValidationError("Select a country!")
-        return team_country
+        if not Country.objects.filter(id=int(team_id)).exists():
+            raise forms.ValidationError("Select a country!")
+        return team_id
