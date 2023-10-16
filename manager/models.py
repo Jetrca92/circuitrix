@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+# One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
+DAYS_IN_A_SEASON = 84
+
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -16,13 +19,13 @@ class Staff(models.Model):
     class Meta:
         abstract = True
 
-    # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
+    
     def age(self):
         now = timezone.now()
         birth_date = self.date_of_birth
         age_days = (now - birth_date).days
-        age_years = int (age_days / 84)
-        age_days = age_days % 84
+        age_years = int (age_days / DAYS_IN_A_SEASON)
+        age_days = age_days % DAYS_IN_A_SEASON
         return f"{age_years} years, {age_days} days"
 
     def __str__(self):
@@ -78,17 +81,6 @@ class Driver(Staff):
 class LeadDesigner(Staff):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="lead_designer_team")
     skill = models.PositiveIntegerField(default=5)
-
-    def age(self):
-        now = timezone.now()
-        birth_date = self.date_of_birth
-        age_days = (now - birth_date).days
-        age_years = int (age_days / 84)
-        age_days = age_days % 84
-        return f"{age_years} years, {age_days} days"
-
-    def __str__(self):
-        return self.name
 
 
 class RaceMechanic(Staff):

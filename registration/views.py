@@ -10,7 +10,7 @@ from django.views import View
 from allauth.account.signals import user_signed_up
 from manager.models import User
 from registration.forms import RegistrationForm, LoginForm, CustomPasswordResetForm, CustomSetPasswordForm
-from registration.helpers import send_welcome_email
+from registration.helpers import send_welcome_email, create_manager_model
 
 
 class RegisterView(View):
@@ -29,11 +29,11 @@ class RegisterView(View):
             username = form.cleaned_data["username"]
             try:
                 with transaction.atomic():
+
+                    # Create user and manager model
                     user = User.objects.create_user(username, email, password)
                     user.save()
-                    
-                    # Create users manager model ...
-                    # TO DO
+                    create_manager_model(user)
                     
                     # Log user in and Send welcome email
                     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -54,10 +54,11 @@ class RegisterView(View):
 @receiver(user_signed_up)
 def send_google_registration_email(request, user, **kwargs):
     if user.socialaccount_set.filter(provider='google').exists():
+
+        # Create users manager model and send welcome email
         email = user.email
         send_welcome_email(email)
-        # Create users manager model ...
-        # TO DO
+        create_manager_model(user)
     return HttpResponseRedirect(reverse("manager:index"))
 
 
