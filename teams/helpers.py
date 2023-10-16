@@ -42,11 +42,10 @@ def generate_driver_skills(overall):
             max_index = skills.index(max(skills))
             skills[max_index] += remaining
 
-            # Check if any skill is negative
-            if any(skill < 0 for skill in skills):
-                raise ValueError("Negative skill generated")
-            if any(skill > 7 for skill in skills):
-                raise ValueError("Single skill too high!")
+            # Check if skill value valid
+            if any(skill < 0 for skill in skills) or any(skill > 7 for skill in skills):
+                raise ValueError("Invalid skill value!")
+            
             # Shuffle the list and assign the skills to named variables
             random.shuffle(skills)
             racecraft, pace, focus, car_management, feedback = skills
