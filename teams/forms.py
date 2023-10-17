@@ -20,7 +20,7 @@ class NewTeamForm(forms.Form):
 
     def clean_team_country(self):
         team_id = self.cleaned_data.get("team_country")
-        if team_id == "selected":
+        if not team_id.isnumeric():
             raise forms.ValidationError("Select a country!")
         if not Country.objects.filter(id=int(team_id)).exists():
             raise forms.ValidationError("Select a country!")

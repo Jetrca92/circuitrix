@@ -34,10 +34,10 @@ class CreateTeamView(LoginRequiredMixin, View):
     def post(self, request):
         form = NewTeamForm(request.POST)
         countries = Country.objects.all()
+        manager = Manager.objects.get(user=request.user)
         if form.is_valid():
             team_name = form.cleaned_data["team_name"]
             team_country = form.cleaned_data["team_country"]
-            manager = Manager.objects.get(user=request.user)
             team_country_object = Country.objects.get(id=int(team_country))
             try:
                 with transaction.atomic():
