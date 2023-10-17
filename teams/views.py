@@ -3,7 +3,7 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.urls import reverse
 
 from teams.forms import NewTeamForm
@@ -73,3 +73,25 @@ class TeamOverviewView(LoginRequiredMixin, DetailView):
     def get_object(self, queryset=None):
         team_id = self.kwargs['id']  # Retrieve the team ID from the URL
         return Team.objects.get(pk=team_id)
+    
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            manager = self.request.user.manager
+            context['manager'] = manager
+            return context
+    
+
+class DriversView(LoginRequiredMixin, ListView):
+    model = Driver
+    template_name="teams/drivers.html"
+    context_object_name = "drivers"
+
+    def get_queryset(self):
+        team = Team.objects.get(pk=self.kwargs['id'])
+        return team.drivers.all()
+
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            manager = self.request.user.manager
+            context['manager'] = manager
+            return context

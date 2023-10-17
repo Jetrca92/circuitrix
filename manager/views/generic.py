@@ -23,7 +23,6 @@ class IndexView(View):
                 return HttpResponseRedirect(reverse("teams:create_team"))
         return render(request, self.template_name, {
             "manager": manager,
-            "team": team,
         })
     
 
