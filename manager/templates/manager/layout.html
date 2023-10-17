@@ -60,10 +60,12 @@
                                 Dashboard
                             </a>
                             <div class="sb-sidenav-menu-heading">My Team</div>
-                            <a class="nav-link" href="">
+                            {% if manager.team %}
+                            <a class="nav-link" href="{% url 'teams:team_overview' manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Overview
                             </a>
+                            {% endif %}
                             <a class="nav-link" href="">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Drivers

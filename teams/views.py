@@ -3,10 +3,11 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from django.views.generic import DetailView
 from django.urls import reverse
 
 from teams.forms import NewTeamForm
-from manager.models import Manager, Team, Country
+from manager.models import Manager, Team, Country, Driver
 from teams.forms import NewTeamForm
 from teams.helpers import (
     generate_car,
@@ -49,6 +50,8 @@ class CreateTeamView(LoginRequiredMixin, View):
                     generate_race_mechanics(team)
                     generate_car(team)
                     team.save()
+                    manager.team = team
+                    manager.save()
                     return HttpResponseRedirect(reverse("manager:index"))
             except IntegrityError:
                 return render(request, self.template_name, {
@@ -60,3 +63,13 @@ class CreateTeamView(LoginRequiredMixin, View):
                 "manager": manager,
                 "countries": countries,
             })
+
+
+class TeamOverviewView(LoginRequiredMixin, DetailView):
+    model = Team
+    template_name = "teams/team_overview.html"
+    context_object_name = "team"
+
+    def get_object(self, queryset=None):
+        team_id = self.kwargs['id']  # Retrieve the team ID from the URL
+        return Team.objects.get(pk=team_id)
