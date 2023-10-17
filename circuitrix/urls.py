@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from manager import views
+from teams import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('manager.urls')),
     path('accounts/', include('allauth.urls')),
     path('registration/', include('registration.urls')),
+    path('team/', include('teams.urls')),
 ]

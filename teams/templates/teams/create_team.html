@@ -1,0 +1,41 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Create a Team
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+    <div class="container col-md-11 px-2 py-5">
+        <div class="col-lg-6">
+            <h1 class="display-5 fw-bold lh-1 mb-3">Create your team</h1>
+            {% for error in form.errors.values %}
+            <div class="text-danger fw-bold mb-3">
+                {{ error|join:", " }}
+            </div>
+            {% endfor %}    
+            <form class="row" action="{% url 'teams:create_team' %}" method="post" role="form">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.team_name.label_tag }}
+                    {{ form.team_name }}
+                </div>
+                <div class="mb-3">
+                    {{ form.team_country.label_tag }}
+                    {{ form.team_country }}
+                </div>
+                {% if form.errors or message %}
+                <div class="mb-3 fw-bold text-danger">
+                    {{ message }}
+                </div>
+                {% endif %}
+                <div>
+                    <button class="btn rounded-3 btn-secondary" type="submit">Create your Team</button>
+                </div>
+            </form>
+                
+        </div>
+    </div>
+
+{% endblock %}

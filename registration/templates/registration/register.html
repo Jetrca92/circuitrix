@@ -15,9 +15,9 @@
                 </div>
                 <div class="modal-body p-5 pt-0">
                     {% for error in form.errors.values %}
-                        <div class="text-danger fw-bold mb-3">
+                    <div class="text-danger fw-bold mb-3">
                         {{ error|join:", " }}
-                        </div>
+                    </div>
                     {% endfor %}
                     <form action="{% url 'registration:register' %}" method="post" role="form" class="row gy-2 gx-2">
                         {% csrf_token %}
