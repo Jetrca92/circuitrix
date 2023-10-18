@@ -1,0 +1,36 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Car - {{ manager.team.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+
+    <h1 class="display-5 fw-bold lh-1 mb-5">Car</h1>
+    <p>
+        The car is the most important factor in achieving success - it doesn't matter how skilled your drivers 
+        or how clever your tactics, if your car isn't good enough you're not going to win any races.
+    </p>
+    <div class="d-flex gap-5">
+        <div>
+            <img src="{% static "manager/car1.png" %}" class="d-block img-fluid" alt="Car1" width="525" height="auto" loading="lazy">
+        </div>
+        <div>
+            <p class="card-text">Engine: {{ car.engine }}</p>
+            <p class="card-text">Gearbox: {{ car.gearbox }}</p>
+            <p class="card-text">Brakes: {{ car.brakes }}</p>
+            <p class="card-text">Front Wing: {{ car.front_wing }}</p>
+            <p class="card-text">Suspension: {{ car.suspension }}</p>
+            <p class="card-text">Rear Wing: {{ car.rear_wing }}</p>
+        </div>
+    </div>
+</div>
+
+        
+    
+      
+
+{% endblock %}

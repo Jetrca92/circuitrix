@@ -1,0 +1,26 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+{{ manager.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center mb-3 gap-3">
+            <h1 class="display-5 fw-bold lh-1">{{ manager.name }}</h1>
+            <img src="{% static manager.avatar %}" alt="united-kingdom-flag" width="auto" height="35" loading="lazy">
+            <span class="text-muted">({{ manager.id }})</span>
+        </div>
+        <div>
+            <ul>
+                <li><span class="text-muted">Joined: </span>{{ manager.user.date_joined }}</li>
+                <li><span class="text-muted">Team: </span><a href="{% url 'teams:team_overview' manager.team.id %}" class="link-dark">{{ manager.team.name }}</a></li> 
+            </ul>    
+        </div>
+    </div>
+</div>
+
+{% endblock %}

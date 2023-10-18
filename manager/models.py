@@ -53,7 +53,7 @@ class Team(models.Model):
     drivers = models.ManyToManyField('Driver', blank=True, related_name="team_drivers")
     lead_designer = models.ForeignKey('LeadDesigner', blank=True, null=True, on_delete=models.CASCADE, related_name="team_designer")
     race_mechanics = models.ManyToManyField('RaceMechanic', blank=True, related_name="team_race_mechanics")
-    car = models.ManyToManyField('Car', blank=True, related_name="team_car")
+    car = models.ForeignKey('Car', on_delete=models.CASCADE, blank=True, null=True, related_name="team_car")
     total_fans = models.PositiveIntegerField(default=0)
 
     def __str__(self):
