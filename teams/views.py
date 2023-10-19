@@ -80,8 +80,8 @@ class TeamOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     context_object_name = "team"
 
     def get_object(self, queryset=None):
-        team_id = self.kwargs['id']  # Retrieve the team ID from the URL
-        return Team.objects.get(pk=team_id)
+        team = Team.objects.get(pk=self.kwargs['id']  )
+        return team
     
 
 class DriversView(LoginRequiredMixin, ManagerContextMixin, ListView):
@@ -93,6 +93,12 @@ class DriversView(LoginRequiredMixin, ManagerContextMixin, ListView):
         team = Team.objects.get(pk=self.kwargs['id'])
         return team.drivers.all()
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(pk=self.kwargs['id'])
+        context['team'] = team
+        return context
+    
 
 class DriverPageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Driver
@@ -100,8 +106,8 @@ class DriverPageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     context_object_name = "driver"
 
     def get_object(self, queryset=None):
-        driver_id = self.kwargs['id']  
-        return Driver.objects.get(pk=driver_id)
+        driver = Driver.objects.get(pk=self.kwargs['id'])  
+        return driver
     
 
 class TeamOwnerView(LoginRequiredMixin, ManagerContextMixin, DetailView):
