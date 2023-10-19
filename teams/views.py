@@ -100,7 +100,7 @@ class DriverPageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     context_object_name = "driver"
 
     def get_object(self, queryset=None):
-        driver_id = self.kwargs['id']  # Retrieve the team ID from the URL
+        driver_id = self.kwargs['id']  
         return Driver.objects.get(pk=driver_id)
     
 
