@@ -16,13 +16,13 @@
         </div>
         <div>
             <ul>
-                <li><span class="text-muted">Owner: </span><a href="{% url 'teams:team_owner' manager.team.id %}" class="link-dark">{{ team.owner.name }}</a></li>
+                <li><span class="text-muted">Owner: </span><a href="{% url 'teams:team_owner' team.id %}" class="link-dark">{{ team.owner.name }}</a></li>
                 <li><span class="text-muted">Fans: </span>{{ team.total_fans }}</li> 
                 <li><span class="text-muted">Championship: </span><a href="" class="link-dark">{{ team.league.name }}</a></li>
                 <li><span class="text-muted">Drivers: </span>
                 <ul>
                     {% for driver in team.drivers.all %}
-                    <li><a href="" class="link-dark">{{ driver.name }} {{ driver.surname }}</a></li>
+                    <li><a href="{% url 'teams:driver_page' driver.id %}" class="link-dark">{{ driver.name }} {{ driver.surname }}</a></li>
                     {% endfor %}
                 </ul></li>
             </ul>

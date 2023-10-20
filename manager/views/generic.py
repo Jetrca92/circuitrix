@@ -21,7 +21,7 @@ class IndexView(View):
             except Team.DoesNotExist:
                 return HttpResponseRedirect(reverse("teams:create_team"))
         return render(request, self.template_name, {
-            "manager": manager,
+            "current_user_manager": manager,
         })
     
 
