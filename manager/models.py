@@ -36,6 +36,7 @@ class Manager(models.Model):
     name = models.CharField(null=True, max_length=20, default=None, unique=True)
     avatar = models.CharField(default="manager/avatar.png", max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.OneToOneField('Team', on_delete=models.CASCADE, blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
     level = models.IntegerField(default=1)
     experience = models.IntegerField(default=0)
@@ -45,14 +46,14 @@ class Manager(models.Model):
     
 
 class Team(models.Model):
-    owner = models.ForeignKey(Manager, on_delete=models.CASCADE)
+    owner = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name="team_owner")
     name = models.CharField(max_length=30, unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
     drivers = models.ManyToManyField('Driver', blank=True, related_name="team_drivers")
     lead_designer = models.ForeignKey('LeadDesigner', blank=True, null=True, on_delete=models.CASCADE, related_name="team_designer")
     race_mechanics = models.ManyToManyField('RaceMechanic', blank=True, related_name="team_race_mechanics")
-    car = models.ManyToManyField('Car', blank=True, related_name="team_car")
+    car = models.ForeignKey('Car', on_delete=models.CASCADE, blank=True, null=True, related_name="team_car")
     total_fans = models.PositiveIntegerField(default=0)
 
     def __str__(self):

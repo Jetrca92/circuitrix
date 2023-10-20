@@ -55,16 +55,18 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">My Office</div>
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="{% url 'manager:index' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
                             <div class="sb-sidenav-menu-heading">My Team</div>
-                            <a class="nav-link" href="">
+                            {% if current_user_manager.team %}
+                            <a class="nav-link" href="{% url 'teams:team_overview' current_user_manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Overview
                             </a>
-                            <a class="nav-link" href="">
+                            
+                            <a class="nav-link" href="{% url 'teams:drivers' current_user_manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Drivers
                             </a>
@@ -72,11 +74,11 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Races
                             </a>
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'teams:staff' current_user_manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Staff
                             </a>
-                            <a class="nav-link" href="">
+                            <a class="nav-link" href="{% url 'teams:car' current_user_manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Car
                             </a>
@@ -84,6 +86,7 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Championship
                             </a>
+                            {% endif %}
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                                 Layouts

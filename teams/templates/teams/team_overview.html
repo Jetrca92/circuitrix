@@ -1,0 +1,33 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+{{ team.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center mb-5 gap-3">
+            <h1 class="display-5 fw-bold lh-1">{{ team.name }}</h1>
+            <img src="{% static "manager/united-kingdom-flag.png" %}" alt="united-kingdom-flag" width="auto" height="35" loading="lazy">
+            <span class="text-muted">({{ team.id }})</span>
+        </div>
+        <div>
+            <ul>
+                <li><span class="text-muted">Owner: </span><a href="{% url 'teams:team_owner' team.id %}" class="link-dark">{{ team.owner.name }}</a></li>
+                <li><span class="text-muted">Fans: </span>{{ team.total_fans }}</li> 
+                <li><span class="text-muted">Championship: </span><a href="" class="link-dark">{{ team.league.name }}</a></li>
+                <li><span class="text-muted">Drivers: </span>
+                <ul>
+                    {% for driver in team.drivers.all %}
+                    <li><a href="{% url 'teams:driver_page' driver.id %}" class="link-dark">{{ driver.name }} {{ driver.surname }}</a></li>
+                    {% endfor %}
+                </ul></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

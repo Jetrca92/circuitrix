@@ -1,0 +1,37 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+    Drivers - {{ team.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <h1 class="display-5 fw-bold lh-1 mb-5">Drivers</h1>
+    {% for driver in drivers %}
+    <hr class="my-4">
+    <div>
+        <div class="card-header">
+            <h5><a href="{% url 'teams:driver_page' driver.id %}" class="link-dark">{{ driver.name }} {{ driver.surname }}</a></h5>
+        </div>
+        <div class="card-body d-flex gap-5">
+            <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
+            <div>
+                <p class="card-text">Team: <a href="{% url 'teams:team_overview' team.id %}" class="link-dark">{{ driver.team }}</a></p>
+                <p class="card-text">Age: {{ driver.age }}</p>
+                <p class="card-text">Overall: {{ driver.skill_overall }}</p>
+            </div>
+            <div>
+                <p class="card-text">Racecraft: {{ driver.skill_racecraft }}</p>
+                <p class="card-text">Pace: {{ driver.skill_pace }}</p>
+                <p class="card-text">Focus: {{ driver.skill_focus }}</p>
+                <p class="card-text">Car Management: {{ driver.skill_car_management }}</p>
+                <p class="card-text">Feedback: {{ driver.skill_feedback }}</p>
+            </div>
+        </div>
+    </div>        
+    {% endfor %}
+</div>
+
+{% endblock %}

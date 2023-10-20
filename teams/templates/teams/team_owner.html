@@ -1,0 +1,26 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+{{ owner.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center mb-3 gap-3">
+            <h1 class="display-5 fw-bold lh-1">{{ owner.name }}</h1>
+            <img src="{% static owner.avatar %}" alt="united-kingdom-flag" width="auto" height="35" loading="lazy">
+            <span class="text-muted">({{ owner.id }})</span>
+        </div>
+        <div>
+            <ul>
+                <li><span class="text-muted">Joined: </span>{{ owner.user.date_joined }}</li>
+                <li><span class="text-muted">Team: </span><a href="{% url 'teams:team_overview' owner.team.id %}" class="link-dark">{{ owner.team.name }}</a></li> 
+            </ul>    
+        </div>
+    </div>
+</div>
+
+{% endblock %}

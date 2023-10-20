@@ -11,16 +11,18 @@ class IndexView(View):
     template_name = "manager/index.html"
 
     def get(self, request):
+        manager = None
         if request.user.is_authenticated:
             try:
                 manager = Manager.objects.get(user=request.user)
-                team = Team.objects.get(owner=manager)
+                Team.objects.get(owner=manager)
             except Manager.DoesNotExist:
                 create_manager_model(request.user)
-                # TO DO Handle if manager doesn't exist
             except Team.DoesNotExist:
                 return HttpResponseRedirect(reverse("teams:create_team"))
-        return render(request, self.template_name)
+        return render(request, self.template_name, {
+            "current_user_manager": manager,
+        })
     
 
 
