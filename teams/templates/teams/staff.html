@@ -1,7 +1,7 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-Staff - {{ manager.team.name }}
+Staff - {{ team.name }}
 {% endblock %}
 
 {% block main %}
@@ -16,10 +16,10 @@ Staff - {{ manager.team.name }}
         <div class="card-body d-flex gap-5">
             <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
             <div>
-                <h5>{{ manager.team.lead_designer.name }} {{ manager.team.lead_designer.surname }}</h5>
+                <h5>{{ team.lead_designer.name }} {{ team.lead_designer.surname }}</h5>
                 <p class="card-text">
-                    Lead designer with {{ manager.team.lead_designer.skill }} skill. 
-                    He is {{ manager.team.lead_designer.age }} old.
+                    Lead designer with {{ team.lead_designer.skill }} skill. 
+                    He is {{ team.lead_designer.age }} old.
                 </p>
             </div>
         </div>

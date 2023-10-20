@@ -113,7 +113,7 @@ class DriverPageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
 class TeamOwnerView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Manager
     template_name = "teams/team_owner.html"
-    context_object_name = "manager"
+    context_object_name = "owner"
 
     def get_object(self, queryset=None):
         team = Team.objects.get(pk=self.kwargs['id'])
@@ -128,6 +128,12 @@ class TeamStaffView(LoginRequiredMixin, ManagerContextMixin, ListView):
     def get_queryset(self):
         team = Team.objects.get(pk=self.kwargs['id'])
         return team.race_mechanics.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(pk=self.kwargs['id'])
+        context['team'] = team
+        return context
     
 
 class TeamCarView(LoginRequiredMixin, ManagerContextMixin, DetailView):

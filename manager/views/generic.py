@@ -15,7 +15,7 @@ class IndexView(View):
         if request.user.is_authenticated:
             try:
                 manager = Manager.objects.get(user=request.user)
-                team = Team.objects.get(owner=manager)
+                Team.objects.get(owner=manager)
             except Manager.DoesNotExist:
                 create_manager_model(request.user)
             except Team.DoesNotExist:
