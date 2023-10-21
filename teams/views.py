@@ -7,8 +7,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 from django.urls import reverse
 
-from teams.forms import NewTeamForm
-from manager.models import Manager, Team, Country, Driver, LeadDesigner, RaceMechanic, Car
+from manager.models import Manager, Team, Country, Driver, RaceMechanic, Car, Race
 from teams.forms import NewTeamForm
 from teams.helpers import (
     generate_car,
@@ -144,3 +143,19 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_object(self, queryset=None):
         team = Team.objects.get(pk=self.kwargs['id'])
         return team.car
+    
+#TO DO
+class TeamRacesView(LoginRequiredMixin, ManagerContextMixin, ListView):
+    model = Race
+    template_name="teams/drivers.html"
+    context_object_name = "drivers"
+
+    def get_queryset(self):
+        team = Team.objects.get(pk=self.kwargs['id'])
+        return team.drivers.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(pk=self.kwargs['id'])
+        context['team'] = team
+        return context
