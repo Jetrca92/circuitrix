@@ -1,5 +1,9 @@
+from django.db import transaction
+
 from manager.models import Championship
 
+
+@transaction.atomic
 def assign_championship(team):
     max_teams_in_championship = 10
     championships = Championship.objects.order_by('division')
