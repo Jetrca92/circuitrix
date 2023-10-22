@@ -8,6 +8,7 @@ from django.views.generic.base import ContextMixin
 from django.urls import reverse
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, Car, Race
+from races.helpers import assign_championship
 from teams.forms import NewTeamForm
 from teams.helpers import (
     generate_car,
@@ -57,6 +58,7 @@ class CreateTeamView(LoginRequiredMixin, View):
                     generate_lead_designer(team)
                     generate_race_mechanics(team)
                     generate_car(team)
+                    assign_championship(team)
                     team.save()
                     manager.team = team
                     manager.save()
