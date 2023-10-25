@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from manager.models import Championship
+from manager.models import Championship, Racetrack, Country
 
 
 @transaction.atomic
@@ -37,3 +37,30 @@ def assign_championship(team):
         c.teams.add(team)
         team.championship = c
         team.save()
+
+
+@transaction.atomic
+def create_racetracks(racetracks):
+    for code, racetrack in racetracks.items():
+        location=Country.objects.get(short_name=racetrack["location"])
+        r = Racetrack(
+            name=racetrack["name"],
+            location=location,
+            lap_length_km=racetrack["lap_length_km"],
+            total_laps=racetrack["total_laps"],
+            straights=racetrack["straights"],
+            slow_corners=racetrack["slow_corners"],
+            fast_corners=racetrack["fast_corners"],
+        )
+        r.save()
+
+
+@transaction.atomic
+def create_countries(countries):
+    for code, country in countries.items():
+        c = Country(
+            name=country["name"],
+            short_name=country["short_name"],
+            logo_location=country["logo"],
+        )
+        c.save()

@@ -157,7 +157,7 @@ class RaceResult(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     position = models.PositiveIntegerField()
-    best_lap = models.TimeField()
+    best_lap = models.DurationField()
 
     def __str__(self):
         return f"{self.race.name} - {self.driver.name} - {self.position}"    
