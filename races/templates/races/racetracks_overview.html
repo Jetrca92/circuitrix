@@ -1,7 +1,7 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-{{ championship.name }}
+Racetracks - {{ championship.name }}
 {% endblock %}
 
 {% block main %}
@@ -10,25 +10,26 @@
 <div class="container col-md-11 px-2 py-5">
     <div class="d-flex align-items-center mb-3 gap-3">
         <h1 class="display-5 fw-bold lh-1">{{ championship.name }}</h1>
-        <img src="{% static "manager/united-kingdom-flag.png" %}" alt="united-kingdom-flag" width="25" height="35" loading="lazy">
         <span class="text-muted">({{ championship.id }})</span>
     </div>
     <div>
-        <h4 class="fw-bold lh-1">Team standings</h4>
+        <h4 class="fw-bold lh-1">Racetracks</h4>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Team</th>
-                    <th scope="col">Points</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Lap length</th>
                 </tr>
             </thead>
             <tbody>
-                {% for team in championship.teams.all %}
+                {% for racetrack in racetracks %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}.</th>
-                    <td><a href="{% url 'teams:team_overview' team.id %}" class="link-dark">{{ team.name }}</a></td>
-                    <td>1</td>
+                    <td><a href="{% url 'races:racetrack' racetrack.id %}" class="link-dark">{{ racetrack.name }}</a></td>
+                    <td><img src="{% static "manager/united-kingdom-flag.png" %}" alt="united-kingdom-flag" width="25" height="35" loading="lazy"></td>
+                    <td>{{ racetrack.lap_length_km }} km</td>
                 </tr>
                 {% endfor %}
             </tbody>

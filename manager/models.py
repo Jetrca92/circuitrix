@@ -112,6 +112,7 @@ class Racetrack(models.Model):
     location = models.ForeignKey(Country, on_delete=models.CASCADE)
     lap_length_km = models.FloatField()
     total_laps = models.PositiveIntegerField()
+    lap_record = models.DurationField(blank=True, null=True)
     # Percentages of different parts of track, total 100%
     straights = models.FloatField()
     slow_corners = models.FloatField()

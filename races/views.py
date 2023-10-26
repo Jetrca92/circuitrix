@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 
-from manager.models import  Team, Championship, Race
+from manager.models import Championship, Race, Racetrack
 
 
 class ManagerContextMixin(ContextMixin):
@@ -22,4 +22,22 @@ class ChampionshipOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailVi
         championship = Championship.objects.get(pk=self.kwargs['id']  )
         return championship
     
+
+class RacetrackView(LoginRequiredMixin, ManagerContextMixin, DetailView):
+    model = Racetrack
+    template_name = "races/racetrack.html"
+    context_object_name = "racetrack"
+
+    def get_object(self, queryset=None):
+        racetrack = Racetrack.objects.get(pk=self.kwargs['id']  )
+        return racetrack
+    
+class RacetracksOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
+    model = Racetrack
+    template_name="races/racetracks_overview.html"
+    context_object_name = "racetracks"
+
+    def get_queryset(self):
+        championship = Championship.objects.get(pk=self.kwargs['id'])
+        return championship.racetracks.all()
 
