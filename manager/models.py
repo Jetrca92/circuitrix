@@ -137,6 +137,7 @@ class Championship(models.Model):
     division = models.PositiveIntegerField(default=1)
     teams = models.ManyToManyField(Team, blank=True, related_name="league_teams")
     races = models.ManyToManyField('Race', blank=True, related_name="league_races")
+    racetracks = models.ManyToManyField(Racetrack, blank=True, related_name="league_racetracks")
 
     def __str__(self):
         return self.name

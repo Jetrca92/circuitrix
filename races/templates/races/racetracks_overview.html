@@ -24,7 +24,7 @@ Racetracks - {{ championship.name }}
                 </tr>
             </thead>
             <tbody>
-                {% for racetrack in racetracks %}
+                {% for racetrack in championship.racetracks.all %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}.</th>
                     <td><a href="{% url 'races:racetrack' racetrack.id %}" class="link-dark">{{ racetrack.name }}</a></td>

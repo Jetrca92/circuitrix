@@ -35,9 +35,9 @@ class RacetrackView(LoginRequiredMixin, ManagerContextMixin, DetailView):
 class RacetracksOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
     model = Racetrack
     template_name="races/racetracks_overview.html"
-    context_object_name = "racetracks"
+    context_object_name = "championship"
 
     def get_queryset(self):
         championship = Championship.objects.get(pk=self.kwargs['id'])
-        return championship.racetracks.all()
+        return championship
 
