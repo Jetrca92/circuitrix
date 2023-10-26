@@ -7,6 +7,7 @@ racetracks = {
         "straights": 40,
         "slow_corners": 30,
         "fast_corners": 30,
+        "description": "Circuito de España boasts a captivating history that is the stuff of motorsport legends. This iconic racetrack, nestled in the heart of Catalonia, has a story as unique as its challenging twists and turns. Over the years, this circuit became synonymous with thrilling racing moments. The track's combination of high-speed straights, daring chicanes, and intricate hairpin turns tested the mettle of every driver who graced it."
     },
     "UK": {
         "name": "Northamptonshire circuit",

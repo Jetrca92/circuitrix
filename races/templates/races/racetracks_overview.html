@@ -28,7 +28,7 @@ Racetracks - {{ championship.name }}
                 <tr>
                     <th scope="row">{{ forloop.counter }}.</th>
                     <td><a href="{% url 'races:racetrack' racetrack.id %}" class="link-dark">{{ racetrack.name }}</a></td>
-                    <td><img src="{% static "manager/united-kingdom-flag.png" %}" alt="united-kingdom-flag" width="25" height="35" loading="lazy"></td>
+                    <td><img src="{% static racetrack.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
                     <td>{{ racetrack.lap_length_km }} km</td>
                 </tr>
                 {% endfor %}

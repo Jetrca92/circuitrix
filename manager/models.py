@@ -112,7 +112,7 @@ class Racetrack(models.Model):
     location = models.ForeignKey(Country, on_delete=models.CASCADE)
     lap_length_km = models.FloatField()
     total_laps = models.PositiveIntegerField()
-    lap_record = models.DurationField(blank=True, null=True)
+    lap_record = models.ForeignKey('LapRecord', on_delete=models.CASCADE, blank=True, null=True, related_name="racetrack_laprecord")
     # Percentages of different parts of track, total 100%
     straights = models.FloatField()
     slow_corners = models.FloatField()
@@ -130,6 +130,13 @@ class Racetrack(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super(Racetrack, self).save(*args, **kwargs)
+
+
+class LapRecord(models.Model):
+    holder = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="laprecord_holder")
+    racetrack = models.ForeignKey(Racetrack, on_delete=models.CASCADE, related_name="laprecord_racetrack")
+    time = models.DurationField(blank=True, null=True)
+    date_set = models.DateTimeField(auto_now_add=True)
 
 
 class Championship(models.Model):
