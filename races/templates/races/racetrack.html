@@ -8,9 +8,9 @@
 {% load static %}
 
 <div class="container col-md-11 px-2 py-5">
-    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5">
         <div class="col-10 col-sm-8 col-lg-6">
-            <img src="{% static "manager/racetracks/barcelona.png" %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+            <img src="{% static racetrack.image_location %}" class="d-block mx-lg-auto img-fluid p-3" style="max-height: 400px;" loading="lazy">
         </div>
         <div class="col-lg-6">
             <div class="d-flex align-items-center mb-3 gap-3">
@@ -18,7 +18,7 @@
                 <img src="{% static racetrack.location.logo_location %}"  width="auto" height="35" loading="lazy">
                 <span class="text-muted">({{ racetrack.id }})</span>
             </div>
-            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            <div class="row g-4 py-4 row-cols-1 row-cols-lg-3">
                 <div class="feature col">
                     <span>Racetrack length</span>
                     <h3 class="fs-2 text-body-emphasis">{{ racetrack.lap_length_km }} km</h3>
@@ -41,10 +41,9 @@
                     </span>
                 </div>
             </div>
-            
         </div>
     </div>
-      
+    {{ racetrack.description }}
 </div>
 
 {% endblock %}

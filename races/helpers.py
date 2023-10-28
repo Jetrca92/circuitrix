@@ -46,6 +46,8 @@ def create_racetracks(racetracks):
         r = Racetrack(
             name=racetrack["name"],
             location=location,
+            image_location=racetrack["image_location"],
+            description=racetrack["description"],
             lap_length_km=racetrack["lap_length_km"],
             total_laps=racetrack["total_laps"],
             straights=racetrack["straights"],

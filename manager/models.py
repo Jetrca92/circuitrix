@@ -110,6 +110,8 @@ class Car(models.Model):
 class Racetrack(models.Model):
     name = models.CharField(max_length=30)
     location = models.ForeignKey(Country, on_delete=models.CASCADE)
+    image_location = models.CharField(max_length=50, default="manager/circuits/blank.png")
+    description = models.TextField()
     lap_length_km = models.FloatField()
     total_laps = models.PositiveIntegerField()
     lap_record = models.ForeignKey('LapRecord', on_delete=models.CASCADE, blank=True, null=True, related_name="racetrack_laprecord")
