@@ -6,7 +6,6 @@ from manager.models import Country, Team
 class NewTeamForm(forms.Form):
     team_name = forms.CharField(label="Team Name", widget=forms.TextInput(attrs={"class": "form-control"}))
     team_country = forms.ChoiceField(
-        choices=[("selected", "Select Country")],
         widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Team Country"})
     )
 
@@ -15,11 +14,9 @@ class NewTeamForm(forms.Form):
         self.fields['team_country'].choices = self.get_country_choices()
 
     def get_country_choices(self):
-        country_choices = [("selected", "Select Country")]
         countries = Country.objects.all()
-        if countries.exists():
-            country_choices.extend([(country.id, country.name) for country in countries])
-        return country_choices
+        choices = list(map(lambda country: (country.id, country.name), countries))
+        return [("selected", "Select Country")] + choices
 
     def clean_team_name(self):
         team_name = self.cleaned_data.get("team_name")
