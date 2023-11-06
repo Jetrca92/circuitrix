@@ -3,7 +3,7 @@ import roman
 from django.db import transaction
 from django.db.models import Max
 
-from manager.models import Championship, Racetrack, Country
+from manager.models import Championship
 
 
 @transaction.atomic
@@ -53,31 +53,3 @@ def assign_championship(team):
                 return
 
         create_championship(highest_division, division_counter + 1)
-
-@transaction.atomic
-def create_racetracks(racetracks):
-    for code, racetrack in racetracks.items():
-        location=Country.objects.get(short_name=racetrack["location"])
-        r = Racetrack(
-            name=racetrack["name"],
-            location=location,
-            image_location=racetrack["image_location"],
-            description=racetrack["description"],
-            lap_length_km=racetrack["lap_length_km"],
-            total_laps=racetrack["total_laps"],
-            straights=racetrack["straights"],
-            slow_corners=racetrack["slow_corners"],
-            fast_corners=racetrack["fast_corners"],
-        )
-        r.save()
-
-
-@transaction.atomic
-def create_countries(countries):
-    for code, country in countries.items():
-        c = Country(
-            name=country["name"],
-            short_name=country["short_name"],
-            logo_location=country["logo"],
-        )
-        c.save()
