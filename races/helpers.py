@@ -12,6 +12,7 @@ def assign_championship(team):
     highest_division = Championship.objects.aggregate(Max('division'))['division__max']
     championship_schema = {
         # division: max number of championships in that division
+        1: 1,
         2: 2,
         3: 4,
         4: 8,
@@ -21,8 +22,8 @@ def assign_championship(team):
     }
 
     def create_championship(division, division_counter):
-        name = f"{roman.toRoman(division)}.{division_counter + 1}"
-        if division_counter == 0 and division == 1:
+        name = f"{roman.toRoman(division)}.{division_counter}"
+        if division == 1:
             name = "Circuitrix"
         championship = Championship(name=name, division=division)
         championship.save()
@@ -32,27 +33,17 @@ def assign_championship(team):
 
     if highest_division is None:
         # No divisions in the database, create the first championship
-        create_championship(1, 0)
+        create_championship(1, 1)
     else:
-        if highest_division == 1:
-            # Division 1 exists, if not full add team
-            championship = Championship.objects.get(division=highest_division)
-            if championship.teams.count() >= max_number_of_teams:
-                highest_division += 1
-            else:
-                championship.teams.add(team)
-                team.championship = championship
-                team.save()
-                return
-
         championships = Championship.objects.filter(division=highest_division)
         division_counter = championships.count()
         if division_counter == 0:
             # No championship yet
-            create_championship(highest_division, 0)
+            create_championship(highest_division, 1)
         if championships.count() >= championship_schema[highest_division]:
             # If divisions full create div+1
             highest_division += 1
+            division_counter = 0
         for championship in championships:
             # If place, add team
             if championship.teams.count() < max_number_of_teams:
@@ -61,7 +52,7 @@ def assign_championship(team):
                 team.save()
                 return
 
-        create_championship(highest_division, division_counter)
+        create_championship(highest_division, division_counter + 1)
 
 @transaction.atomic
 def create_racetracks(racetracks):
