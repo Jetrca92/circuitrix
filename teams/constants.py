@@ -1,42 +1,52 @@
 countries = {
     "ES": {
         "name": "Spain",
+        "short_name": "ES",
         "logo": "manager/flags/spain.png",
     },
     "UK": {
         "name": "United Kingdom",
+        "short_name": "UK",
         "logo": "manager/flags/united_kingdom.png",
     },
     "IT": {
         "name": "Italy",
+        "short_name": "IT",
         "logo": "manager/flags/italy.png"
     },
     "MC": {
         "name": "Monaco",
+        "short_name": "MC",
         "logo": "manager/flags/monaco.png",
     },
     "US": {
         "name": "United States",
+        "short_name": "US",
         "logo": "manager/flags/united_states.png",
     },
     "AT": {
         "name": "Austria",
+        "short_name": "AT",
         "logo": "manager/flags/austria.png",
     },
     "DE": {
         "name": "Germany",
+        "short_name": "DE",
         "logo": "manager/flags/germany.png",
     },
     "BE": {
         "name": "Belgium",
+        "short_name": "BE",
         "logo": "manager/flags/belgium.png",
     },
     "FR": {
         "name": "France",
+        "short_name": "FR",
         "logo": "manager/flags/france.png",
     },
     "JP": {
         "name": "Japan",
+        "short_name": "JP",
         "logo": "manager/flags/japan.png",
     },
 }

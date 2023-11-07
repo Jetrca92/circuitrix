@@ -1,0 +1,49 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+{{ racetrack.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+            <img src="{% static racetrack.image_location %}" class="d-block mx-lg-auto img-fluid p-3" style="max-height: 400px;" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center mb-3 gap-3">
+                <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">{{ racetrack.name }}</h1>
+                <img src="{% static racetrack.location.logo_location %}"  width="auto" height="35" loading="lazy">
+                <span class="text-muted">({{ racetrack.id }})</span>
+            </div>
+            <div class="row g-4 py-4 row-cols-1 row-cols-lg-3">
+                <div class="feature col">
+                    <span>Racetrack length</span>
+                    <h3 class="fs-2 text-body-emphasis">{{ racetrack.lap_length_km }} km</h3>
+                </div>
+                <div class="feature col">
+                    <span>Number of laps</span>
+                    <h3 class="fs-2 text-body-emphasis">{{ racetrack.total_laps }}</h3>
+                </div>
+                <div class="feature col">
+                    <span>Race distance</span>
+                    <h3 class="fs-2 text-body-emphasis">TODO</h3>
+                </div>
+                <div class="feature col">
+                    <span>Lap record</span>
+                    <h3 class="fs-2 text-body-emphasis">{{ racetrack.lap_record }}</h3>
+                    <span>
+                        {% if racetrack.lap_record %}
+                        {{ racetrack.lap_record.holder.name }} {{ racetrack.lap_record.holder.surname }} ({{ racetrack.lap_record.date_set }})
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ racetrack.description }}
+</div>
+
+{% endblock %}

@@ -4,7 +4,7 @@ from django.views import View
 from django.urls import reverse
 
 from registration.helpers import create_manager_model
-from manager.models import Manager, Team
+from manager.models import Manager, Team, Racetrack, Country
 
 
 class IndexView(View):

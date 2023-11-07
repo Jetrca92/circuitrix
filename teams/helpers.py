@@ -2,7 +2,18 @@ import random
 
 from datetime import datetime, timedelta
 
-from teams.constants import uk_names, uk_surnames, us_names, us_surnames, fr_names, fr_surnames, es_names, es_surnames, mc_names, mc_surnames, it_names, it_surnames, at_names, at_surnames, be_names, be_surnames, de_names, de_surnames, jp_names, jp_surnames
+from teams.constants import (
+    uk_names, uk_surnames, 
+    us_names, us_surnames, 
+    fr_names, fr_surnames, 
+    es_names, es_surnames, 
+    mc_names, mc_surnames, 
+    it_names, it_surnames, 
+    at_names, at_surnames, 
+    be_names, be_surnames, 
+    de_names, de_surnames, 
+    jp_names, jp_surnames
+)
 from manager.models import Country, Driver, Car, LeadDesigner, RaceMechanic
 
 

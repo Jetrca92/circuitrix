@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'manager',
     'registration',
     'teams',
+    'races',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,7 +154,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 2
+SITE_ID = 3
 LOGIN_REDIRECT_URL = '/'
 
 # Additional configuration settings
