@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_racetracks, reverse_code=migrations.RunPython.noop),
         migrations.RunPython(create_countries, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(create_racetracks, reverse_code=migrations.RunPython.noop),
     ]
