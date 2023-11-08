@@ -1,0 +1,90 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Manual
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <h1 class="display-5 fw-bold lh-1">Manual</h1>
+    <h1 class="text-muted fw-light">Introduction</h1>
+    <p>
+        Circuitrix is a game where you get to lead a virtual racing team to glory, in competition with other participants 
+        from all over the world. Circuitrix is a simple game, it's easy to grasp the basics. You can play Circuitrix even 
+        if you just log in once or twice a week. The challenge is not to beat the game, the challenge lies within the 
+        competition with the other participants. While competing, many participants become friends, making Circuitrix 
+        also a social game.
+    </p>
+    <div class="fw-bold mt-5">Your overall tasks</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        You perform the duties of both manager and team owner. You plan tactics and strategy, manage your research and development 
+        team and select which drivers should race. You buy and sell drivers, invest in team facilities and much more. 
+        To be successful a good piece of advice is to form a good strategy and a long term plan. Success and glory will not 
+        come for free, after all.
+    </p>
+    <div class="fw-bold mt-5">Your new team</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        When you take charge of your team it has just got a vacant slot in any of the two lowest divisions in the Circuitrix 
+        series system. To start your climb upwards you got two drivers (might be talented or not), a car and some money to your aid. 
+        Now it's time for you to show your magic.
+    </p>
+    <div class="fw-bold mt-5">Our best piece of advice</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        The best piece of advice we can give you is to read the manual. You don't need to read everything at once, 
+        just reading the first chapters to start with will give you a good clue how to play the game.
+    </p>
+    <p>
+        To give everyone else the best Circuitrix experience there are some very simple rules of conduct to follow which 
+        you can find in our house rules.
+    </p>
+    <h1 class="text-muted fw-light">The Car</h1>
+    <p>
+        The car is the most important factor in achieving success - it doesn't matter how skilled your drivers or how clever 
+        your tactics, if your car isn't good enough you're not going to win any races.
+    </p>
+    <p>
+        To evaluate a car's performance, it is important to understand the significance of its various components. 
+        The following aspects of the car directly impact its capabilities on the track:
+    </p>
+    <div class="fw-bold mt-5">Components</div>
+    <hr class="mt-1 mb-3">
+    <ul>
+        <li><span class="fw-bold">Engine</span> is related to the top speed of the car.</li>
+        <li><span class="fw-bold">Gearbox</span> relates to the acceleration of the car. It is important for the tracks involving multiple corners.</li>
+        <li><span class="fw-bold">Brakes</span> are related to how fast the car can decelerate, thus high brake performance relates to longer high speed retained before the brakes have to engage to prepare for the corner.</li>
+        <li><span class="fw-bold">Front Wing</span> is used for slow corners. The more front wing you have the faster your car will go around slow corners.</li>
+        <li><span class="fw-bold">Suspension</span> relates to the maximum speed of the car going around the corner.</li>
+        <li><span class="fw-bold">Rear Wing</span> is used for fast corners. The more rear wing you have the faster you can go around fast corners.</li> 
+    </ul>
+    <div class="fw-bold mt-5">How good is your car?</div>
+    <hr class="mt-1 mb-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Food quality</th>
+                <th>Energy Increase</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Q1</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Q2</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>Q3</td>
+                <td>15</td>
+            </tr>
+        </tbody>
+    </table>   
+</div>
+
+{% endblock %}
