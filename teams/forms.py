@@ -36,10 +36,4 @@ class NewTeamForm(forms.Form):
     
 
 class EditCarNameForm(forms.Form):
-    new_car_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), max_length=30, required=True)
-
-    def clean_new_car_name(self):
-        car_name = self.cleaned_data.get("new_car_name")
-        if car_name == "":
-            raise forms.ValidationError("Car name can't be empty!")
-        return car_name
+    new_car_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), min_length=1, max_length=30)
