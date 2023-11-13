@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.base import TemplateView
 from django.urls import reverse
 
 from registration.helpers import create_manager_model
@@ -24,6 +25,16 @@ class IndexView(View):
             "current_user_manager": manager,
         })
     
+
+class ManualView(TemplateView):
+    template_name = "manager/manual.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manager = self.request.user.manager
+        context['current_user_manager'] = manager
+        return context
+
 
 
     

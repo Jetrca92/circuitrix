@@ -106,6 +106,10 @@ class Car(models.Model):
     def __str__(self):
         return self.name
     
+    def update_name(self, new_name):
+        self.name = new_name
+        self.save()
+    
 
 class Racetrack(models.Model):
     name = models.CharField(max_length=30)

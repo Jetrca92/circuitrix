@@ -1,0 +1,176 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Manual
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <h1 class="display-5 fw-bold lh-1">Manual</h1>
+    <h1 class="text-muted fw-light">Introduction</h1>
+    <p>
+        Circuitrix is a game where you get to lead a virtual racing team to glory, in competition with other participants 
+        from all over the world. Circuitrix is a simple game, it's easy to grasp the basics. You can play Circuitrix even 
+        if you just log in once or twice a week. The challenge is not to beat the game, the challenge lies within the 
+        competition with the other participants. While competing, many participants become friends, making Circuitrix 
+        also a social game.
+    </p>
+    <div class="fw-bold mt-5">Your overall tasks</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        You perform the duties of both manager and team owner. You plan tactics and strategy, manage your research and development 
+        team and select which drivers should race. You buy and sell drivers, invest in team facilities and much more. 
+        To be successful a good piece of advice is to form a good strategy and a long term plan. Success and glory will not 
+        come for free, after all.
+    </p>
+    <div class="fw-bold mt-5">Your new team</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        When you take charge of your team it has just got a vacant slot in any of the two lowest divisions in the Circuitrix 
+        series system. To start your climb upwards you got two drivers (might be talented or not), a car and some money to your aid. 
+        Now it's time for you to show your magic.
+    </p>
+    <div class="fw-bold mt-5">Our best piece of advice</div>
+    <hr class="mt-1 mb-3">   
+    <p>
+        The best piece of advice we can give you is to read the manual. You don't need to read everything at once, 
+        just reading the first chapters to start with will give you a good clue how to play the game.
+    </p>
+    <p>
+        To give everyone else the best Circuitrix experience there are some very simple rules of conduct to follow which 
+        you can find in our house rules.
+    </p>
+    <h1 class="text-muted fw-light">The Car</h1>
+    <p>
+        The car is the most important factor in achieving success - it doesn't matter how skilled your drivers or how clever 
+        your tactics, if your car isn't good enough you're not going to win any races.
+    </p>
+    <p>
+        To evaluate a car's performance, it is important to understand the significance of its various components. 
+        The following aspects of the car directly impact its capabilities on the track:
+    </p>
+    <div class="fw-bold mt-5">Components</div>
+    <hr class="mt-1 mb-3">
+    <ul>
+        <li><span class="fw-bold">Engine</span> is related to the top speed of the car.</li>
+        <li><span class="fw-bold">Gearbox</span> relates to the acceleration of the car. It is important for the tracks involving multiple corners.</li>
+        <li><span class="fw-bold">Brakes</span> are related to how fast the car can decelerate, thus high brake performance relates to longer high speed retained before the brakes have to engage to prepare for the corner.</li>
+        <li><span class="fw-bold">Front Wing</span> is used for slow corners. The more front wing you have the faster your car will go around slow corners.</li>
+        <li><span class="fw-bold">Suspension</span> relates to the maximum speed of the car going around the corner.</li>
+        <li><span class="fw-bold">Rear Wing</span> is used for fast corners. The more rear wing you have the faster you can go around fast corners.</li> 
+    </ul>
+    <div class="fw-bold mt-5">How good is your car?</div>
+    <hr class="mt-1 mb-3">
+    <p>
+        In the real world, when you lay eyes on a Formula car, you might describe it as a “fairly decent car” or a 
+        “truly exceptional car”. In Circuitrix, we assess the quality of a car based on the ratings of its components. 
+        Every part of the car is graded on a scale from 1 to 20: the higher the number, the more advanced the car is in 
+        that specific component. Additionally, we provide an overall rating, measured on a scale from 1 to 100, to offer 
+        a comprehensive evaluation of the car's performance.
+    </p>
+    <h1 class="text-muted fw-light">Drivers</h1>
+    <p>
+        The driver is a paramount factor in attaining victory. Regardless of the quality of your car or the cunningness of 
+        your strategies, if your driver lacks the necessary skills, you won't be claiming any race victories.
+    </p>
+    <p>
+        Each driver has 5 basic skills, while there are also some additional factors affecting their performance in different 
+        situations. Let's have a rundown on the various skills first:
+    </p>
+    <div class="fw-bold mt-5">Skills</div>
+    <hr class="mt-1 mb-3">
+    <ul>
+        <li><span class="fw-bold">Racecraft:</span> The ability to overtake, defend and adjust to changing conditions.</li>
+        <li><span class="fw-bold">Pace:</span> The ability to complete a lap as quickly as possible.</li>
+        <li><span class="fw-bold">Focus:</span> Drivers with higher focus are smooth, accurate and have more control.</li>
+        <li><span class="fw-bold">Car Management:</span> The ability to manage tires, fuel and ERS more efficiently.</li>
+        <li><span class="fw-bold">Feedback:</span> The outcome of your car setup depends on how well a driver can communicate 
+            to his engineer during practice, development and even during the race.</li> 
+    </ul>
+    <h1 class="text-muted fw-light">Racetracks</h1>
+    <p>
+        To assess a car's performance on a track, it's essential to consider the track's characteristics, including its length, 
+        style, and specific information. The following aspects of the track are crucial in determining how well the car will perform:
+    </p>
+    <ul>
+        <li>
+            <span class="fw-bold">Track length:</span> The length of the track affects various performance factors. 
+            Longer tracks provide more opportunities for high-speed sections, where a car with a powerful engine can excel. 
+            On the other hand, shorter tracks may have more tight corners, emphasizing the 
+            importance of acceleration and handling..
+        </li>
+        <li>
+            <span class="fw-bold">Straights:</span> Tracks with longer straight sections favor cars with better engine performance. 
+            A higher percentage of the track dedicated to straights benefits cars that can achieve higher top speeds. Additionally, 
+            good braking capabilities are crucial for maximizing performance at the end of straights when preparing for corners.
+        </li>
+        <li>
+            <span class="fw-bold">Slow corners:</span> Tracks with a significant number of slow corners demand cars with excellent 
+            front wing performance. A higher front wing level allows the car to generate more downforce, enabling faster cornering 
+            speeds in slow corners. Additionally, a well-tuned gearbox is vital for efficient acceleration out of these corners.
+        </li>
+        <li>
+            <span class="fw-bold">Fast corners:</span> Tracks featuring fast corners require cars with an above average rear wing level. 
+            More rear wing generates increased downforce, enabling better stability and higher speeds through fast corners. Suspension 
+            characteristics also play a significant role in maximizing the car's speed and control around these corners.
+        </li>
+    </ul>
+    <div class="fw-bold mt-5">How do we calculate how fast a car is on a track?</div>
+    <hr class="mt-1 mb-3">
+    <p>
+        We factor in the specific characteristics of the track where the race takes place. These factors, like the track's straight 
+        sections, slow corners, and fast corners, affect how we weigh each component's importance for that particular track. Suffice 
+        it to say that a well-balanced car with high-rated components tailored to the track's features can lead to impressive speeds 
+        and, hopefully, victory on the track.
+    </p>
+    <h1 class="text-muted fw-light">Championship system</h1>
+    <p>
+        A Circuitrix season is 12 weeks long: 10 championship rounds (10 teams in each series who race on 10 different tracks), one week 
+        for qualifiers and one week with no championship activity.
+    </p>
+    <div class="fw-bold mt-5">Series tree</div>
+    <p>
+        In the world of Circuitrix, the series tree is a hierarchical structure that categorizes teams into championships, and these 
+        championships are further organized into divisions. Each championship has 10 teams, and the highest division exclusively 
+        features a single championship. Let's take a closer look at how the series system is structured:<br>
+        1 Division I (Circuitrix series)<br>
+        2 Division II (II.1, II.2)<br>
+        4 Division III (III.1, III.2, III.3, III.4)<br>
+        8 Division IV (IV.1, IV.2, etc. to IV.8)<br>
+        16 Division V (V.1, V.2, etc. to V.16)<br>
+        32 Division VI (VI.1, VI.2, etc. to VI.32)<br>
+        64 Division VII (VII.1, VII.2, etc. to VII.64)<br>
+    </p>
+    <div class="fw-bold mt-5">Promotion and relegation</div>
+    <p>
+        If you win your championship, you earn a direct promotion. However, if you find yourself in the 9th or 10th position, you will 
+        face relegation to the division below, with the exception of the lowest division.
+    </p>
+    <hr class="mt-1 mb-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Food quality</th>
+                <th>Energy Increase</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Q1</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Q2</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>Q3</td>
+                <td>15</td>
+            </tr>
+        </tbody>
+    </table>   
+</div>
+
+{% endblock %}

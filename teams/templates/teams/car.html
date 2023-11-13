@@ -15,6 +15,27 @@ Car - {{ car.owner.name }}
         or how clever your tactics, if your car isn't good enough you're not going to win any races.
     </p>
     <div class="d-flex gap-5">
+        <h4 class="fw-bold lh-1">{{ car.name }}</h4>
+        {% for error in form.errors.values %}
+        <div class="text-danger fw-bold mb-3">
+            {{ error|join:", " }}
+        </div>
+        {% endfor %}
+        <img src="{% static "manager/edit.png" %}" class="d-block" id="edit_car_name" width="16" height="16" loading="lazy" style="cursor: pointer;">
+        <div id="edit_car_name_form" style="display: none;">
+            <form action="{% url 'teams:car' current_user_manager.team.id %}" method="post" role="form" class="row">
+                {% csrf_token %}
+                <div class="col">
+                    {{ form.new_car_name }}
+                </div>
+                <div class="col">
+                    <input class="btn btn-primary" type="submit" value="Edit">
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="my-3">
+    <div class="d-flex gap-5">
         <div>
             <img src="{% static "manager/car1.png" %}" class="d-block img-fluid" alt="Car1" width="525" height="auto" loading="lazy">
         </div>
@@ -29,8 +50,22 @@ Car - {{ car.owner.name }}
     </div>
 </div>
 
+<script>
+    enableTogglableContent('#edit_car_name', '#edit_car_name_form');
+    function enableTogglableContent(btnSelector, editTextAreaSelector) {
+        var btn = document.querySelector(btnSelector);
+        var editTextArea = document.querySelector(editTextAreaSelector);
         
+        btn.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            if (!editTextArea) {
+                return;
+            }
+            const displayed = editTextArea.style.display === 'block'
+            editTextArea.style.display = displayed ? 'none' : 'block'
+        });
+    }
+</script>        
     
-      
-
 {% endblock %}

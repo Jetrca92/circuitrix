@@ -33,3 +33,7 @@ class NewTeamForm(forms.Form):
         if not Country.objects.filter(id=int(country_id)).exists():
             raise forms.ValidationError("Select a country!")
         return country_id
+    
+
+class EditCarNameForm(forms.Form):
+    new_car_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), min_length=1, max_length=30)

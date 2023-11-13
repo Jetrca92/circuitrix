@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, Car, Race
 from races.helpers import assign_championship
-from teams.forms import NewTeamForm
+from teams.forms import NewTeamForm, EditCarNameForm
 from teams.helpers import (
     generate_car,
     generate_drivers,
@@ -137,27 +137,38 @@ class TeamStaffView(LoginRequiredMixin, ManagerContextMixin, ListView):
         return context
     
 
-class TeamCarView(LoginRequiredMixin, ManagerContextMixin, DetailView):
-    model = Car
+class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "teams/car.html"
-    context_object_name = "car"
 
+    def get(self, request, id):
+        form = EditCarNameForm()
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+            "car": self.get_object(),
+        })
+        return render(request, self.template_name, context)
+
+    def post(self, request, id):
+        form = EditCarNameForm(request.POST)
+        if form.is_valid():
+            new_car_name = form.cleaned_data["new_car_name"]
+            car = self.get_object()
+            car.update_name(new_car_name)
+            return HttpResponseRedirect(reverse("teams:car", kwargs={'id': id}))
+        else:
+            context = self.get_context(form)
+            return render(request, self.template_name, context)
+        
+    def get_context(self, form):
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+            "car": self.get_object(),
+        })
+        return context
+        
     def get_object(self, queryset=None):
         team = Team.objects.get(pk=self.kwargs['id'])
-        return team.car
-    
-#TO DO
-class TeamRacesView(LoginRequiredMixin, ManagerContextMixin, ListView):
-    model = Race
-    template_name="teams/drivers.html"
-    context_object_name = "drivers"
-
-    def get_queryset(self):
-        team = Team.objects.get(pk=self.kwargs['id'])
-        return team.drivers.all()
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        team = Team.objects.get(pk=self.kwargs['id'])
-        context['team'] = team
-        return context
+        car = team.car
+        return car

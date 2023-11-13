@@ -1,82 +1,85 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-    Formula Manager
+Formula Manager
 {% endblock %}
 
 {% block main %}
 {% load static %}
 
-    <div class="container col-md-11 px-2 py-5">
-        <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
-            <div class="col-7 col-sm-4 col-lg-6">
-                <img src="{% static "manager/race-car.jpg" %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="425" height="auto" loading="lazy">
-            </div>
-            <div class="col-lg-6">
-                <h1 class="display-5 fw-bold lh-1 mb-3">Formula Manager Game</h1>
-                <h5 class="display-7">Join the free formula racing world!</h5>
-                <p class="lead text-start">
-                    The Formula Manager game is an online strategy game where you take the role of a team manager with one goal - 
-                    the top of the racing world. You are in charge of all aspects of team management: buying and selling drivers, 
-                    deciding what skills to train and develop, preparing a strategy for each race in your championship, managing
-                    car research and developement.
+<div class="container col-md-11 px-2 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
+        <div class="col-7 col-sm-4 col-lg-6">
+            <img src="{% static "manager/race-car.jpg" %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="425" height="auto" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+            <h1 class="display-5 fw-bold lh-1 mb-3">Formula Manager Game</h1>
+            <h5 class="display-7">Join the free formula racing world!</h5>
+            <p class="lead text-start">
+                The Formula Manager game is an online strategy game where you take the role of a team manager with one goal - 
+                the top of the racing world. You are in charge of all aspects of team management: buying and selling drivers, 
+                deciding what skills to train and develop, preparing a strategy for each race in your championship, managing
+                car research and developement.
+            </p>
+        </div>
+    </div>
+    <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
+        <div class="col-lg-6">
+            <p class="lead text-start">    
+                Your races will be simulated by our system, and you can follow the action in our live commentary viewer or analyze 
+                the race afterwards. A big part of the excitement is that it is a multiplayer experience - the teams you face are 
+                managed by other humans who will try to outsmart you. You can also join a community to learn about the best ways 
+                to train, set up your team strategy, and improve your team financially. Unlike many other games, you can play 
+                at your own pace, and there is no way to buy in-game advantages. Welcome to the formula manager game - the best free 
+                strategy game out there!
+            </p>
+        </div>
+        <div class="col-7 col-sm-4 col-lg-6">
+            <img src="{% static "manager/racing.jpg" %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="425" height="auto" loading="lazy">
+        </div>
+    </div>    
+    <h1 class="display-5 fw-bold mt-3">Features</h1>
+    <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
+        <div class="col d-flex align-items-start">
+            <div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <img src="{% static "manager/manager.png" %}" alt="manager icon from flaticon" class="me-3" style="height: 2.5rem;">
+                    <h3 class="fw-bold mb-0 fs-4">Manage team and drivers</h3>
+                </div>
+                <p class="lead">
+                    Formula Manager is a strategic racing game where you build and manage your own Formula One team at your own pace. 
+                    Whether you log in every day or once a week, the choices you make will determine your team's success. With the right decisions 
+                    and expert management, you can lead your team to become the Champion!
                 </p>
             </div>
         </div>
-
-        <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
-            <div class="col-lg-6">
-                <p class="lead text-start">
-                    
-                    Your races will be simulated by our system, and you can follow the action in our live commentary viewer or analyze 
-                    the race afterwards. A big part of the excitement is that it is a multiplayer experience - the teams you face are 
-                    managed by other humans who will try to outsmart you. You can also join a community to learn about the best ways 
-                    to train, set up your team strategy, and improve your team financially. Unlike many other games, you can play 
-                    at your own pace, and there is no way to buy in-game advantages. Welcome to the formula manager game - the best free 
-                    strategy game out there!
+        <div class="col d-flex align-items-start">
+            <div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <img src="{% static "manager/develop.png" %}" alt="wheel icon from flaticon" class="me-3" style="height: 2.5rem;">
+                    <h3 class="fw-bold mb-0 fs-4">Develop and train your team</h3>
+                </div>
+                <p class="lead">
+                    Develop your own team by training your drivers and developing your car. Manage your team's finances 
+                    carefully to make smart investments in research and development. Scout for new drivers or nurture young talents 
+                    through your own racing academy to build the next generation of champions.
                 </p>
             </div>
-            <div class="col-7 col-sm-4 col-lg-6">
-                <img src="{% static "manager/racing.jpg" %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="425" height="auto" loading="lazy">
-            </div>
         </div>
-        
-        <h1 class="display-5 fw-bold mt-3">Features</h1>
-        <div class="row flex-lg-row-reverse align-items-center g-5 mb-3">
-            <div class="col d-flex align-items-start">
-                <div>
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <img src="{% static "manager/manager.png" %}" alt="manager icon from flaticon" class="me-3" style="height: 2.5rem;">
-                        <h3 class="fw-bold mb-0 fs-4">Manage team and drivers</h3>
-                    </div>
-                    <p class="lead">Formula Manager is a strategic racing game where you build and manage your own Formula One team at your own pace. 
-                        Whether you log in every day or once a week, the choices you make will determine your team's success. With the right decisions 
-                        and expert management, you can lead your team to become the Champion!</p>
+        <div class="col d-flex align-items-start">
+            <div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <img src="{% static "manager/best.png" %}" alt="formula icon from flaticon" class="me-3" style="height: 2.5rem;">
+                    <h3 class="fw-bold mb-0 fs-4">Strategize your way to victory</h3>
                 </div>
-            </div>
-            <div class="col d-flex align-items-start">
-                <div>
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <img src="{% static "manager/develop.png" %}" alt="wheel icon from flaticon" class="me-3" style="height: 2.5rem;">
-                        <h3 class="fw-bold mb-0 fs-4">Develop and train your team</h3>
-                    </div>
-                    <p class="lead">Develop your own team by training your drivers and developing your car. Manage your team's finances 
-                        carefully to make smart investments in research and development. Scout for new drivers or nurture young talents 
-                        through your own racing academy to build the next generation of champions.</p>
-                </div>
-            </div>
-            <div class="col d-flex align-items-start">
-                <div>
-                    <div class="d-flex align-items-center justify-content-center mb-2">
-                        <img src="{% static "manager/best.png" %}" alt="formula icon from flaticon" class="me-3" style="height: 2.5rem;">
-                        <h3 class="fw-bold mb-0 fs-4">Strategize your way to victory</h3>
-                    </div>
-                    <p class="lead">You compete against other human managers in racing leagues. Start at the bottom and work your way up 
-                        through the ranks to become the ultimate team. Stay ahead of the curve by outmaneuvering your opponents with your 
-                        superior strategy and tactics. Challenge your friends to see who has what it takes to be the best formula manager.</p>
-                </div>
+                <p class="lead">
+                    You compete against other human managers in racing leagues. Start at the bottom and work your way up 
+                    through the ranks to become the ultimate team. Stay ahead of the curve by outmaneuvering your opponents with your 
+                    superior strategy and tactics. Challenge your friends to see who has what it takes to be the best formula manager.
+                </p>
             </div>
         </div>
     </div>
+</div>
 
 {% endblock %}
