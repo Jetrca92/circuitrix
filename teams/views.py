@@ -142,28 +142,33 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
 
     def get(self, request, id):
         form = EditCarNameForm()
-        team = Team.objects.get(id=id)
-        manager = Manager.objects.get(user=request.user)
-        car = team.car
-        context = {
+        context = self.get_context_data()
+        context.update({
             "form": form,
-            "car": car,
-            "current_user_manager": manager,
-        }
+            "car": self.get_object(),
+        })
         return render(request, self.template_name, context)
 
     def post(self, request, id):
         form = EditCarNameForm(request.POST)
-        manager = Manager.objects.get(user=request.user)
-        team = Team.objects.get(id=id)
-        car = team.car
         if form.is_valid():
             new_car_name = form.cleaned_data["new_car_name"]
+            car = self.get_object()
             car.update_name(new_car_name)
             return HttpResponseRedirect(reverse("teams:car", kwargs={'id': id}))
         else:
-            return render(request, self.template_name, {
-                "form": form,
-                "car": car,
-                "current_user_manager": manager,
-            })
+            context = self.get_context(form)
+            return render(request, self.template_name, context)
+        
+    def get_context(self, form):
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+            "car": self.get_object(),
+        })
+        return context
+        
+    def get_object(self, queryset=None):
+        team = Team.objects.get(pk=self.kwargs['id'])
+        car = team.car
+        return car
