@@ -59,11 +59,11 @@ Car - {{ car.owner.name }}
         btn.addEventListener('click', function(event) {
             event.preventDefault();
             
-            if (editTextArea && (editTextArea.style.display === 'none' || editTextArea.style.display === '')) {
-                editTextArea.style.display = 'block';
-            } else if (editTextArea) {
-                editTextArea.style.display = 'none';
+            if (!editTextArea) {
+                return;
             }
+            const displayed = editTextArea.style.display === 'block'
+            editTextArea.style.display = displayed ? 'none' : 'block'
         });
     }
 </script>        
