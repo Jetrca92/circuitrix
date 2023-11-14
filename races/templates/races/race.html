@@ -1,0 +1,28 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+{{ race.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+            <img src="{% static race.location.image_location %}" class="d-block mx-lg-auto img-fluid p-3" style="max-height: 400px;" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center mb-3 gap-3">
+                <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">{{ race.name }}</h1>
+                <img src="{% static race.location.location.logo_location %}"  width="auto" height="35" loading="lazy">
+                <span class="text-muted">({{ race.id }})</span>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock %}

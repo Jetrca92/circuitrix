@@ -1,0 +1,40 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Races - {{ championship.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="d-flex align-items-center mb-3 gap-3">
+        <h1 class="display-5 fw-bold lh-1">{{ championship.name }}</h1>
+        <span class="text-muted">({{ championship.id }})</span>
+    </div>
+    <div>
+        <h4 class="fw-bold lh-1">Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Laps</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in championship.races.all %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+</div>
+
+{% endblock %}

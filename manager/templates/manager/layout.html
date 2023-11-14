@@ -70,10 +70,6 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Drivers
                             </a>
-                            <a class="nav-link" href="">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Races
-                            </a>
                             <a class="nav-link" href="{% url 'teams:staff' current_user_manager.team.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Staff
@@ -91,6 +87,10 @@
                             <a class="nav-link" href="{% url 'races:racetracks_overview' current_user_manager.team.championship.id %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Racetracks
+                            </a>
+                            <a class="nav-link" href="{% url 'races:races_overview' current_user_manager.team.championship.id %}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Races
                             </a>
                             {% endif %}
                             {% endif %}
