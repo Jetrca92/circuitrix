@@ -12,17 +12,20 @@ from races.constants import racetracks
 def create_races(championship):
     next_sunday = next_sunday_date()
     teams = championship.teams.all()
-    for code, racetrack in racetracks.items():
+    for i, (code, racetrack) in enumerate(racetracks.items(), start=0):
         location = Racetrack.objects.get(name=racetrack["name"])
+        date = next_sunday + timedelta(days=i * 7)
         r = Race(
             name=racetrack["name"] + " Grand Prix",
-            date=next_sunday,
+            date=date,
             location=location,
             laps=racetrack["total_laps"],
         )
         r.save()
+        championship.races.add(r)
+        championship.add_racetracks()
+        championship.save()
         r.teams.set(teams)
-        r.save()
 
 
 @transaction.atomic
@@ -81,5 +84,5 @@ def next_sunday_date():
     current_date = datetime.now()
     days_until_sunday = (6 - current_date.weekday() + 7) % 7
     next_sunday = current_date + timedelta(days=days_until_sunday)
-    next_sunday_date = next_sunday.date()
+    next_sunday_date = next_sunday.replace(hour=15, minute=0, second=0)
     return next_sunday_date
