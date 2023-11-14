@@ -1,8 +1,9 @@
 import roman
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.db import transaction
 from django.db.models import Max
+from django.utils import timezone
 
 from manager.models import Championship, Racetrack, Race
 from races.constants import racetracks
@@ -82,7 +83,7 @@ def assign_championship(team):
 
 
 def next_sunday_date():
-    current_date = datetime.now()
+    current_date = timezone.now()
     days_until_sunday = (6 - current_date.weekday() + 7) % 7
     next_sunday = current_date + timedelta(days=days_until_sunday)
     next_sunday_date = next_sunday.replace(hour=15, minute=0, second=0)
@@ -90,7 +91,7 @@ def next_sunday_date():
 
 
 def add_team_to_upcoming_races(championship, team):
-    upcoming_races = championship.races.filter(date__gt=datetime.now())
+    upcoming_races = championship.races.filter(date__gt=timezone.now())
     if not upcoming_races:
         return
     for race in upcoming_races:
