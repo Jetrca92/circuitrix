@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from manager.models import User, Manager, Team, Country, RaceMechanic, LeadDesigner, Driver, Car, Championship, Racetrack
+from manager.models import User, Manager, Team, Country, RaceMechanic, LeadDesigner, Driver, Car, Championship, Racetrack, Race
 
 
 admin.site.register(User)
@@ -13,3 +13,4 @@ admin.site.register(Country)
 admin.site.register(Car)
 admin.site.register(Championship)
 admin.site.register(Racetrack)
+admin.site.register(Race)
