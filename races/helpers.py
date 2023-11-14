@@ -75,6 +75,7 @@ def assign_championship(team):
                 championship.teams.add(team)
                 team.championship = championship
                 team.save()
+                add_team_to_upcoming_races(championship, team)
                 return
 
         create_championship(team, highest_division, division_counter + 1)
@@ -86,3 +87,11 @@ def next_sunday_date():
     next_sunday = current_date + timedelta(days=days_until_sunday)
     next_sunday_date = next_sunday.replace(hour=15, minute=0, second=0)
     return next_sunday_date
+
+
+def add_team_to_upcoming_races(championship, team):
+    upcoming_races = championship.races.filter(date__gt=datetime.now())
+    for race in upcoming_races:
+        race.teams.add(team)
+        race.save()
+    
