@@ -91,6 +91,8 @@ def next_sunday_date():
 
 def add_team_to_upcoming_races(championship, team):
     upcoming_races = championship.races.filter(date__gt=datetime.now())
+    if not upcoming_races:
+        return
     for race in upcoming_races:
         race.teams.add(team)
         race.save()
