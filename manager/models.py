@@ -154,7 +154,11 @@ class Championship(models.Model):
 
     def __str__(self):
         return self.name
-
+    
+    def add_racetracks(self):
+        racetracks = Racetrack.objects.all()
+        self.racetracks.set(racetracks)
+        
 
 class Race(models.Model):
     name = models.CharField(max_length=30)
@@ -164,7 +168,7 @@ class Race(models.Model):
     teams = models.ManyToManyField(Team, related_name="races")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.date})"
     
 
 class RaceResult(models.Model):
