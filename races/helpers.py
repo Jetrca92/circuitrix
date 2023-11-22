@@ -98,3 +98,40 @@ def add_team_to_upcoming_races(championship, team):
         race.teams.add(team)
         race.save()
     
+
+def calculate_car_performance_rating(car, racetrack):
+    performance = (car.engine * racetrack.straights) + \
+        (car.gearbox * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) + \
+        (car.brakes * racetrack.straights) + \
+        (car.front_wing * racetrack.slow_corners) + \
+        (car.suspension * racetrack.fast_corners) + \
+        (car.rear_wing * racetrack.fast_corners)
+    return performance
+
+
+def calculate_low_high_performance_rating(low_high_rating_number, racetrack):
+    performance = (low_high_rating_number * racetrack.straights) + \
+        (low_high_rating_number * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) + \
+        (low_high_rating_number * racetrack.straights) + \
+        (low_high_rating_number * racetrack.slow_corners) + \
+        (low_high_rating_number * racetrack.fast_corners) + \
+        (low_high_rating_number * racetrack.fast_corners)
+    return performance
+
+
+def calculate_optimal_lap_time(car, racetrack) -> int:
+    rating_low = calculate_low_high_performance_rating(5, racetrack)
+    rating_high = calculate_low_high_performance_rating(20, racetrack)
+    rating = calculate_car_performance_rating(car, racetrack)
+    
+    # Get max, min constant
+    constant_low = racetracks[racetrack.location.short_name]["worst_benchmark_time"] * rating_low
+    constant_high = racetracks[racetrack.location.short_name]["best_benchmark_time"] * rating_high
+    
+    # Linear interpolation to determine the constant for the specific rating
+    constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
+    
+    lap_time = int(constant / rating)
+    return lap_time
+
+

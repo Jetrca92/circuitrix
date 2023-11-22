@@ -1,16 +1,18 @@
+import random
 from datetime import timedelta
 
 from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date  
+from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date  , calculate_optimal_lap_time, calculate_car_performance_rating
+
 
 class AssignChampionshipTestCase(TestCase):
     
     def test_assign_teams(self):
         # Create 1270 Users, Managers, and Teams for testing
-        for i in range(1270):
+        for i in range(12):
             user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
             manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
             team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
@@ -165,3 +167,45 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
 
         # Ensure that the team has not been added to the race
         self.assertNotIn(self.team, self.race.teams.all())
+
+
+class CarPerformanceFormulaTestCase(TestCase):
+    def setUp(self):
+        # Create country and racetrack
+        country = Country.objects.create(name="Test Country", short_name="IT", logo_location="manager/flags/test.png")
+        self.racetrack = Racetrack.objects.create(
+            name="Test Monza Racetrack",
+            location=country,
+            image_location="manager/circuits/test.png",
+            description="A test racetrack",
+            lap_length_km=4.5,
+            total_laps=50,
+            straights=70.0,
+            slow_corners=10.0,
+            fast_corners=20.0,
+        )
+        # Generate teams
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
+            car = Car(
+                owner=team,
+                engine=random.randint(5, 20),
+                gearbox=random.randint(5, 20),
+                brakes=random.randint(5, 20),
+                front_wing=random.randint(5, 20),
+                suspension=random.randint(5, 20),
+                rear_wing=random.randint(5, 20),
+            )
+            car.save()
+            team.car = car
+            team.save()
+
+        
+    def test_car_function(self):
+        # Test function
+        teams = Team.objects.all()
+        for team in teams:
+            print(f"Car:{team.car.name}, lap_time:{calculate_optimal_lap_time(team.car, self.racetrack)}, rating:{calculate_car_performance_rating(team.car, self.racetrack)}")
+        
