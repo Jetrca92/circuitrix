@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date  , calculate_optimal_lap_time, calculate_car_performance_rating
+from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, simple_calculation
 
 
 class AssignChampionshipTestCase(TestCase):
@@ -206,6 +206,6 @@ class CarPerformanceFormulaTestCase(TestCase):
     def test_car_function(self):
         # Test function
         teams = Team.objects.all()
-        for team in teams:
-            print(f"Car:{team.car.name}, lap_time:{calculate_optimal_lap_time(team.car, self.racetrack)}, rating:{calculate_car_performance_rating(team.car, self.racetrack)}")
+        result = calculate_race_result(teams, self.racetrack)
+        simple_calculation()
         
