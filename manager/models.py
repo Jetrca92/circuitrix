@@ -186,4 +186,5 @@ class RaceResult(models.Model):
 class Lap(models.Model):
     time = models.PositiveIntegerField()
     lap_number = models.PositiveIntegerField()
-    race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")  
+    race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")
+    position = models.PositiveIntegerField(blank=True, null=True)  

@@ -175,7 +175,8 @@ def calculate_race_result(drivers, race):
             lap = Lap(
                 time=driver_1["lap_time"],
                 lap_number=lap_number,
-                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]))
+                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"])),
+                position=driver_1["rank"],
             )
             lap.save()
 
@@ -190,3 +191,8 @@ def calculate_race_result(drivers, race):
         print("Maximum Time Difference:", max_diff)
         print("Drivers with the highest Time difference:", drivers_with_max_diff)
         print("Updated Drivers:", sorted_drivers)
+
+    for driver in drivers:
+        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]))
+        update_result.position = driver["rank"]
+        update_result.save()
