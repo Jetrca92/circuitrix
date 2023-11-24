@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
-from manager.models import Championship, Racetrack, Race
+from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver
 from races.constants import racetracks
 
 
@@ -136,124 +136,57 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
     return lap_time
 
 
-def calculate_race_result(teams, racetrack):
-    cars = [team.car for team in teams]
-    laps = 10
-    positions = {}
-
-    for lap in range(laps):
-        lap_times = {f"{car.owner.name}": calculate_optimal_lap_time(car, racetrack) * random.uniform(1.0, 1.0) for car in cars}
-
-        # Convert dictionary items to a list of tuples for easier iteration
-        team_lap_times = list(lap_times.items())
-        
-        # Find the pair with the biggest time difference
-        biggest_lap_diff = 0
-        teams_with_biggest_diff = None
-        
-        # Iterate through the list to find lap time differences
-        for i in range(len(team_lap_times) - 1):
-            team_1, lap_time_1 = team_lap_times[i]
-            team_2, lap_time_2 = team_lap_times[i + 1]
-
-            lap_time_diff = lap_time_2 - lap_time_1
-            if lap_time_diff < biggest_lap_diff and lap_time_diff < 0:
-                biggest_lap_diff = lap_time_diff
-                teams_with_biggest_diff = (team_1, team_2)
-        print(f"Lap {lap + 1} lap times: {lap_times}")
-        if teams_with_biggest_diff:
-            print(f"Difference between {teams_with_biggest_diff}: {biggest_lap_diff:.2f} seconds")
-            # Swap the positions of the teams in the cars list
-            team_1_index = [i for i, team in enumerate(teams) if team.car.owner.name == teams_with_biggest_diff[0]][0]
-            team_2_index = [i for i, team in enumerate(teams) if team.car.owner.name == teams_with_biggest_diff[1]][0]
-
-            cars[team_1_index], cars[team_2_index] = cars[team_2_index], cars[team_1_index]
-            print(f"Swapping {teams_with_biggest_diff[0]} and {teams_with_biggest_diff[1]}")
-
-        positions[lap + 1] = [car.owner.name for car in cars]
-        
-
-    print(positions)
-    return positions
-
-
-def simple_calculation():
-    teams = [
+def calculate_race_result(drivers, race):
+    drivers = [
         {
-            'name': 'McLaren', 
-            'rating': 90, 
-            'rank': 1
-        },
-        {
-            'name': 'Ferarri', 
-            'rating': 85, 
-            'rank': 2
-        },
-        {
-            'name': 'RedBull', 
-            'rating': 100, 
-            'rank': 3
-        },
-        {
-            'name': 'AlphaTauri', 
-            'rating': 65, 
-            'rank': 4
-        },
-        {
-            'name': 'Mercedes', 
-            'rating': 89, 
-            'rank': 5
-        },
-        {
-            'name': 'Alpine', 
-            'rating': 68, 
-            'rank': 6
-        },
-        {
-            'name': 'Haas', 
-            'rating': 65, 
-            'rank': 7
-        },
-        {
-            'name': 'AlfaRomeo', 
-            'rating': 64, 
-            'rank': 8
-        },
-        {
-            'name': 'AstonMartin', 
-            'rating': 83, 
-            'rank': 9
-        },
-        {
-            'name': 'Williams', 
-            'rating': 76, 
-            'rank': 10
-        }]
-
-    laps = 5
-    
-    for lap in range(laps):
+            "team_name": driver.team.name,
+            "team_id": driver.team.id,
+            "rank": i + 1,
+            "lap_time": calculate_optimal_lap_time(driver.team.car, race.location),
+            "driver_id": driver.id
+        }
+        for i, (driver) in enumerate(drivers, start=0)
+    ]
+    laps = race.laps
+    for driver in drivers:
+        result = RaceResult(
+            race=race,
+            team=Team.objects.get(id=driver["team_id"]),
+            driver=Driver.objects.get(id=driver["driver_id"]),
+        )
+        result.save()
+    for i in range(laps):
         max_diff = 0
-        teams_with_max_diff = None
-        teams = sorted(teams, key=lambda x: x["rank"])
-        for i in range(len(teams) - 1):
-            team_1 = teams[i]
-            team_2 = teams[i + 1]
+        drivers_with_max_diff = None
+        lap_number = i + 1
+        sorted_drivers = sorted(drivers, key=lambda x: x["rank"])
+        for i in range(len(sorted_drivers) - 1):
+            # Get max difference between adjacent cars
+            driver_1 = sorted_drivers[i]
+            driver_2 = sorted_drivers[i + 1]
 
-            rating_diff = team_1["rating"] - team_2["rating"]
+            rating_diff = driver_2["lap_time"] - driver_1["lap_time"]
 
             if rating_diff < max_diff and rating_diff < 0:
                 max_diff = rating_diff
-                teams_with_max_diff = (team_1, team_2)
+                drivers_with_max_diff = (driver_1, driver_2)
 
-        if teams_with_max_diff:
-            team_1_index = teams.index(teams_with_max_diff[0])
-            team_2_index = teams.index(teams_with_max_diff[1])
+            # Add result to model
+            lap = Lap(
+                time=driver_1["lap_time"],
+                lap_number=lap_number,
+                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]))
+            )
+            lap.save()
 
-            teams[team_1_index]["rank"], teams[team_2_index]["rank"] = teams[team_2_index]["rank"], teams[team_1_index]["rank"]
-        teams = sorted(teams, key=lambda x: x['rank'])
-        print("Maximum Rating Difference:", max_diff)
-        print("Teams with the highest rating difference:", teams_with_max_diff)
-        print("Updated Teams:", teams)
+        if drivers_with_max_diff:
+            driver_1_index = drivers.index(drivers_with_max_diff[0])
+            driver_2_index = drivers.index(drivers_with_max_diff[1])
 
+            sorted_drivers[driver_1_index]["rank"], sorted_drivers[driver_2_index]["rank"] = sorted_drivers[driver_2_index]["rank"], sorted_drivers[driver_1_index]["rank"]
+        sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
 
+        print(f"Lap number: {lap_number}")
+        print("Maximum Time Difference:", max_diff)
+        print("Drivers with the highest Time difference:", drivers_with_max_diff)
+        print("Updated Drivers:", sorted_drivers)

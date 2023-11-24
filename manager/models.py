@@ -175,8 +175,15 @@ class RaceResult(models.Model):
     race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name='results')
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    position = models.PositiveIntegerField()
-    best_lap = models.DurationField()
+    position = models.PositiveIntegerField(blank=True, null=True)
+    best_lap = models.DurationField(blank=True, null=True)
+    laps = models.ManyToManyField('Lap', blank=True, related_name="lap_race")
 
     def __str__(self):
-        return f"{self.race.name} - {self.driver.name} - {self.position}"    
+        return f"{self.race.name} - {self.driver.name} - {self.position}"  
+
+
+class Lap(models.Model):
+    time = models.PositiveIntegerField()
+    lap_number = models.PositiveIntegerField()
+    race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")  

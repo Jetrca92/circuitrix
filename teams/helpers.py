@@ -1,6 +1,7 @@
 import random
+from datetime import timedelta
 
-from datetime import datetime, timedelta
+from django.utils import timezone
 
 from teams.constants import (
     uk_names, uk_surnames, 
@@ -113,14 +114,14 @@ def generate_drivers(team):
 
 
 def driver_random_birth_date():
-    now = datetime.now()
+    now = timezone.now()
     delta = timedelta(days=random.randint(1512, 1900))
     driver_birth_date = now - delta
     return driver_birth_date
 
 
 def staff_random_birth_date():
-    now = datetime.now()
+    now = timezone.now()
     delta = timedelta(days=random.randint(2100, 2900))
     staff_birth_date = now - delta
     return staff_birth_date

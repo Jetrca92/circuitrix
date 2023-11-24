@@ -5,7 +5,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, simple_calculation
+from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result
+from teams.helpers import generate_drivers
 
 
 class AssignChampionshipTestCase(TestCase):
@@ -172,7 +173,7 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
 class CarPerformanceFormulaTestCase(TestCase):
     def setUp(self):
         # Create country and racetrack
-        country = Country.objects.create(name="Test Country", short_name="IT", logo_location="manager/flags/test.png")
+        country = Country.objects.create(name="Italy", short_name="IT", logo_location="manager/flags/test.png")
         self.racetrack = Racetrack.objects.create(
             name="Test Monza Racetrack",
             location=country,
@@ -188,7 +189,7 @@ class CarPerformanceFormulaTestCase(TestCase):
         for i in range(10):
             user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
             manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
-            team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=country)
             car = Car(
                 owner=team,
                 engine=random.randint(5, 20),
@@ -201,11 +202,17 @@ class CarPerformanceFormulaTestCase(TestCase):
             car.save()
             team.car = car
             team.save()
-
-        
+            generate_drivers(team)
+        self.race = Race.objects.create(
+            name="Test Race",
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=10,
+        )
+        self.race.teams.set(Team.objects.all())
     def test_car_function(self):
         # Test function
-        teams = Team.objects.all()
-        result = calculate_race_result(teams, self.racetrack)
-        simple_calculation()
+        drivers = Driver.objects.all()
+        calculate_race_result(drivers, self.race)
+        
         
