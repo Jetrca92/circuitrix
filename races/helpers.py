@@ -132,8 +132,7 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
     # Linear interpolation to determine the constant for the specific rating
     constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
     
-    lap_time = int(constant / rating)
-    return lap_time
+    return int(constant / rating)
 
 
 def calculate_race_result(drivers, race):
@@ -183,8 +182,8 @@ def calculate_race_result(drivers, race):
         if drivers_with_max_diff:
             driver_1_index = drivers.index(drivers_with_max_diff[0])
             driver_2_index = drivers.index(drivers_with_max_diff[1])
-
             sorted_drivers[driver_1_index]["rank"], sorted_drivers[driver_2_index]["rank"] = sorted_drivers[driver_2_index]["rank"], sorted_drivers[driver_1_index]["rank"]
+        
         sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
 
         print(f"Lap number: {lap_number}")

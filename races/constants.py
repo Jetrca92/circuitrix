@@ -72,7 +72,7 @@ dedicated fans, Fukuoka is a beloved destination for Formula 1 enthusiasts. Get 
 on this iconic Japanese track, where precision and power come together for an unforgettable race day!"""
 
 racetracks = {
-    "ES": {
+    "ES_racetrack": {
         "name": "Circuito de España",
         "location": "ES",
         "image_location": "manager/circuits/circuito_de_espana.png",
@@ -85,7 +85,7 @@ racetracks = {
         "fast_corners": 30,
         "description": es_description,
     },
-    "UK": {
+    "UK_racetrack": {
         "name": "Goldenstone circuit",
         "location": "UK",
         "image_location": "manager/circuits/goldenstone_circuit.png",
@@ -98,7 +98,7 @@ racetracks = {
         "fast_corners": 35,
         "description": uk_description,
     },
-    "IT": {
+    "IT_racetrack": {
         "name": "Autodromo dell'Italia",
         "location": "IT",
         "image_location": "manager/circuits/autodromo_dell_italia.png",
@@ -111,7 +111,7 @@ racetracks = {
         "fast_corners": 20,
         "description": it_description,
     },
-    "MC": {
+    "MC_racetrack": {
         "name": "Circuit de Monte Carlo",
         "location": "MC",
         "image_location": "manager/circuits/circuit_de_monte_carlo.png",
@@ -124,7 +124,7 @@ racetracks = {
         "fast_corners": 20,
         "description": mc_description,
     },
-    "US": {
+    "US_racetrack": {
         "name": "Circuit of the United States",
         "location": "US",
         "image_location": "manager/circuits/circuit_of_the_united_states.png",
@@ -137,7 +137,7 @@ racetracks = {
         "fast_corners": 40,
         "description": us_description,
     },
-    "AT": {
+    "AT_racetrack": {
         "name": "Spielberg Rundkurs",
         "location": "AT",
         "image_location": "manager/circuits/spielberg_rundkurs.png",
@@ -150,7 +150,7 @@ racetracks = {
         "fast_corners": 30,
         "description": at_description,
     },
-    "DE": {
+    "DE_racetrack": {
         "name": "Deutschring",
         "location": "DE",
         "image_location": "manager/circuits/deutschring.png",
@@ -163,7 +163,7 @@ racetracks = {
         "fast_corners": 25,
         "description": de_description,
     },
-    "BE": {
+    "BE_racetrack": {
         "name": "Circuit de Belgique",
         "location": "BE",
         "image_location": "manager/circuits/circuit_de_belgique.png",
@@ -176,7 +176,7 @@ racetracks = {
         "fast_corners": 35,
         "description": be_description,
     },
-    "FR": {
+    "FR_racetrack": {
         "name": "Circuit de France",
         "location": "FR",
         "image_location": "manager/circuits/circuit_de_france.png",
@@ -189,7 +189,7 @@ racetracks = {
         "fast_corners": 35,
         "description": fr_description,
     },
-    "JP": {
+    "JP_racetrack": {
         "name": "Fukuoka",
         "location": "JP",
         "image_location": "manager/circuits/fukuoka.png",

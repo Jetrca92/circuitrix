@@ -5,7 +5,9 @@ from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result
+from races.constants import racetracks
+from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, calculate_car_performance_rating, calculate_low_high_performance_rating
+from teams.constants import countries
 from teams.helpers import generate_drivers
 
 
@@ -13,7 +15,7 @@ class AssignChampionshipTestCase(TestCase):
     
     def test_assign_teams(self):
         # Create 1270 Users, Managers, and Teams for testing
-        for i in range(12):
+        for i in range(1270):
             user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
             manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
             team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
@@ -214,5 +216,98 @@ class CarPerformanceFormulaTestCase(TestCase):
         # Test function
         drivers = Driver.objects.all()
         calculate_race_result(drivers, self.race)
+
+
+class CalculateCarPerformanceRatingTestCase(TestCase):
+    def setUp(self):
+
+        # Create countries and teams
+        for code, country in countries.items():
+            c, created = Country.objects.get_or_create(
+                short_name=country["short_name"],
+                defaults={
+                    "name": country["name"],
+                    "logo_location": country["logo"],
+                }
+            )
+
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
+            car = Car(
+                owner=team,
+                engine=random.randint(5, 20),
+                gearbox=random.randint(5, 20),
+                brakes=random.randint(5, 20),
+                front_wing=random.randint(5, 20),
+                suspension=random.randint(5, 20),
+                rear_wing=random.randint(5, 20),
+            )
+            car.save()
+            team.car = car
+            team.save()
+
+        # Create Racetrack object
+        for code, racetrack in racetracks.items():
+            try:
+                location = Country.objects.get(short_name=racetrack["location"])
+                r = Racetrack(
+                    name=racetrack["name"],
+                    location=location,
+                    image_location=racetrack["image_location"],
+                    description=racetrack["description"],
+                    lap_length_km=racetrack["lap_length_km"],
+                    total_laps=racetrack["total_laps"],
+                    straights=racetrack["straights"],
+                    slow_corners=racetrack["slow_corners"],
+                    fast_corners=racetrack["fast_corners"],
+                )
+                r.save()
+            except Country.MultipleObjectsReturned:
+                print(f"Multiple countries found for short_name '{racetrack['location']}'")
+
+    def test_calculate_car_performance(self):
+        for team in Team.objects.all():
+            for racetrack in Racetrack.objects.all():   
+                expected_result = (
+                    (team.car.engine * racetrack.straights) +
+                    (team.car.gearbox * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                    (team.car.brakes * racetrack.straights) +
+                    (team.car.front_wing * racetrack.slow_corners) +
+                    (team.car.suspension * racetrack.fast_corners) +
+                    (team.car.rear_wing * racetrack.fast_corners)
+                )
+                actual_result = calculate_car_performance_rating(team.car, racetrack)
+
+                self.assertEqual(expected_result, actual_result)
+
+    def test_calculate_low_high_performance(self):
+        for racetrack in Racetrack.objects.all():
+            expected_result_min = (
+                (5 * racetrack.straights) +
+                (5 * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                (5 * racetrack.straights) +
+                (5 * racetrack.slow_corners) +
+                (5 * racetrack.fast_corners) +
+                (5 * racetrack.fast_corners)
+            )
+            expected_result_max = (
+                (20 * racetrack.straights) +
+                (20 * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                (20 * racetrack.straights) +
+                (20 * racetrack.slow_corners) +
+                (20 * racetrack.fast_corners) +
+                (20 * racetrack.fast_corners)
+            )
+            actual_result_min = calculate_low_high_performance_rating(5, racetrack)
+            actual_result_max = calculate_low_high_performance_rating(20, racetrack)
+
+            self.assertEqual(expected_result_min, actual_result_min)
+            self.assertEqual(expected_result_max, actual_result_max)
+
+
+
+        
         
         
