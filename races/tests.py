@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
 from races.constants import racetracks
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, calculate_car_performance_rating, calculate_low_high_performance_rating
+from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, calculate_car_performance_rating, calculate_low_high_performance_rating, calculate_optimal_lap_time
 from teams.constants import countries
 from teams.helpers import generate_drivers
 
@@ -305,6 +305,22 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
 
             self.assertEqual(expected_result_min, actual_result_min)
             self.assertEqual(expected_result_max, actual_result_max)
+
+    def test_calculate_optimal_lap_time(self):
+        for racetrack in Racetrack.objects.all():
+            for team in Team.objects.all():
+                rating_low = calculate_low_high_performance_rating(5, racetrack)
+                rating_high = calculate_low_high_performance_rating(20, racetrack)
+                rating = calculate_car_performance_rating(team.car, racetrack)
+                constant_low = racetracks[racetrack.location.short_name]["worst_benchmark_time"] * rating_low
+                constant_high = racetracks[racetrack.location.short_name]["best_benchmark_time"] * rating_high
+                constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
+        
+                expected_result = int(constant / rating)
+                actual_result = calculate_optimal_lap_time(team.car, racetrack)
+
+                self.assertEqual(expected_result, actual_result)
+                
 
 
 
