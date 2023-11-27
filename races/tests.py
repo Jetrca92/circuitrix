@@ -4,11 +4,19 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
+from manager.models import (
+    Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
+    Car, Driver, RaceResult, Lap
+)
 from races.constants import racetracks
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date, calculate_race_result, calculate_car_performance_rating, calculate_low_high_performance_rating, calculate_optimal_lap_time
+from races.helpers import (
+    assign_championship, add_team_to_upcoming_races, next_sunday_date,
+    calculate_race_result, calculate_car_performance_rating,
+    calculate_low_high_performance_rating, calculate_optimal_lap_time
+)
 from teams.constants import countries
 from teams.helpers import generate_drivers
+
 
 
 class AssignChampionshipTestCase(TestCase):
@@ -172,7 +180,7 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
         self.assertNotIn(self.team, self.race.teams.all())
 
 
-class CarPerformanceFormulaTestCase(TestCase):
+class CalculateRaceResultTestCase(TestCase):
     def setUp(self):
         # Create country and racetrack
         country = Country.objects.create(name="Italy", short_name="IT", logo_location="manager/flags/test.png")
@@ -209,13 +217,27 @@ class CarPerformanceFormulaTestCase(TestCase):
             name="Test Race",
             date=timezone.now(),
             location=self.racetrack,
-            laps=10,
+            laps=65,
         )
         self.race.teams.set(Team.objects.all())
+
     def test_car_function(self):
-        # Test function
         drivers = Driver.objects.all()
-        calculate_race_result(drivers, self.race)
+        updated_drivers = calculate_race_result(drivers, self.race)
+
+        # Test object creation
+        for driver in updated_drivers:
+            result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+            self.assertEqual(result.team, Team.objects.get(id=driver["team_id"]))
+            self.assertEqual(result.race, self.race)
+
+        for driver in updated_drivers:
+            laps = Lap.objects.filter(race_result__driver=Driver.objects.get(id=driver['driver_id']))
+            self.assertEqual(laps.count(), self.race.laps)
+
+        for driver in updated_drivers:
+            result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+            self.assertEqual(result.position, driver["rank"])
 
 
 class CalculateCarPerformanceRatingTestCase(TestCase):

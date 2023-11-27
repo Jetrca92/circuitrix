@@ -146,7 +146,6 @@ def calculate_race_result(drivers, race):
         }
         for i, (driver) in enumerate(drivers, start=0)
     ]
-    laps = race.laps
     for driver in drivers:
         result = RaceResult(
             race=race,
@@ -154,7 +153,7 @@ def calculate_race_result(drivers, race):
             driver=Driver.objects.get(id=driver["driver_id"]),
         )
         result.save()
-    for i in range(laps):
+    for i in range(race.laps):
         max_diff = 0
         drivers_with_max_diff = None
         lap_number = i + 1
@@ -178,7 +177,16 @@ def calculate_race_result(drivers, race):
                 position=driver_1["rank"],
             )
             lap.save()
-
+            # Process the last driver explicitly
+            if i == len(sorted_drivers) - 2:
+                lap = Lap(
+                    time=driver_2["lap_time"],
+                    lap_number=lap_number,
+                    race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"])),
+                    position=driver_2["rank"],
+                )
+                lap.save()
+        
         if drivers_with_max_diff:
             driver_1_index = drivers.index(drivers_with_max_diff[0])
             driver_2_index = drivers.index(drivers_with_max_diff[1])
@@ -186,12 +194,14 @@ def calculate_race_result(drivers, race):
         
         sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
 
-        print(f"Lap number: {lap_number}")
-        print("Maximum Time Difference:", max_diff)
-        print("Drivers with the highest Time difference:", drivers_with_max_diff)
-        print("Updated Drivers:", sorted_drivers)
+        #print(f"Lap number: {lap_number}")
+        #print("Maximum Time Difference:", max_diff)
+        #print("Drivers with the highest Time difference:", drivers_with_max_diff)
+        #print("Updated Drivers:", sorted_drivers)
 
     for driver in drivers:
-        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]))
+        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
         update_result.position = driver["rank"]
         update_result.save()
+    
+    return sorted_drivers
