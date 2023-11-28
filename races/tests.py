@@ -217,14 +217,23 @@ class CalculateRaceResultTestCase(TestCase):
             name="Test Race",
             date=timezone.now(),
             location=self.racetrack,
-            laps=65,
+            laps=1000,
         )
         self.race.teams.set(Team.objects.all())
 
     def test_car_function(self):
         drivers = Driver.objects.all()
         updated_drivers = calculate_race_result(drivers, self.race)
+        sorted_updated_drivers = sorted(updated_drivers, key=lambda x: x['rank'])
 
+        # After 1000 laps, cars should be sorted based on lap_time ascending
+        for i in range(len(sorted_updated_drivers) - 1):
+            current_driver = sorted_updated_drivers[i]
+            next_driver = sorted_updated_drivers[i + 1]
+
+            self.assertLessEqual(current_driver['lap_time'], next_driver['lap_time'])
+            self.assertLessEqual(current_driver['rank'], next_driver['rank'])
+            
         # Test object creation
         for driver in updated_drivers:
             result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))

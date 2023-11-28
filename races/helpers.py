@@ -157,7 +157,9 @@ def calculate_race_result(drivers, race):
         max_diff = 0
         drivers_with_max_diff = None
         lap_number = i + 1
-        sorted_drivers = sorted(drivers, key=lambda x: x["rank"])
+        # Sort drivers on first loop
+        if i == 0:
+            sorted_drivers = sorted(drivers, key=lambda x: x["rank"])
         for i in range(len(sorted_drivers) - 1):
             # Get max difference between adjacent cars
             driver_1 = sorted_drivers[i]
@@ -188,8 +190,8 @@ def calculate_race_result(drivers, race):
                 lap.save()
         
         if drivers_with_max_diff:
-            driver_1_index = drivers.index(drivers_with_max_diff[0])
-            driver_2_index = drivers.index(drivers_with_max_diff[1])
+            driver_1_index = sorted_drivers.index(drivers_with_max_diff[0])
+            driver_2_index = sorted_drivers.index(drivers_with_max_diff[1])
             sorted_drivers[driver_1_index]["rank"], sorted_drivers[driver_2_index]["rank"] = sorted_drivers[driver_2_index]["rank"], sorted_drivers[driver_1_index]["rank"]
         
         sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
@@ -204,4 +206,4 @@ def calculate_race_result(drivers, race):
         update_result.position = driver["rank"]
         update_result.save()
     
-    return sorted_drivers
+    return drivers
