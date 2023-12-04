@@ -91,6 +91,7 @@ def next_sunday_date():
     return next_sunday_date
 
 
+@transaction.atomic
 def add_team_to_upcoming_races(championship, team):
     upcoming_races = championship.races.filter(date__gt=timezone.now())
     if not upcoming_races:
@@ -101,23 +102,21 @@ def add_team_to_upcoming_races(championship, team):
     
 
 def calculate_car_performance_rating(car, racetrack):
-    performance = (car.engine * racetrack.straights) + \
+    return (car.engine * racetrack.straights) + \
         (car.gearbox * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) + \
         (car.brakes * racetrack.straights) + \
         (car.front_wing * racetrack.slow_corners) + \
         (car.suspension * racetrack.fast_corners) + \
         (car.rear_wing * racetrack.fast_corners)
-    return performance
 
 
 def calculate_low_high_performance_rating(low_high_rating_number, racetrack):
-    performance = (low_high_rating_number * racetrack.straights) + \
+    return (low_high_rating_number * racetrack.straights) + \
         (low_high_rating_number * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) + \
         (low_high_rating_number * racetrack.straights) + \
         (low_high_rating_number * racetrack.slow_corners) + \
         (low_high_rating_number * racetrack.fast_corners) + \
         (low_high_rating_number * racetrack.fast_corners)
-    return performance
 
 
 def calculate_optimal_lap_time(car, racetrack) -> int:
@@ -135,6 +134,7 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
     return int(constant / rating)
 
 
+@transaction.atomic
 def calculate_race_result(drivers, race):
     drivers = [
         {
