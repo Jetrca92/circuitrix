@@ -1,10 +1,25 @@
+import random
 from datetime import timedelta
+from unittest import mock
+from unittest.mock import call, Mock
 
 from django.test import TestCase
 from django.utils import timezone
 
-from manager.models import Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic, Car, Driver
-from races.helpers import assign_championship, add_team_to_upcoming_races, next_sunday_date  
+from manager.models import (
+    Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
+    Car, Driver, RaceResult, Lap
+)
+from races.constants import racetracks
+from races.helpers import (
+    assign_championship, add_team_to_upcoming_races, next_sunday_date,
+    calculate_race_result, calculate_car_performance_rating,
+    calculate_low_high_performance_rating, calculate_optimal_lap_time
+)
+from teams.constants import countries
+from teams.helpers import generate_drivers
+
+
 
 class AssignChampionshipTestCase(TestCase):
     
@@ -165,3 +180,183 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
 
         # Ensure that the team has not been added to the race
         self.assertNotIn(self.team, self.race.teams.all())
+
+
+class CalculateRaceResultTestCase(TestCase):
+    def setUp(self):
+        # Create country and racetrack
+        country = Country.objects.create(name="Italy", short_name="IT", logo_location="manager/flags/test.png")
+        self.racetrack = Racetrack.objects.create(
+            name="Test Monza Racetrack",
+            location=country,
+            image_location="manager/circuits/test.png",
+            description="A test racetrack",
+            lap_length_km=4.5,
+            total_laps=50,
+            straights=70.0,
+            slow_corners=10.0,
+            fast_corners=20.0,
+        )
+        # Generate teams
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=country)
+            car = Car(
+                owner=team,
+                engine=random.randint(5, 20),
+                gearbox=random.randint(5, 20),
+                brakes=random.randint(5, 20),
+                front_wing=random.randint(5, 20),
+                suspension=random.randint(5, 20),
+                rear_wing=random.randint(5, 20),
+            )
+            car.save()
+            team.car = car
+            team.save()
+            generate_drivers(team)
+        self.race = Race.objects.create(
+            name="Test Race",
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=1000,
+        )
+        self.race.teams.set(Team.objects.all())
+
+    def test_car_function(self):
+        drivers = Driver.objects.all()
+        updated_drivers = calculate_race_result(drivers, self.race)
+        sorted_updated_drivers = sorted(updated_drivers, key=lambda x: x['rank'])
+
+        # After 1000 laps, cars should be sorted based on lap_time ascending
+        for i in range(len(sorted_updated_drivers) - 1):
+            current_driver = sorted_updated_drivers[i]
+            next_driver = sorted_updated_drivers[i + 1]
+
+            self.assertLessEqual(current_driver['lap_time'], next_driver['lap_time'])
+            self.assertLessEqual(current_driver['rank'], next_driver['rank'])
+            
+        # Test object creation
+        for driver in updated_drivers:
+            result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+            self.assertEqual(result.team, Team.objects.get(id=driver["team_id"]))
+            self.assertEqual(result.race, self.race)
+
+        for driver in updated_drivers:
+            laps = Lap.objects.filter(race_result__driver=Driver.objects.get(id=driver['driver_id']))
+            self.assertEqual(laps.count(), self.race.laps)
+
+        for driver in updated_drivers:
+            result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+            self.assertEqual(result.position, driver["rank"])
+
+
+class CalculateCarPerformanceRatingTestCase(TestCase):
+    def setUp(self):
+
+        # Create countries and teams
+        for code, country in countries.items():
+            c, created = Country.objects.get_or_create(
+                short_name=country["short_name"],
+                defaults={
+                    "name": country["name"],
+                    "logo_location": country["logo"],
+                }
+            )
+
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager)
+            car = Car(
+                owner=team,
+                engine=random.randint(5, 20),
+                gearbox=random.randint(5, 20),
+                brakes=random.randint(5, 20),
+                front_wing=random.randint(5, 20),
+                suspension=random.randint(5, 20),
+                rear_wing=random.randint(5, 20),
+            )
+            car.save()
+            team.car = car
+            team.save()
+
+        # Create Racetrack object
+        for code, racetrack in racetracks.items():
+            try:
+                location = Country.objects.get(short_name=racetrack["location"])
+                r = Racetrack(
+                    name=racetrack["name"],
+                    location=location,
+                    image_location=racetrack["image_location"],
+                    description=racetrack["description"],
+                    lap_length_km=racetrack["lap_length_km"],
+                    total_laps=racetrack["total_laps"],
+                    straights=racetrack["straights"],
+                    slow_corners=racetrack["slow_corners"],
+                    fast_corners=racetrack["fast_corners"],
+                )
+                r.save()
+            except Country.MultipleObjectsReturned:
+                print(f"Multiple countries found for short_name '{racetrack['location']}'")
+
+    def test_calculate_car_performance(self):
+        for team in Team.objects.all():
+            for racetrack in Racetrack.objects.all():   
+                expected_result = (
+                    (team.car.engine * racetrack.straights) +
+                    (team.car.gearbox * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                    (team.car.brakes * racetrack.straights) +
+                    (team.car.front_wing * racetrack.slow_corners) +
+                    (team.car.suspension * racetrack.fast_corners) +
+                    (team.car.rear_wing * racetrack.fast_corners)
+                )
+                actual_result = calculate_car_performance_rating(team.car, racetrack)
+
+                self.assertEqual(expected_result, actual_result)
+
+    def test_calculate_low_high_performance(self):
+        for racetrack in Racetrack.objects.all():
+            expected_result_min = (
+                (5 * racetrack.straights) +
+                (5 * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                (5 * racetrack.straights) +
+                (5 * racetrack.slow_corners) +
+                (5 * racetrack.fast_corners) +
+                (5 * racetrack.fast_corners)
+            )
+            expected_result_max = (
+                (20 * racetrack.straights) +
+                (20 * ((racetrack.slow_corners + racetrack.fast_corners) / 2)) +
+                (20 * racetrack.straights) +
+                (20 * racetrack.slow_corners) +
+                (20 * racetrack.fast_corners) +
+                (20 * racetrack.fast_corners)
+            )
+            actual_result_min = calculate_low_high_performance_rating(5, racetrack)
+            actual_result_max = calculate_low_high_performance_rating(20, racetrack)
+
+            self.assertEqual(expected_result_min, actual_result_min)
+            self.assertEqual(expected_result_max, actual_result_max)
+
+    @mock.patch('races.helpers.calculate_car_performance_rating', return_value=10)
+    @mock.patch('races.helpers.calculate_low_high_performance_rating', side_effect=lambda number, racetrack: number)
+    def test_calculate_optimal_lap_time(self, lhpr, cpr):
+        car = Car.objects.first()
+        racetrack = Racetrack.objects.first()
+
+        self.assertEqual(84, calculate_optimal_lap_time(car, racetrack))
+
+        lhpr.assert_has_calls([
+            call(5, racetrack,),
+            call(20, racetrack,),
+        ])
+
+        cpr.assert_called_with(car, racetrack)
+                    
+
+
+
+        
+        
+        
