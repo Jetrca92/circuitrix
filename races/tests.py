@@ -1,5 +1,7 @@
 import random
 from datetime import timedelta
+from unittest import mock
+from unittest.mock import call, Mock
 
 from django.test import TestCase
 from django.utils import timezone
@@ -337,21 +339,21 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
             self.assertEqual(expected_result_min, actual_result_min)
             self.assertEqual(expected_result_max, actual_result_max)
 
-    def test_calculate_optimal_lap_time(self):
-        for racetrack in Racetrack.objects.all():
-            for team in Team.objects.all():
-                rating_low = calculate_low_high_performance_rating(5, racetrack)
-                rating_high = calculate_low_high_performance_rating(20, racetrack)
-                rating = calculate_car_performance_rating(team.car, racetrack)
-                constant_low = racetracks[racetrack.location.short_name]["worst_benchmark_time"] * rating_low
-                constant_high = racetracks[racetrack.location.short_name]["best_benchmark_time"] * rating_high
-                constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
-        
-                expected_result = int(constant / rating)
-                actual_result = calculate_optimal_lap_time(team.car, racetrack)
+    @mock.patch('races.helpers.calculate_car_performance_rating', return_value=10)
+    @mock.patch('races.helpers.calculate_low_high_performance_rating', side_effect=lambda number, racetrack: number)
+    def test_calculate_optimal_lap_time(self, lhpr, cpr):
+        car = Car.objects.first()
+        racetrack = Racetrack.objects.first()
 
-                self.assertEqual(expected_result, actual_result)
-                
+        self.assertEqual(84, calculate_optimal_lap_time(car, racetrack))
+
+        lhpr.assert_has_calls([
+            call(5, racetrack,),
+            call(20, racetrack,),
+        ])
+
+        cpr.assert_called_with(car, racetrack)
+                    
 
 
 
