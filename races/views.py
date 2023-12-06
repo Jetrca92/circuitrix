@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
+from django.utils import timezone
 
 from manager.models import Championship, Race, Racetrack
 
@@ -61,4 +62,15 @@ class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_object(self, queryset=None):
         championship = Championship.objects.get(pk=self.kwargs['id'])
         return championship
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        championship = Championship.objects.get(pk=self.kwargs['id'])
+        upcoming_races = championship.races.filter(date__gt=timezone.now())
+        completed_races = championship.races.filter(date__lt=timezone.now())
+        ongoing_races = championship.races.filter(date=timezone.now())
+        context['upcoming_races'] = upcoming_races
+        context['completed_races'] = completed_races
+        context['ongoing_races'] = ongoing_races
+        return context
 

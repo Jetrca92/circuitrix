@@ -13,18 +13,63 @@ Races - {{ championship.name }}
         <span class="text-muted">({{ championship.id }})</span>
     </div>
     <div>
-        <h4 class="fw-bold lh-1">Races</h4>
+        {% if ongoing_races %}
+        <h4 class="fw-bold lh-1">Ongoing Races</h4>
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Country</th>
-                    <th scope="col">Laps</th>
-                    <th scope="col">Date</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-                {% for race in championship.races.all %}
+                {% for race in upcoming_races %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        <h4 class="fw-bold lh-1">Upcoming Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in upcoming_races %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h4 class="fw-bold lh-1">Completed Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in completed_races %}
                 <tr>
                     <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
                     <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>

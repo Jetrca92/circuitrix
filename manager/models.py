@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from races.managers import UpcomingRacesManager
 
 
 # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
@@ -166,6 +167,12 @@ class Race(models.Model):
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
     teams = models.ManyToManyField(Team, related_name="races")
+
+    objects = models.Manager()
+    upcoming_objects = UpcomingRacesManager()
+
+    def get_upcoming_races(self):
+        return self.upcoming_objects.all()
 
     def __str__(self):
         return f"{self.name} ({self.date})"
