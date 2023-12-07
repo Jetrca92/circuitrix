@@ -175,7 +175,7 @@ def calculate_race_result(drivers, race):
             lap = Lap(
                 time=driver_1["lap_time"],
                 lap_number=lap_number,
-                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"])),
+                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]), race=race),
                 position=driver_1["rank"],
             )
             lap.save()
@@ -184,7 +184,7 @@ def calculate_race_result(drivers, race):
                 lap = Lap(
                     time=driver_2["lap_time"],
                     lap_number=lap_number,
-                    race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"])),
+                    race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"]), race=race),
                     position=driver_2["rank"],
                 )
                 lap.save()
@@ -202,7 +202,7 @@ def calculate_race_result(drivers, race):
         #print("Updated Drivers:", sorted_drivers)
 
     for driver in drivers:
-        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]), race=race)
         update_result.position = driver["rank"]
         update_result.save()
     

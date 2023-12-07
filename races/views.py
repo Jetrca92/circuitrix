@@ -55,9 +55,8 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get(self, request, *args, **kwargs):
         race = self.get_object()
         if race.date < timezone.now():
-            try:
-                result = RaceResult.objects.get(race=race)
-            except RaceResult.DoesNotExist:
+            results = RaceResult.objects.filter(race=race).first()
+            if results is None:
                 drivers = []
                 for team in race.teams.all():
                     drivers.extend(team.drivers.all())
@@ -67,6 +66,13 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_object(self, queryset=None):
         race = Race.objects.get(pk=self.kwargs['id'])
         return race
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        race = Race.objects.get(pk=self.kwargs['id'])
+        race_results = RaceResult.objects.filter(race=race)
+        context['race_results'] = race_results
+        return context
 
 
 class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
@@ -81,11 +87,8 @@ class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         championship = Championship.objects.get(pk=self.kwargs['id'])
-        upcoming_races = championship.races.filter(date__gt=timezone.now())
-        completed_races = championship.races.filter(date__lt=timezone.now())
-        ongoing_races = championship.races.filter(date=timezone.now())
-        context['upcoming_races'] = upcoming_races
-        context['completed_races'] = completed_races
-        context['ongoing_races'] = ongoing_races
+        context['upcoming_races'] = championship.races.filter(date__gt=timezone.now())
+        context['completed_races'] = championship.races.filter(date__lt=timezone.now())
+        context['ongoing_races'] = championship.races.filter(date=timezone.now())
         return context
 

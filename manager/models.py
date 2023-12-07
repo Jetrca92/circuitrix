@@ -162,7 +162,7 @@ class Championship(models.Model):
         
 
 class Race(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     date = models.DateTimeField()
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()

@@ -27,6 +27,14 @@
             <li class="list-group-item">{{ team.name }}</li>
             {% endfor %}
         </ul>
+        {% if race_results %}
+        <h4 class="fw-bold lh-1">Results</h4>
+        <ul class="list-group list-group-flush">
+            {% for result in race_results %}
+            <li class="list-group-item">{{ result.driver.name }} - {{ result.position }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
     
 </div>
