@@ -19,6 +19,7 @@ def create_races(championship):
         date = next_sunday + timedelta(days=i * 7)
         r = Race(
             name=racetrack["name"] + " Grand Prix",
+            season=championship.season,
             date=date,
             location=location,
             laps=racetrack["total_laps"],
