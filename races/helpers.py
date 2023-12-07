@@ -40,8 +40,10 @@ def create_championship(team, division, division_counter):
         name = "Circuitrix"
     championship = Championship(name=name, season=season, division=division)
     championship.save()
-    create_races(championship)
     championship.teams.add(team)
+    championship.save()
+    create_races(championship)
+    
     team.championship = championship
     team.save()
 
