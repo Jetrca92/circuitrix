@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
-from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver
+from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver, Season
 from races.constants import racetracks
 
 
@@ -34,15 +34,29 @@ def create_races(championship):
 @transaction.atomic
 def create_championship(team, division, division_counter):
     name = f"{roman.toRoman(division)}.{division_counter}"
+    season_number = get_season_number()
+    season, created = Season.objects.get_or_create(number=season_number, is_ongoing=True)
     if division == 1:
         name = "Circuitrix"
-    championship = Championship(name=name, division=division)
+    championship = Championship(name=name, season=season, division=division)
     championship.save()
     create_races(championship)
     championship.teams.add(team)
     team.championship = championship
     team.save()
 
+
+def get_season_number():
+    try:
+        current_season = Season.objects.get(is_ongoing=True)
+        return current_season.number
+    except Season.DoesNotExist:
+        latest_season = Season.objects.all().order_by("-number").first()
+        if latest_season:
+            return latest_season.number
+        else:
+            return 1
+        
 
 @transaction.atomic
 def assign_championship(team):
