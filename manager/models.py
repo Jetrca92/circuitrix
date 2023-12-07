@@ -139,6 +139,14 @@ class Racetrack(models.Model):
         super(Racetrack, self).save(*args, **kwargs)
 
 
+class Season(models.Model):
+    number = models.PositiveIntegerField(unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Season {self.number}"
+
+
 class LapRecord(models.Model):
     holder = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="laprecord_holder")
     racetrack = models.ForeignKey(Racetrack, on_delete=models.CASCADE, related_name="laprecord_racetrack")
@@ -148,6 +156,7 @@ class LapRecord(models.Model):
 
 class Championship(models.Model):
     name = models.CharField(max_length=30)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True, related_name="championship_season")
     division = models.PositiveIntegerField(default=1)
     teams = models.ManyToManyField(Team, blank=True, related_name="league_teams")
     races = models.ManyToManyField('Race', blank=True, related_name="league_races")
@@ -163,6 +172,7 @@ class Championship(models.Model):
 
 class Race(models.Model):
     name = models.CharField(max_length=60)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True, related_name="race_season")
     date = models.DateTimeField()
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
@@ -195,3 +205,13 @@ class Lap(models.Model):
     lap_number = models.PositiveIntegerField()
     race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")
     position = models.PositiveIntegerField(blank=True, null=True)  
+
+
+class Points(models.Model):
+    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="points_race")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="points_team")
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="points_driver")
+    points = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.race.name} - {self.driver.name} - {self.points} points"
