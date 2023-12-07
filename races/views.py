@@ -1,9 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 from django.utils import timezone
+from django.urls import reverse
 
-from manager.models import Championship, Race, Racetrack
+from manager.models import Championship, Race, Racetrack, RaceResult
+from races.helpers import calculate_race_result
 
 
 class ManagerContextMixin(ContextMixin):
@@ -48,6 +51,18 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Race
     template_name = "races/race.html"
     context_object_name = "race"
+
+    def get(self, request, *args, **kwargs):
+        race = self.get_object()
+        if race.date < timezone.now():
+            try:
+                result = RaceResult.objects.get(race=race)
+            except RaceResult.DoesNotExist:
+                drivers = []
+                for team in race.teams.all():
+                    drivers.extend(team.drivers.all())
+                calculate_race_result(drivers, race)
+        return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         race = Race.objects.get(pk=self.kwargs['id'])
