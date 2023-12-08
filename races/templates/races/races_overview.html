@@ -36,6 +36,7 @@ Races - {{ championship.name }}
             </tbody>
         </table>
         {% endif %}
+        {% if upcoming_races %}
         <h4 class="fw-bold lh-1">Upcoming Races</h4>
         <table class="table">
             <thead>
@@ -57,7 +58,9 @@ Races - {{ championship.name }}
                 {% endfor %}
             </tbody>
         </table>
+        {% endif %}
 
+        {% if completed_races %}
         <h4 class="fw-bold lh-1">Completed Races</h4>
         <table class="table">
             <thead>
@@ -79,6 +82,7 @@ Races - {{ championship.name }}
                 {% endfor %}
             </tbody>
         </table>
+        {% endif %}
     </div>    
 </div>
 

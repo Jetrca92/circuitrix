@@ -172,3 +172,7 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
         team = Team.objects.get(pk=self.kwargs['id'])
         car = team.car
         return car
+    
+
+class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
+    pass
