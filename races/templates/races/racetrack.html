@@ -43,7 +43,23 @@
             </div>
         </div>
     </div>
-    {{ racetrack.description }}
+    <div class="mb-2">
+        {{ racetrack.description }}
+    </div>
+    <div class="feature col">
+        <h3 class="">Track characteristics</h3>
+        <div class="progress mb-1">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ racetrack.straights }}%;" aria-valuenow="{{ racetrack.straights }}" aria-valuemin="0" aria-valuemax="100">Straights {{ racetrack.straights|floatformat }}%</div>
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ racetrack.slow_corners }}%;" aria-valuenow="{{ racetrack.slow_corners }}" aria-valuemin="0" aria-valuemax="100">Slow corners {{ racetrack.slow_corners|floatformat }}%</div>
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ racetrack.fast_corners }}%;" aria-valuenow="{{ racetrack.fast_corners }}" aria-valuemin="0" aria-valuemax="100">Fast corners {{ racetrack.fast_corners|floatformat }}%</div>
+        </div>
+        <span>
+            {% if racetrack.lap_record %}
+            {{ racetrack.lap_record.holder.name }} {{ racetrack.lap_record.holder.surname }} ({{ racetrack.lap_record.date_set }})
+            {% endif %}
+        </span>
+    </div>
+    
 </div>
 
 {% endblock %}

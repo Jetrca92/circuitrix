@@ -37,3 +37,12 @@ class NewTeamForm(forms.Form):
 
 class EditCarNameForm(forms.Form):
     new_car_name = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}), min_length=1, max_length=30)
+
+
+class RaceOrdersForm(forms.Form):
+    driver_1 = forms.ChoiceField(
+        widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Driver"})
+    )
+    driver_2 = forms.ChoiceField(
+        widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Driver"})
+    )
