@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, Car, Race
 from races.helpers import assign_championship
-from teams.forms import NewTeamForm, EditCarNameForm
+from teams.forms import NewTeamForm, EditCarNameForm, RaceOrdersForm
 from teams.helpers import (
     generate_car,
     generate_drivers,
@@ -175,4 +175,26 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
     
 
 class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
-    pass
+    template_name = "teams/race_orders.html"
+
+    def get(self, request, id):
+        context = self.get_context_data()
+        team = Team.objects.get(owner=context['current_user_manager'])
+        form = RaceOrdersForm(team)
+        context.update({
+            "form": form,
+            "race": self.get_object(),
+        })
+        return render(request, self.template_name, context)
+
+    def get_context(self, form):
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+            "car": self.get_object(),
+        })
+        return context
+
+    def get_object(self, queryset=None):
+        race = Race.objects.get(pk=self.kwargs['id'])
+        return race

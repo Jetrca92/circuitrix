@@ -1,0 +1,57 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Race orders - {{ race.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+
+    <div class="row flex-lg-row-reverse align-items-center g-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+            <img src="{% static race.location.image_location %}" class="d-block mx-lg-auto img-fluid p-3" style="max-height: 400px;" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center mb-3 gap-3">
+                <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">{{ race.name }}</h1>
+                <img src="{% static race.location.location.logo_location %}"  width="auto" height="35" loading="lazy">
+                <span class="text-muted">({{ race.id }})</span>
+            </div>
+            
+            </div>
+        </div>
+        <h3 class="">Track characteristics</h3>
+        <div class="progress mb-1">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ race.location.straights }}%;" aria-valuenow="{{ race.location.straights }}" aria-valuemin="0" aria-valuemax="100">Straights {{ race.location.straights|floatformat }}%</div>
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ race.location.slow_corners }}%;" aria-valuenow="{{ race.location.slow_corners }}" aria-valuemin="0" aria-valuemax="100">Slow corners {{ race.location.slow_corners|floatformat }}%</div>
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ race.location.fast_corners }}%;" aria-valuenow="{{ race.location.fast_corners }}" aria-valuemin="0" aria-valuemax="100">Fast corners {{ race.location.fast_corners|floatformat }}%</div>
+        </div>
+    </div>
+
+    Race orders
+    {% for error in form.errors.values %}
+    <div class="text-danger fw-bold mb-3">
+        {{ error|join:", " }}
+    </div>
+    {% endfor %}
+    
+    <form action="{% url 'teams:race_orders' race.id %}" method="post" role="form" class="row">
+        {% csrf_token %}
+        <div class="col">
+            {{ form.driver_1 }}
+        </div>
+        <div class="col">
+            {{ form.driver_2 }}
+        </div>
+        <div class="col">
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </div>
+    </form>
+
+    
+    
+</div> 
+    
+{% endblock %}

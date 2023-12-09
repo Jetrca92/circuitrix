@@ -1,6 +1,6 @@
 from django import forms
 
-from manager.models import Country, Team
+from manager.models import Country, Team, Driver
 
 
 class NewTeamForm(forms.Form):
@@ -46,3 +46,13 @@ class RaceOrdersForm(forms.Form):
     driver_2 = forms.ChoiceField(
         widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Driver"})
     )
+
+    def __init__(self, team, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['driver_1'].choices = self.get_driver_choices(team)
+        self.fields['driver_2'].choices = self.get_driver_choices(team)
+
+    def get_driver_choices(self, team):
+        drivers = Driver.objects.filter(team=team)
+        choices = list(map(lambda driver: (driver.id, driver.surname), drivers))
+        return [("selected", "Select Driver")] + choices
