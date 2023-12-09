@@ -41,9 +41,11 @@ class EditCarNameForm(forms.Form):
 
 class RaceOrdersForm(forms.Form):
     driver_1 = forms.ChoiceField(
+        label="Driver 1",
         widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Driver"})
     )
     driver_2 = forms.ChoiceField(
+        label="Driver 2",
         widget=forms.Select(attrs={"class": "form-select", "aria-label": "Select Driver"})
     )
 
