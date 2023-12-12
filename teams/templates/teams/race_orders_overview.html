@@ -1,0 +1,90 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Races - {{ team.name }}
+{% endblock %}
+
+{% block main %}
+{% load static %}
+
+<div class="container col-md-11 px-2 py-5">
+    <div class="d-flex align-items-center mb-3 gap-3">
+        <h1 class="display-5 fw-bold lh-1">Set Race Orders</h1>
+    </div>
+    <div>
+        {% if ongoing_races %}
+        <h4 class="fw-bold lh-1">Ongoing Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in upcoming_races %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if upcoming_races %}
+        <h4 class="fw-bold lh-1">Upcoming Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in upcoming_races %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                    <td><a href="{% url 'teams:race_orders' race.id %}" class="link-dark">Set orders</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if completed_races %}
+        <h4 class="fw-bold lh-1">Completed Races</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for race in completed_races %}
+                <tr>
+                    <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+                    <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+                    <td>{{ race.laps }} laps</td>
+                    <td class="text-muted">{{ race.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>    
+</div>
+
+{% endblock %}

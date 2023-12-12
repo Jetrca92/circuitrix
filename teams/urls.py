@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from teams.views import CreateTeamView, TeamOverviewView, DriversView, DriverPageView, TeamOwnerView, TeamStaffView, TeamCarView, RaceOrdersView
+from teams.views import CreateTeamView, TeamOverviewView, DriversView, DriverPageView, TeamOwnerView, TeamStaffView, TeamCarView, RaceOrdersView, RaceOrdersOverviewView
 
 app_name = "teams"
 
@@ -13,4 +13,5 @@ urlpatterns = [
     path("<int:id>/staff", TeamStaffView.as_view(), name="staff"),
     path("<int:id>/car", TeamCarView.as_view(), name="car"),
     path("<int:id>/race-orders", RaceOrdersView.as_view(), name="race_orders"),
+    path("<int:id>/team-races", RaceOrdersOverviewView.as_view(), name="race_orders_overview"),
 ]

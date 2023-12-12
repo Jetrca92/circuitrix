@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 from django.urls import reverse
+from django.utils import timezone
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, RaceOrders, Race, RaceOrders
 from races.helpers import assign_championship
@@ -173,6 +174,25 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
         car = team.car
         return car
     
+
+class RaceOrdersOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
+    model = Race
+    template_name = "teams/race_orders_overview.html"
+    context_object_name = "races"
+
+    def get_queryset(self):
+        team = Team.objects.get(pk=self.kwargs['id'])
+        return team.championship.races.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(pk=self.kwargs['id'])
+        context['team'] = team
+        context['upcoming_races'] = team.championship.races.filter(date__gt=timezone.now())
+        context['completed_races'] = team.championship.races.filter(date__lt=timezone.now())
+        context['ongoing_races'] = team.championship.races.filter(date=timezone.now())
+        return context
+
 
 class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "teams/race_orders.html"
