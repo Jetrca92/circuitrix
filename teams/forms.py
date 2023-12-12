@@ -56,5 +56,28 @@ class RaceOrdersForm(forms.Form):
 
     def get_driver_choices(self, team):
         drivers = Driver.objects.filter(team=team)
-        choices = list(map(lambda driver: (driver.id, driver.surname), drivers))
+        choices = list(map(lambda driver: (driver.id, f"{driver.name} {driver.surname}"), drivers))
         return [("selected", "Select Driver")] + choices
+    
+    def clean_driver_1(self):
+        driver_1_id = self.cleaned_data.get("driver_1")
+        if not driver_1_id.isnumeric():
+            raise forms.ValidationError("Select Driver 1!")
+        if not Driver.objects.filter(id=int(driver_1_id)).exists():
+            raise forms.ValidationError("Select Driver 1!")
+        return driver_1_id
+    
+    def clean_driver_2(self):
+        driver_2_id = self.cleaned_data.get("driver_2")
+        if not driver_2_id.isnumeric():
+            raise forms.ValidationError("Select Driver 2!")
+        if not Driver.objects.filter(id=int(driver_2_id)).exists():
+            raise forms.ValidationError("Select Driver 2!")
+        return driver_2_id
+    
+    def clean(self):
+        driver_1_id = self.cleaned_data.get("driver_1")
+        driver_2_id = self.cleaned_data.get("driver_2")
+        if driver_1_id == driver_2_id:
+            raise forms.ValidationError("Driver 1 and Driver 2 must be different drivers!")
+        

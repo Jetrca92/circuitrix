@@ -5,7 +5,7 @@ from django.views.generic.base import ContextMixin
 from django.utils import timezone
 from django.urls import reverse
 
-from manager.models import Championship, Race, Racetrack, RaceResult
+from manager.models import Championship, Race, Racetrack, RaceResult, RaceOrders
 from races.helpers import calculate_race_result
 
 
@@ -59,7 +59,11 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
             if results is None:
                 drivers = []
                 for team in race.teams.all():
-                    drivers.extend(team.drivers.all())
+                    try:
+                        ro = RaceOrders.objects.get(team=team, race=race)
+                        drivers.extend([ro.driver_1, ro.driver_2])
+                    except RaceOrders.DoesNotExist:
+                        drivers.extend(team.drivers.all())
                 calculate_race_result(drivers, race)
         return super().get(request, *args, **kwargs)
 

@@ -216,3 +216,10 @@ class Points(models.Model):
 
     def __str__(self):
         return f"{self.race.name} - {self.driver.name} - {self.points} points"
+    
+
+class RaceOrders(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="orders_team")
+    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="orders_race")
+    driver_1 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_1")
+    driver_2 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_2")
