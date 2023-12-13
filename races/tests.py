@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from manager.models import (
     Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
-    Car, Driver, RaceResult, Lap
+    Car, Driver, RaceResult, Lap, Season
 )
 from races.constants import racetracks
 from races.helpers import (
@@ -122,11 +122,13 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
         )
 
         # Create a championship with a race
-        self.championship = Championship.objects.create(name="Test Championship", division=1)
+        self.season = Season.objects.create(number=1, is_ongoing=True)
+        self.championship = Championship.objects.create(name="Test Championship", season=self.season, division=1)
         self.championship.racetracks.add(self.racetrack)
 
         self.race = Race.objects.create(
             name="Test Race",
+            season=self.season,
             date=timezone.now() + timedelta(days=7),
             location=self.racetrack,
             laps=10,
@@ -148,6 +150,7 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
         # Create another race for testing
         another_race = Race.objects.create(
             name="Another Test Race",
+            season=self.season,
             date=next_sunday_date() + timedelta(days=14),
             location=self.racetrack,
             laps=15,
@@ -215,8 +218,10 @@ class CalculateRaceResultTestCase(TestCase):
             team.car = car
             team.save()
             generate_drivers(team)
+        self.season = Season.objects.create(number=1, is_ongoing=True)
         self.race = Race.objects.create(
             name="Test Race",
+            season=self.season,
             date=timezone.now(),
             location=self.racetrack,
             laps=1000,

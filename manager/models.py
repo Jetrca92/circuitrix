@@ -157,7 +157,7 @@ class LapRecord(models.Model):
 
 class Championship(models.Model):
     name = models.CharField(max_length=30)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True, related_name="championship_season")
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="championship_season")
     division = models.PositiveIntegerField(default=1)
     teams = models.ManyToManyField(Team, blank=True, related_name="league_teams")
     races = models.ManyToManyField('Race', blank=True, related_name="league_races")
@@ -173,7 +173,7 @@ class Championship(models.Model):
 
 class Race(models.Model):
     name = models.CharField(max_length=60)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, blank=True, null=True, related_name="race_season")
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="race_season")
     date = models.DateTimeField()
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
