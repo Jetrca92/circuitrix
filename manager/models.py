@@ -212,6 +212,11 @@ class RaceResult(models.Model):
     best_lap = models.DurationField(blank=True, null=True)
     laps = models.ManyToManyField('Lap', blank=True, related_name="lap_race")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['race', 'driver'], name='unique_race_result'),
+        ]
+
     def __str__(self):
         return f"{self.race.name} - {self.driver.name} - {self.position}"  
 
@@ -234,7 +239,12 @@ class Points(models.Model):
     
 
 class RaceOrders(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="orders_team")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="orders_team", )
     race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="orders_race")
     driver_1 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_1")
     driver_2 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_2")
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['team', 'race'], name='unique_race_order'),
+        ]
