@@ -51,29 +51,27 @@ class RaceOrdersForm(forms.Form):
 
     def __init__(self, team, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['driver_1'].choices = self.get_driver_choices(team)
-        self.fields['driver_2'].choices = self.get_driver_choices(team)
+        choices = self.get_driver_choices(team)
+        self.fields['driver_1'].choices = choices
+        self.fields['driver_2'].choices = choices
 
     def get_driver_choices(self, team):
         drivers = Driver.objects.filter(team=team)
         choices = list(map(lambda driver: (driver.id, f"{driver.name} {driver.surname}"), drivers))
         return [("selected", "Select Driver")] + choices
     
+    def clean_driver(self, driver_id, driver_number):
+        if not driver_id.isnumeric():
+            raise forms.ValidationError(f"Select Driver {driver_number}!")
+        if not Driver.objects.filter(id=int(driver_id)).exists():
+            raise forms.ValidationError(f"Select Driver {driver_number}!")
+        return driver_id
+    
     def clean_driver_1(self):
-        driver_1_id = self.cleaned_data.get("driver_1")
-        if not driver_1_id.isnumeric():
-            raise forms.ValidationError("Select Driver 1!")
-        if not Driver.objects.filter(id=int(driver_1_id)).exists():
-            raise forms.ValidationError("Select Driver 1!")
-        return driver_1_id
+        return self.clean_driver(self.cleaned_data.get("driver_1"), 1)
     
     def clean_driver_2(self):
-        driver_2_id = self.cleaned_data.get("driver_2")
-        if not driver_2_id.isnumeric():
-            raise forms.ValidationError("Select Driver 2!")
-        if not Driver.objects.filter(id=int(driver_2_id)).exists():
-            raise forms.ValidationError("Select Driver 2!")
-        return driver_2_id
+        return self.clean_driver(self.cleaned_data.get("driver_2"), 2)
     
     def clean(self):
         driver_1_id = self.cleaned_data.get("driver_1")
