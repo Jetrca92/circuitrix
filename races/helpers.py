@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
-from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver, Season
+from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver, Season, RaceOrders
 from races.constants import racetracks
 
 
@@ -201,14 +201,21 @@ def calculate_race_result(drivers, race):
         
         sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
 
-        #print(f"Lap number: {lap_number}")
-        #print("Maximum Time Difference:", max_diff)
-        #print("Drivers with the highest Time difference:", drivers_with_max_diff)
-        #print("Updated Drivers:", sorted_drivers)
-
     for driver in drivers:
         update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]), race=race)
         update_result.position = driver["rank"]
         update_result.save()
     
     return drivers
+
+
+@transaction.atomic
+def get_race_result(race):
+    drivers = []
+    for team in race.teams.all():
+        try:
+            ro = RaceOrders.objects.get(team=team, race=race)
+            drivers.extend([ro.driver_1, ro.driver_2])
+        except RaceOrders.DoesNotExist:
+            drivers.extend(team.drivers.all())
+    calculate_race_result(drivers, race)

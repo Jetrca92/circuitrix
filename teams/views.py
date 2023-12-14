@@ -220,7 +220,7 @@ class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
                     "driver_2": Driver.objects.get(id=int(form.cleaned_data["driver_2"])),
                 }
             )
-            return HttpResponseRedirect(reverse("teams:race_orders", kwargs={'id': id}))
+            return HttpResponseRedirect(reverse("teams:race_orders_overview", kwargs={'id': team.id}))
         else:
             context = self.get_context(form)
             return render(request, self.template_name, context)
