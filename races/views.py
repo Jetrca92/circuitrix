@@ -91,8 +91,8 @@ class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         championship = Championship.objects.get(pk=self.kwargs['id'])
-        context['upcoming_races'] = championship.races.filter(date__gt=timezone.now())
-        context['completed_races'] = championship.races.filter(date__lt=timezone.now())
-        context['ongoing_races'] = championship.races.filter(date=timezone.now())
+        context['upcoming_races'] = championship.upcoming_races()
+        context['completed_races'] = championship.completed_races()
+        context['ongoing_races'] = championship.ongoing_races()
         return context
 

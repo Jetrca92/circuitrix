@@ -140,6 +140,18 @@ class Racetrack(models.Model):
 
 
 class Season(models.Model):
+    @staticmethod
+    def current_season():
+        try:
+            return Season.objects.get(is_ongoing=True)
+        except Season.DoesNotExist:
+            latest_season = Season.objects.all().order_by("-number").first()
+            if latest_season:
+                return latest_season
+            else:
+                new_season = Season.objects.create(number=1, is_ongoing=True)
+                return new_season
+            
     number = models.PositiveIntegerField(unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     is_ongoing = models.BooleanField(default=False)
@@ -169,6 +181,15 @@ class Championship(models.Model):
     def add_racetracks(self):
         racetracks = Racetrack.objects.all()
         self.racetracks.set(racetracks)
+
+    def upcoming_races(self):
+        return self.races.filter(date__gt=timezone.now())
+    
+    def completed_races(self):
+        return self.races.filter(date__lt=timezone.now())
+    
+    def ongoing_races(self):
+        return self.races.filter(date=timezone.now())
         
 
 class Race(models.Model):
@@ -178,12 +199,6 @@ class Race(models.Model):
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
     teams = models.ManyToManyField(Team, related_name="races")
-
-    objects = models.Manager()
-    upcoming_objects = UpcomingRacesManager()
-
-    def get_upcoming_races(self):
-        return self.upcoming_objects.all()
 
     def __str__(self):
         return f"{self.name} ({self.date})"

@@ -34,7 +34,7 @@ def create_races(championship):
 @transaction.atomic
 def create_championship(team, division, division_counter):
     name = f"{roman.toRoman(division)}.{division_counter}"
-    season_number = get_season_number()
+    season_number = Season.current_season().number
     season, created = Season.objects.get_or_create(number=season_number, is_ongoing=True)
     if division == 1:
         name = "Circuitrix"
@@ -46,18 +46,6 @@ def create_championship(team, division, division_counter):
     
     team.championship = championship
     team.save()
-
-
-def get_season_number():
-    try:
-        current_season = Season.objects.get(is_ongoing=True)
-        return current_season.number
-    except Season.DoesNotExist:
-        latest_season = Season.objects.all().order_by("-number").first()
-        if latest_season:
-            return latest_season.number
-        else:
-            return 1
         
 
 @transaction.atomic

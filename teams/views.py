@@ -188,9 +188,9 @@ class RaceOrdersOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(pk=self.kwargs['id'])
         context['team'] = team
-        context['upcoming_races'] = team.championship.races.filter(date__gt=timezone.now())
-        context['completed_races'] = team.championship.races.filter(date__lt=timezone.now())
-        context['ongoing_races'] = team.championship.races.filter(date=timezone.now())
+        context['upcoming_races'] = team.championship.upcoming_races()
+        context['completed_races'] = team.championship.completed_races()
+        context['ongoing_races'] = team.championship.ongoing_races()
         return context
 
 
