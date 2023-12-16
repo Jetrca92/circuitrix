@@ -210,7 +210,7 @@ def calculate_race_result(drivers, race):
 
 
 @transaction.atomic
-def get_race_result(race):
+def get_race_drivers(race):
     drivers = []
     for team in race.teams.all():
         try:
@@ -218,4 +218,4 @@ def get_race_result(race):
             drivers.extend([ro.driver_1, ro.driver_2])
         except RaceOrders.DoesNotExist:
             drivers.extend(team.drivers.all())
-    calculate_race_result(drivers, race)
+    return drivers

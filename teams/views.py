@@ -212,7 +212,7 @@ class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
         team = Team.objects.get(owner=context['current_user_manager'])
         form = RaceOrdersForm(team, request.POST)
         if form.is_valid():
-            race_orders, created = RaceOrders.objects.update_or_create(
+            race_orders, _created = RaceOrders.objects.update_or_create(
                 team=team,
                 race=Race.objects.get(id=id),
                 defaults={

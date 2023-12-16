@@ -60,7 +60,7 @@ class RaceOrdersForm(forms.Form):
         choices = list(map(lambda driver: (driver.id, f"{driver.name} {driver.surname}"), drivers))
         return [("selected", "Select Driver")] + choices
     
-    def clean_driver(self, driver_id, driver_number):
+    def _clean_driver(self, driver_id, driver_number):
         if not driver_id.isnumeric():
             raise forms.ValidationError(f"Select Driver {driver_number}!")
         if not Driver.objects.filter(id=int(driver_id)).exists():
@@ -68,10 +68,10 @@ class RaceOrdersForm(forms.Form):
         return driver_id
     
     def clean_driver_1(self):
-        return self.clean_driver(self.cleaned_data.get("driver_1"), 1)
+        return self._clean_driver(self.cleaned_data.get("driver_1"), 1)
     
     def clean_driver_2(self):
-        return self.clean_driver(self.cleaned_data.get("driver_2"), 2)
+        return self._clean_driver(self.cleaned_data.get("driver_2"), 2)
     
     def clean(self):
         driver_1_id = self.cleaned_data.get("driver_1")

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from manager.models import Championship, Race, Racetrack, RaceResult, RaceOrders
-from races.helpers import get_race_result
+from races.helpers import get_race_drivers, calculate_race_result
 
 
 class ManagerContextMixin(ContextMixin):
@@ -57,7 +57,7 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         if race.date < timezone.now():
             results = RaceResult.objects.filter(race=race).first()
             if results is None:
-                get_race_result(race)      
+                calculate_race_result(get_race_drivers(race), race)      
         return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):

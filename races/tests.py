@@ -15,7 +15,7 @@ from races.helpers import (
     assign_championship, add_team_to_upcoming_races, next_sunday_date,
     calculate_race_result, calculate_car_performance_rating,
     calculate_low_high_performance_rating, calculate_optimal_lap_time,
-    get_race_result
+    get_race_drivers
 )
 from teams.constants import countries
 from teams.helpers import generate_drivers
@@ -396,13 +396,7 @@ class GetRaceResultTestCase(TestCase):
             generate_drivers(team)
 
     def test_driver_list_no_race_orders(self):
-        drivers = []
-        for team in self.race.teams.all():
-            try:
-                ro = RaceOrders.objects.get(team=team, race=self.race)
-                drivers.extend([ro.driver_1, ro.driver_2])
-            except RaceOrders.DoesNotExist:
-                drivers.extend(team.drivers.all())
+        drivers = get_race_drivers(self.race)
         expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
         self.assertEqual(drivers, expected_drivers)
 
