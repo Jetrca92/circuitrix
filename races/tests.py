@@ -261,8 +261,8 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
     def setUp(self):
 
         # Create countries and teams
-        for code, country in countries.items():
-            c, created = Country.objects.get_or_create(
+        for _code, country in countries.items():
+            c, _created = Country.objects.get_or_create(
                 short_name=country["short_name"],
                 defaults={
                     "name": country["name"],
@@ -364,8 +364,8 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
 class GetRaceResultTestCase(TestCase):
     def setUp(self):
         self.season = Season.objects.create(number=1)
-        for code, country in countries.items():
-            c, created = Country.objects.get_or_create(
+        for _code, country in countries.items():
+            c, _created = Country.objects.get_or_create(
                 short_name=country["short_name"],
                 defaults={
                     "name": country["name"],

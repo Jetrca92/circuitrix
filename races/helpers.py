@@ -14,7 +14,7 @@ from races.constants import racetracks
 def create_races(championship):
     next_sunday = next_sunday_date()
     teams = championship.teams.all()
-    for i, (code, racetrack) in enumerate(racetracks.items(), start=0):
+    for i, (_code, racetrack) in enumerate(racetracks.items(), start=0):
         location = Racetrack.objects.get(name=racetrack["name"])
         date = next_sunday + timedelta(days=i * 7)
         r = Race(
@@ -35,7 +35,7 @@ def create_races(championship):
 def create_championship(team, division, division_counter):
     name = f"{roman.toRoman(division)}.{division_counter}"
     season_number = Season.current_season().number
-    season, created = Season.objects.get_or_create(number=season_number, is_ongoing=True)
+    season, _created = Season.objects.get_or_create(number=season_number, is_ongoing=True)
     if division == 1:
         name = "Circuitrix"
     championship = Championship(name=name, season=season, division=division)
