@@ -148,9 +148,7 @@ class Season(models.Model):
             latest_season = Season.objects.all().order_by("-number").first()
             if latest_season:
                 return latest_season
-            else:
-                new_season = Season.objects.create(number=1, is_ongoing=True)
-                return new_season
+            return Season.objects.create(number=1, is_ongoing=True)
             
     number = models.PositiveIntegerField(unique=True)
     date_created = models.DateTimeField(auto_now_add=True)

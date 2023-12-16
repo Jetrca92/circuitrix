@@ -1,20 +1,21 @@
 import random
 from datetime import timedelta
 from unittest import mock
-from unittest.mock import call, Mock
+from unittest.mock import call, MagicMock
 
 from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import (
     Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
-    Car, Driver, RaceResult, Lap, Season
+    Car, Driver, RaceResult, Lap, Season, RaceOrders
 )
 from races.constants import racetracks
 from races.helpers import (
     assign_championship, add_team_to_upcoming_races, next_sunday_date,
     calculate_race_result, calculate_car_performance_rating,
-    calculate_low_high_performance_rating, calculate_optimal_lap_time
+    calculate_low_high_performance_rating, calculate_optimal_lap_time,
+    get_race_result
 )
 from teams.constants import countries
 from teams.helpers import generate_drivers
@@ -360,7 +361,50 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
         cpr.assert_called_with(car, racetrack)
                     
 
+class GetRaceResultTestCase(TestCase):
+    def setUp(self):
+        self.season = Season.objects.create(number=1)
+        for code, country in countries.items():
+            c, created = Country.objects.get_or_create(
+                short_name=country["short_name"],
+                defaults={
+                    "name": country["name"],
+                    "logo_location": country["logo"],
+                }
+            )
+        self.racetrack = Racetrack.objects.create(
+            name="Test racetrack",
+            location = Country.objects.filter(short_name="IT").first(),
+            description = "test",
+            lap_length_km = 5,
+            total_laps = 65,
+            straights = 33,
+            slow_corners = 33,
+            fast_corners = 34,
+        )
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=Country.objects.filter(short_name="IT").first())
+            self.race = Race.objects.create(
+                name="Test Race",
+                season=self.season,
+                date=timezone.now(),
+                location=self.racetrack,
+                laps=1,
+            )
+            generate_drivers(team)
 
+    def test_driver_list_no_race_orders(self):
+        drivers = []
+        for team in self.race.teams.all():
+            try:
+                ro = RaceOrders.objects.get(team=team, race=self.race)
+                drivers.extend([ro.driver_1, ro.driver_2])
+            except RaceOrders.DoesNotExist:
+                drivers.extend(team.drivers.all())
+        expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
+        self.assertEqual(drivers, expected_drivers)
 
         
         
