@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
-from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver
+from manager.models import Championship, Racetrack, Race, RaceResult, Lap, Team, Driver, Season, RaceOrders
 from races.constants import racetracks
 
 
@@ -14,11 +14,12 @@ from races.constants import racetracks
 def create_races(championship):
     next_sunday = next_sunday_date()
     teams = championship.teams.all()
-    for i, (code, racetrack) in enumerate(racetracks.items(), start=0):
+    for i, (_code, racetrack) in enumerate(racetracks.items(), start=0):
         location = Racetrack.objects.get(name=racetrack["name"])
         date = next_sunday + timedelta(days=i * 7)
         r = Race(
             name=racetrack["name"] + " Grand Prix",
+            season=championship.season,
             date=date,
             location=location,
             laps=racetrack["total_laps"],
@@ -33,15 +34,19 @@ def create_races(championship):
 @transaction.atomic
 def create_championship(team, division, division_counter):
     name = f"{roman.toRoman(division)}.{division_counter}"
+    season_number = Season.current_season().number
+    season, _created = Season.objects.get_or_create(number=season_number, is_ongoing=True)
     if division == 1:
         name = "Circuitrix"
-    championship = Championship(name=name, division=division)
+    championship = Championship(name=name, season=season, division=division)
+    championship.save()
+    championship.teams.add(team)
     championship.save()
     create_races(championship)
-    championship.teams.add(team)
+    
     team.championship = championship
     team.save()
-
+        
 
 @transaction.atomic
 def assign_championship(team):
@@ -135,7 +140,8 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
 
 
 @transaction.atomic
-def calculate_race_result(drivers, race):
+def calculate_race_result(race):
+    drivers = get_race_drivers(race)
     drivers = [
         {
             "team_name": driver.team.name,
@@ -175,7 +181,7 @@ def calculate_race_result(drivers, race):
             lap = Lap(
                 time=driver_1["lap_time"],
                 lap_number=lap_number,
-                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"])),
+                race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]), race=race),
                 position=driver_1["rank"],
             )
             lap.save()
@@ -184,7 +190,7 @@ def calculate_race_result(drivers, race):
                 lap = Lap(
                     time=driver_2["lap_time"],
                     lap_number=lap_number,
-                    race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"])),
+                    race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"]), race=race),
                     position=driver_2["rank"],
                 )
                 lap.save()
@@ -196,14 +202,21 @@ def calculate_race_result(drivers, race):
         
         sorted_drivers = sorted(sorted_drivers, key=lambda x: x['rank'])
 
-        #print(f"Lap number: {lap_number}")
-        #print("Maximum Time Difference:", max_diff)
-        #print("Drivers with the highest Time difference:", drivers_with_max_diff)
-        #print("Updated Drivers:", sorted_drivers)
-
     for driver in drivers:
-        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
+        update_result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]), race=race)
         update_result.position = driver["rank"]
         update_result.save()
     
+    return drivers
+
+
+@transaction.atomic
+def get_race_drivers(race):
+    drivers = []
+    for team in race.teams.all():
+        try:
+            ro = RaceOrders.objects.get(team=team, race=race)
+            drivers.extend([ro.driver_1, ro.driver_2])
+        except RaceOrders.DoesNotExist:
+            drivers.extend(team.drivers.all())
     return drivers

@@ -78,6 +78,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Car
                             </a>
+                            <a class="nav-link" href="{% url 'teams:race_orders_overview' current_user_manager.team.id %}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Race orders
+                            </a>
                             {% if current_user_manager.team.championship %}
                             <div class="sb-sidenav-menu-heading">Championship</div>
                             <a class="nav-link" href="{% url 'races:championship_overview' current_user_manager.team.championship.id %}">

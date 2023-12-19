@@ -1,7 +1,7 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-Races - {{ championship.name }}
+Races - {{ team.name }}
 {% endblock %}
 
 {% block main %}
@@ -9,22 +9,21 @@ Races - {{ championship.name }}
 
 <div class="container col-md-11 px-2 py-5">
     <div class="d-flex align-items-center mb-3 gap-3">
-        <h1 class="display-5 fw-bold lh-1">{{ championship.name }}</h1>
-        <span class="text-muted">({{ championship.id }})</span>
+        <h1 class="display-5 fw-bold lh-1">Set Race Orders</h1>
     </div>
     <div>
         {% if ongoing_races %}
         <h4 class="fw-bold lh-1">Ongoing Races</h4>
-        {% include 'partials/races_table.html' with races=ongoing_races id="ongoing_races" %}
+        {% include 'partials/orders_table.html' with races=ongoing_races id="ongoing_races" %}
         {% endif %}
         {% if upcoming_races %}
         <h4 class="fw-bold lh-1">Upcoming Races</h4>
-        {% include 'partials/races_table.html' with races=upcoming_races id="upcoming_races" %}
+        {% include 'partials/orders_table.html' with races=upcoming_races id="upcoming_races" %}
         {% endif %}
 
         {% if completed_races %}
         <h4 class="fw-bold lh-1">Completed Races</h4>
-        {% include 'partials/races_table.html' with races=completed_races id="completed_races" %}
+        {% include 'partials/orders_table.html' with races=completed_races id="completed_races" %}
         {% endif %}
     </div>    
 </div>

@@ -1,8 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
+from django.utils import timezone
+from django.urls import reverse
 
-from manager.models import Championship, Race, Racetrack
+from manager.models import Championship, Race, Racetrack, RaceResult, RaceOrders
+from races.helpers import get_race_drivers, calculate_race_result
 
 
 class ManagerContextMixin(ContextMixin):
@@ -48,9 +52,24 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     template_name = "races/race.html"
     context_object_name = "race"
 
+    def get(self, request, *args, **kwargs):
+        race = self.get_object()
+        if race.date < timezone.now():
+            results = RaceResult.objects.filter(race=race).first()
+            if results is None:
+                calculate_race_result(race)      
+        return super().get(request, *args, **kwargs)
+
     def get_object(self, queryset=None):
         race = Race.objects.get(pk=self.kwargs['id'])
         return race
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        race = Race.objects.get(pk=self.kwargs['id'])
+        race_results = race.results.all()
+        context['race_results'] = race_results
+        return context
 
 
 class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
@@ -61,4 +80,12 @@ class RacesOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_object(self, queryset=None):
         championship = Championship.objects.get(pk=self.kwargs['id'])
         return championship
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        championship = Championship.objects.get(pk=self.kwargs['id'])
+        context['upcoming_races'] = championship.upcoming_races()
+        context['completed_races'] = championship.completed_races()
+        context['ongoing_races'] = championship.ongoing_races()
+        return context
 

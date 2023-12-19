@@ -1,20 +1,21 @@
 import random
 from datetime import timedelta
 from unittest import mock
-from unittest.mock import call, Mock
+from unittest.mock import call, MagicMock
 
 from django.test import TestCase
 from django.utils import timezone
 
 from manager.models import (
     Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
-    Car, Driver, RaceResult, Lap
+    Car, Driver, RaceResult, Lap, Season, RaceOrders
 )
 from races.constants import racetracks
 from races.helpers import (
     assign_championship, add_team_to_upcoming_races, next_sunday_date,
     calculate_race_result, calculate_car_performance_rating,
-    calculate_low_high_performance_rating, calculate_optimal_lap_time
+    calculate_low_high_performance_rating, calculate_optimal_lap_time,
+    get_race_drivers
 )
 from teams.constants import countries
 from teams.helpers import generate_drivers
@@ -122,11 +123,13 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
         )
 
         # Create a championship with a race
-        self.championship = Championship.objects.create(name="Test Championship", division=1)
+        self.season = Season.objects.create(number=1, is_ongoing=True)
+        self.championship = Championship.objects.create(name="Test Championship", season=self.season, division=1)
         self.championship.racetracks.add(self.racetrack)
 
         self.race = Race.objects.create(
             name="Test Race",
+            season=self.season,
             date=timezone.now() + timedelta(days=7),
             location=self.racetrack,
             laps=10,
@@ -148,6 +151,7 @@ class AddTeamToUpcomingRacesTestCase(TestCase):
         # Create another race for testing
         another_race = Race.objects.create(
             name="Another Test Race",
+            season=self.season,
             date=next_sunday_date() + timedelta(days=14),
             location=self.racetrack,
             laps=15,
@@ -215,8 +219,10 @@ class CalculateRaceResultTestCase(TestCase):
             team.car = car
             team.save()
             generate_drivers(team)
+        self.season = Season.objects.create(number=1, is_ongoing=True)
         self.race = Race.objects.create(
             name="Test Race",
+            season=self.season,
             date=timezone.now(),
             location=self.racetrack,
             laps=1000,
@@ -225,7 +231,7 @@ class CalculateRaceResultTestCase(TestCase):
 
     def test_car_function(self):
         drivers = Driver.objects.all()
-        updated_drivers = calculate_race_result(drivers, self.race)
+        updated_drivers = calculate_race_result(self.race)
         sorted_updated_drivers = sorted(updated_drivers, key=lambda x: x['rank'])
 
         # After 1000 laps, cars should be sorted based on lap_time ascending
@@ -255,8 +261,8 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
     def setUp(self):
 
         # Create countries and teams
-        for code, country in countries.items():
-            c, created = Country.objects.get_or_create(
+        for  country in countries.values():
+            c, _created = Country.objects.get_or_create(
                 short_name=country["short_name"],
                 defaults={
                     "name": country["name"],
@@ -282,7 +288,7 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
             team.save()
 
         # Create Racetrack object
-        for code, racetrack in racetracks.items():
+        for racetrack in racetracks.values():
             try:
                 location = Country.objects.get(short_name=racetrack["location"])
                 r = Racetrack(
@@ -355,7 +361,44 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
         cpr.assert_called_with(car, racetrack)
                     
 
+class GetRaceResultTestCase(TestCase):
+    def setUp(self):
+        self.season = Season.objects.create(number=1)
+        for country in countries.values():
+            c, _created = Country.objects.get_or_create(
+                short_name=country["short_name"],
+                defaults={
+                    "name": country["name"],
+                    "logo_location": country["logo"],
+                }
+            )
+        self.racetrack = Racetrack.objects.create(
+            name="Test racetrack",
+            location = Country.objects.filter(short_name="IT").first(),
+            description = "test",
+            lap_length_km = 5,
+            total_laps = 65,
+            straights = 33,
+            slow_corners = 33,
+            fast_corners = 34,
+        )
+        for i in range(10):
+            user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
+            manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
+            team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=Country.objects.filter(short_name="IT").first())
+            self.race = Race.objects.create(
+                name="Test Race",
+                season=self.season,
+                date=timezone.now(),
+                location=self.racetrack,
+                laps=1,
+            )
+            generate_drivers(team)
 
+    def test_driver_list_no_race_orders(self):
+        drivers = get_race_drivers(self.race)
+        expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
+        self.assertEqual(drivers, expected_drivers)
 
         
         

@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from races.managers import UpcomingRacesManager
 
 
 # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
@@ -138,6 +139,25 @@ class Racetrack(models.Model):
         super(Racetrack, self).save(*args, **kwargs)
 
 
+class Season(models.Model):
+    @staticmethod
+    def current_season():
+        try:
+            return Season.objects.get(is_ongoing=True)
+        except Season.DoesNotExist:
+            latest_season = Season.objects.all().order_by("-number").first()
+            if latest_season:
+                return latest_season
+            return Season.objects.create(number=1, is_ongoing=True)
+            
+    number = models.PositiveIntegerField(unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    is_ongoing = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Season {self.number}"
+
+
 class LapRecord(models.Model):
     holder = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="laprecord_holder")
     racetrack = models.ForeignKey(Racetrack, on_delete=models.CASCADE, related_name="laprecord_racetrack")
@@ -147,6 +167,7 @@ class LapRecord(models.Model):
 
 class Championship(models.Model):
     name = models.CharField(max_length=30)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="championship_season")
     division = models.PositiveIntegerField(default=1)
     teams = models.ManyToManyField(Team, blank=True, related_name="league_teams")
     races = models.ManyToManyField('Race', blank=True, related_name="league_races")
@@ -158,10 +179,20 @@ class Championship(models.Model):
     def add_racetracks(self):
         racetracks = Racetrack.objects.all()
         self.racetracks.set(racetracks)
+
+    def upcoming_races(self):
+        return self.races.filter(date__gt=timezone.now())
+    
+    def completed_races(self):
+        return self.races.filter(date__lt=timezone.now())
+    
+    def ongoing_races(self):
+        return self.races.filter(date=timezone.now())
         
 
 class Race(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="race_season")
     date = models.DateTimeField()
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
@@ -179,6 +210,11 @@ class RaceResult(models.Model):
     best_lap = models.DurationField(blank=True, null=True)
     laps = models.ManyToManyField('Lap', blank=True, related_name="lap_race")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['race', 'driver'], name='unique_race_result'),
+        ]
+
     def __str__(self):
         return f"{self.race.name} - {self.driver.name} - {self.position}"  
 
@@ -188,3 +224,25 @@ class Lap(models.Model):
     lap_number = models.PositiveIntegerField()
     race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")
     position = models.PositiveIntegerField(blank=True, null=True)  
+
+
+class Points(models.Model):
+    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="points_race")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="points_team")
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="points_driver")
+    points = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.race.name} - {self.driver.name} - {self.points} points"
+    
+
+class RaceOrders(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="orders_team", )
+    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="orders_race")
+    driver_1 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_1")
+    driver_2 = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="orders_driver_2")
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['team', 'race'], name='unique_race_order'),
+        ]

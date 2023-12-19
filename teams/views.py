@@ -6,10 +6,11 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import ContextMixin
 from django.urls import reverse
+from django.utils import timezone
 
-from manager.models import Manager, Team, Country, Driver, RaceMechanic, Car, Race
+from manager.models import Manager, Team, Country, Driver, RaceMechanic, RaceOrders, Race, RaceOrders
 from races.helpers import assign_championship
-from teams.forms import NewTeamForm, EditCarNameForm
+from teams.forms import NewTeamForm, EditCarNameForm, RaceOrdersForm
 from teams.helpers import (
     generate_car,
     generate_drivers,
@@ -172,3 +173,66 @@ class TeamCarView(LoginRequiredMixin, ManagerContextMixin, View):
         team = Team.objects.get(pk=self.kwargs['id'])
         car = team.car
         return car
+    
+
+class RaceOrdersOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
+    model = Race
+    template_name = "teams/race_orders_overview.html"
+    context_object_name = "races"
+
+    def get_queryset(self):
+        team = Team.objects.get(pk=self.kwargs['id'])
+        return team.championship.races.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(pk=self.kwargs['id'])
+        context['team'] = team
+        context['upcoming_races'] = team.championship.upcoming_races()
+        context['completed_races'] = team.championship.completed_races()
+        context['ongoing_races'] = team.championship.ongoing_races()
+        return context
+
+
+class RaceOrdersView(LoginRequiredMixin, ManagerContextMixin, View):
+    template_name = "teams/race_orders.html"
+
+    def get(self, request, id):
+        context = self.get_context_data()
+        team = Team.objects.get(owner=context['current_user_manager'])
+        form = RaceOrdersForm(team)
+        context.update({
+            "form": form,
+            "race": self.get_object(),
+        })
+        return render(request, self.template_name, context)
+    
+    def post(self, request, id):
+        context = self.get_context_data()
+        team = Team.objects.get(owner=context['current_user_manager'])
+        form = RaceOrdersForm(team, request.POST)
+        if form.is_valid():
+            race_orders, _created = RaceOrders.objects.update_or_create(
+                team=team,
+                race=Race.objects.get(id=id),
+                defaults={
+                    "driver_1": Driver.objects.get(id=int(form.cleaned_data["driver_1"])),
+                    "driver_2": Driver.objects.get(id=int(form.cleaned_data["driver_2"])),
+                }
+            )
+            return HttpResponseRedirect(reverse("teams:race_orders_overview", kwargs={'id': team.id}))
+        else:
+            context = self.get_context(form)
+            return render(request, self.template_name, context)
+
+    def get_context(self, form):
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+            "race": self.get_object(),
+        })
+        return context
+
+    def get_object(self, queryset=None):
+        race = Race.objects.get(pk=self.kwargs['id'])
+        return race

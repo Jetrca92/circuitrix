@@ -1,0 +1,21 @@
+{% load static %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for race in races %}
+        <tr>
+            <td><a href="{% url 'races:race' race.id %}" class="link-dark">{{ race.name }}</a></td>
+            <td><img src="{% static race.location.location.logo_location %}" alt="united-kingdom-flag" width="auto" height="25" loading="lazy"></td>
+            <td>{{ race.laps }} laps</td>
+            <td class="text-muted">{{ race.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
