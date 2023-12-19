@@ -57,7 +57,7 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         if race.date < timezone.now():
             results = RaceResult.objects.filter(race=race).first()
             if results is None:
-                calculate_race_result(get_race_drivers(race), race)      
+                calculate_race_result(race)      
         return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):

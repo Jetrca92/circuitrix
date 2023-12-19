@@ -231,7 +231,7 @@ class CalculateRaceResultTestCase(TestCase):
 
     def test_car_function(self):
         drivers = Driver.objects.all()
-        updated_drivers = calculate_race_result(drivers, self.race)
+        updated_drivers = calculate_race_result(self.race)
         sorted_updated_drivers = sorted(updated_drivers, key=lambda x: x['rank'])
 
         # After 1000 laps, cars should be sorted based on lap_time ascending
@@ -261,7 +261,7 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
     def setUp(self):
 
         # Create countries and teams
-        for _code, country in countries.items():
+        for  country in countries.values():
             c, _created = Country.objects.get_or_create(
                 short_name=country["short_name"],
                 defaults={
@@ -288,7 +288,7 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
             team.save()
 
         # Create Racetrack object
-        for code, racetrack in racetracks.items():
+        for racetrack in racetracks.values():
             try:
                 location = Country.objects.get(short_name=racetrack["location"])
                 r = Racetrack(
@@ -364,7 +364,7 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
 class GetRaceResultTestCase(TestCase):
     def setUp(self):
         self.season = Season.objects.create(number=1)
-        for _code, country in countries.items():
+        for country in countries.values():
             c, _created = Country.objects.get_or_create(
                 short_name=country["short_name"],
                 defaults={

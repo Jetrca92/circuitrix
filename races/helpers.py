@@ -140,7 +140,8 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
 
 
 @transaction.atomic
-def calculate_race_result(drivers, race):
+def calculate_race_result(race):
+    drivers = get_race_drivers(race)
     drivers = [
         {
             "team_name": driver.team.name,
