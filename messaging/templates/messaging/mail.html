@@ -1,45 +1,42 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-    Mail
+Mail
 {% endblock %}
 
 {% block main %}
-{% load static %}
-{% load my_template_tags %}
-
-    <div class="container">
-        <h1 class="fw-light">Mail</h1>
-        <div class="d-flex gap-2 align-items-center">
-            Letters    
-        </div>
-        <hr class="my-1">
-        <button class="btn btn-primary" id="recieved_mail_btn">Recieved</button>
-        <button class="btn btn-outline-primary" id="sent_mail_btn">Sent</button>
-        {% include 'partials/mail_list.html' with list=received_messages id="recieved_list" %}
-        {% include 'partials/mail_list.html' with list=sent_messages id="sent_list" style="display: none;" %}
+<div class="container">
+    <h1 class="fw-light">Mail</h1>
+    <div class="d-flex gap-2 align-items-center">
+        Messages 
     </div>
+    <hr class="my-1">
+    <button class="btn btn-primary" id="recieved_mail_btn">Recieved</button>
+    <button class="btn btn-outline-primary" id="sent_mail_btn">Sent</button>
+    {% include 'partials/mail_list.html' with list=received_messages id="recieved_list" %}
+    {% include 'partials/mail_list.html' with list=sent_messages id="sent_list" style="display: none;" %}
+</div>
 
-    <script defer>
-        /* filter mail */
-        const recievedMailBtn = document.querySelector('#recieved_mail_btn');
-        const sentMailBtn = document.querySelector('#sent_mail_btn');
-        const recievedList = document.querySelector('#recieved_list');
-        const sentList = document.querySelector('#sent_list');
+<script defer>
+    /* filter mail */
+    const recievedMailBtn = document.querySelector('#recieved_mail_btn');
+    const sentMailBtn = document.querySelector('#sent_mail_btn');
+    const recievedList = document.querySelector('#recieved_list');
+    const sentList = document.querySelector('#sent_list');
 
-        recievedMailBtn.addEventListener('click', () => {
-            recievedList.style.display = 'block';
-            sentList.style.display = 'none';
-            recievedMailBtn.className = 'btn btn-primary';
-            sentMailBtn.className = 'btn btn-outline-primary';
-        });
+    recievedMailBtn.addEventListener('click', () => {
+        recievedList.style.display = 'block';
+        sentList.style.display = 'none';
+        recievedMailBtn.className = 'btn btn-primary';
+        sentMailBtn.className = 'btn btn-outline-primary';
+    });
 
-        sentMailBtn.addEventListener('click', () => {
-            sentList.style.display = 'block';
-            recievedList.style.display = 'none';
-            sentMailBtn.className = 'btn btn-primary';
-            recievedMailBtn.className = 'btn btn-outline-primary';
-        });
-    </script>
+    sentMailBtn.addEventListener('click', () => {
+        sentList.style.display = 'block';
+        recievedList.style.display = 'none';
+        sentMailBtn.className = 'btn btn-primary';
+        recievedMailBtn.className = 'btn btn-outline-primary';
+    });
+</script>
     
 {% endblock %}

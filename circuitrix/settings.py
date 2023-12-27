@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'registration',
     'teams',
     'races',
+    'messaging',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

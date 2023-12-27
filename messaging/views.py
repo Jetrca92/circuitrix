@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import View, DetailView
+from django.views.generic import TemplateView, DetailView
 from django.views.generic.base import ContextMixin
 
 from messaging.models import Message
@@ -15,7 +15,7 @@ class ManagerContextMixin(ContextMixin):
         return context
     
 
-class MailInboxView(LoginRequiredMixin, ManagerContextMixin, View):
+class MailInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     model = Message
     template_name="messaging/mail.html"
     

@@ -15,9 +15,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from manager import views
-from teams import views
-from races import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
