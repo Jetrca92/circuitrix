@@ -1,42 +1,49 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-Mail
+Mail - {{ message.subject }}
 {% endblock %}
 
 {% block main %}
 <div class="container">
-    <h1 class="fw-light">Mail</h1>
-    <div class="d-flex gap-2 align-items-center">
-        Messages 
+    <h1 class="fw-light">{{ message.topic }}</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{% url 'user_profile' message.sender.name %}" class="text-decoration-none text-dark fw-bold">{{ message.sender.name }}</a>
+            to
+            <a href="{% url 'user_profile' message.recipient.name %}" class="text-decoration-none text-dark fw-bold">{{ message.recipient.name }}</a>
+        </div>
+        <form action="{% url 'message' message.id %}" method="post" role="form">
+            {% csrf_token %}
+            <input hidden type="text" name="delete_letter_id" value="{{ message.id }}">
+            <input class="btn rounded-3 btn-danger" type="submit" value="X">  
+        </form>
+    </div>    
+    <hr class="my-1"> 
+    <p>
+        {{ message.message }}
+    </p>
+    <div class="d-flex gap-2 align-items-center mb-2">
+        {% if message.sender != resident %}
+            <button class="btn btn-primary" id="reply_btn">Reply</button>
+        {% endif %}
+        <a href="{% url 'mail' %}"><button class="btn btn-primary">Back</button></a>
     </div>
-    <hr class="my-1">
-    <button class="btn btn-primary" id="recieved_mail_btn">Recieved</button>
-    <button class="btn btn-outline-primary" id="sent_mail_btn">Sent</button>
-    {% include 'partials/mail_list.html' with list=received_messages id="recieved_list" %}
-    {% include 'partials/mail_list.html' with list=sent_messages id="sent_list" style="display: none;" %}
+    <form action="{% url 'messaging:message' message.id %}" style="display: none;" method="post" role="form" id="reply_form">
+        {% csrf_token %}
+        <input type="text" class="form-control mb-2" name="topic_reply" value="Re: {{ letter.topic }}" maxlength="104">
+        <textarea class="form-control mb-2" id="message_reply" name="message_reply" rows="8" maxlength="1000"></textarea>
+        <input class="btn btn-primary" type="submit" value="Send">
+    </form>
 </div>
 
-<script defer>
-    /* filter mail */
-    const recievedMailBtn = document.querySelector('#recieved_mail_btn');
-    const sentMailBtn = document.querySelector('#sent_mail_btn');
-    const recievedList = document.querySelector('#recieved_list');
-    const sentList = document.querySelector('#sent_list');
+    <script defer>
+        const replyBtn = document.querySelector('#reply_btn');
+        const replyForm = document.querySelector('#reply_form');
+        replyBtn.addEventListener('click', () => {
+            replyBtn.style.display = 'none';
+            replyForm.style.display = 'block';
+        })
+    </script>
 
-    recievedMailBtn.addEventListener('click', () => {
-        recievedList.style.display = 'block';
-        sentList.style.display = 'none';
-        recievedMailBtn.className = 'btn btn-primary';
-        sentMailBtn.className = 'btn btn-outline-primary';
-    });
-
-    sentMailBtn.addEventListener('click', () => {
-        sentList.style.display = 'block';
-        recievedList.style.display = 'none';
-        sentMailBtn.className = 'btn btn-primary';
-        recievedMailBtn.className = 'btn btn-outline-primary';
-    });
-</script>
-    
 {% endblock %}

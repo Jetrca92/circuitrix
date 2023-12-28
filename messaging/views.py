@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import TemplateView, View, DetailView
 from django.views.generic.base import ContextMixin
 
 from messaging.models import Message
+from messaging.forms import NewMessageForm
 from manager.models import Team
 
 
@@ -17,7 +18,7 @@ class ManagerContextMixin(ContextMixin):
 
 class MailInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     model = Message
-    template_name="messaging/mail.html"
+    template_name="messaging/mail_overview.html"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -29,13 +30,25 @@ class MailInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
 
 class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Message
-    template_name = "messages/message.html"
+    template_name = "messages/mail.html"
     context_object_name = "message"
 
     def get_object(self, queryset=None):
         message = Message.objects.get(pk=self.kwargs['id']  )
         return message
+    
 
+class NewMailView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
+    template_name = "messaging/new_mail.html"
+    
+    def get(self, request):
+        form = NewMessageForm()
+        context = self.get_context_data()
+        context['form'] = form
+        return render(request, self.template_name, context)
+    
+    def post(self, request):
+        pass
 
 
 """

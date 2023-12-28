@@ -1,0 +1,24 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+New Mail
+{% endblock %}
+
+{% block main %}
+{% load static %}
+<div class="container">
+    <h1 class="fw-light">Send message</h1>
+    <hr class="my-1">
+    <form action="" method="post" role="form" class="">
+        {% csrf_token %}
+        <label for="topic" class="form-label">Topic</label>
+        <input type="text" class="form-control mb-2" name="topic" maxlength="100">
+        <label for="message" class="form-label">Message</label>
+        <textarea class="form-control mb-2" name="message" rows="8" maxlength="1000"></textarea>
+        <input class="btn btn-primary" type="submit" value="Send">
+    </form>
+</div>
+
+    
+
+{% endblock %}
