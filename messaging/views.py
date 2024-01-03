@@ -41,10 +41,14 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     template_name = "messaging/new_message.html"
     
-    def get(self, request):
+    def get(self, request, receiver_id=None):
         form = NewMessageForm()
         context = self.get_context_data()
         context['form'] = form
+
+        if receiver_id is not None:
+            # Logic if receiver is known
+            pass
         return render(request, self.template_name, context)
     
     def post(self, request):
