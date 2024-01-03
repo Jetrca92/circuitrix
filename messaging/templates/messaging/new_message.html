@@ -15,14 +15,36 @@ New Message
         New Message
     </div>
     <hr class="my-1">
-    <form action="" method="post" role="form" class="">
+    {% for error in form.errors.values %}
+        <div class="text-danger fw-bold mb-3">
+            {{ error|join:", " }}
+        </div>
+    {% endfor %}
+    <form class="row" action="{% url 'messaging:new_message' %}" method="post" role="form">
         {% csrf_token %}
-        <label for="topic" class="form-label">Topic</label>
-        <input type="text" class="form-control mb-2" name="topic" maxlength="100">
-        <label for="message" class="form-label">Message</label>
-        <textarea class="form-control mb-2" name="message" rows="8" maxlength="1000"></textarea>
-        <input class="btn btn-secondary" type="submit" value="Send">
-    </form>
+        {% if receiver == None %}
+        <div class="mb-3">
+            {{ form.receiver.label_tag }}
+            {{ form.receiver }}
+        </div>
+        {% endif %}
+        <div class="mb-3">
+            {{ form.subject.label_tag }}
+            {{ form.subject }}
+        </div>
+        <div class="mb-3">
+            {{ form.content.label_tag }}
+            {{ form.content }}
+        </div>
+        {% if form.errors or message %}
+        <div class="mb-3 fw-bold text-danger">
+            {{ message }}
+        </div>
+        {% endif %}
+        <div>
+            <button class="btn rounded-3 btn-secondary" type="submit">Create your Team</button>
+        </div>
+    </form>        
 </div>
 
     

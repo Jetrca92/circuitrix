@@ -5,7 +5,7 @@ from django.views.generic.base import ContextMixin
 
 from messaging.models import Message
 from messaging.forms import NewMessageForm
-from manager.models import Team
+from manager.models import Team, User
 
 
 class ManagerContextMixin(ContextMixin):
@@ -48,7 +48,8 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
 
         if receiver_id is not None:
             # Logic if receiver is known
-            pass
+            receiver = User.objects.get(id=receiver_id)
+            context['receiver'] = receiver
         return render(request, self.template_name, context)
     
     def post(self, request):
