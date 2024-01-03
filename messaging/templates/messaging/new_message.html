@@ -1,13 +1,19 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-New Mail
+New Message
 {% endblock %}
 
 {% block main %}
 {% load static %}
 <div class="container">
-    <h1 class="fw-light">Send message</h1>
+    <div class="d-flex justify-content-between">
+        <h1 class="fw-light">Messages</h1>
+        <a class="btn btn-outline-secondary m-2" href="{% url "messaging:messages_overview" %}">Back</a>
+    </div>
+    <div class="d-flex gap-2 align-items-center" id="messages_subtitle">
+        New Message
+    </div>
     <hr class="my-1">
     <form action="" method="post" role="form" class="">
         {% csrf_token %}
@@ -15,7 +21,7 @@ New Mail
         <input type="text" class="form-control mb-2" name="topic" maxlength="100">
         <label for="message" class="form-label">Message</label>
         <textarea class="form-control mb-2" name="message" rows="8" maxlength="1000"></textarea>
-        <input class="btn btn-primary" type="submit" value="Send">
+        <input class="btn btn-secondary" type="submit" value="Send">
     </form>
 </div>
 

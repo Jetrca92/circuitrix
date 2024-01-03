@@ -1,23 +1,23 @@
 {% extends "manager/layout.html" %}
 
 {% block title %}
-Mail
+Messages
 {% endblock %}
 
 {% block main %}
 <div class="container">
     <div class="d-flex justify-content-between">
-        <h1 class="fw-light">Mail</h1>
-        <a class="btn btn-outline-secondary m-2" href="{% url "messaging:new_mail" %}">+ New Mail</a>
+        <h1 class="fw-light">Messages</h1>
+        <a class="btn btn-outline-secondary m-2" href="{% url "messaging:new_message" %}">+ New Message</a>
     </div>
-    <div class="d-flex gap-2 align-items-center">
-        Messages 
+    <div class="d-flex gap-2 align-items-center" id="messages_subtitle">
+        Recieved Messages 
     </div>
     <hr class="my-1">
     <button class="btn btn-secondary" id="recieved_mail_btn">Recieved</button>
     <button class="btn btn-outline-secondary" id="sent_mail_btn">Sent</button>
-    {% include 'partials/mail_list.html' with list=received_messages id="recieved_list" %}
-    {% include 'partials/mail_list.html' with list=sent_messages id="sent_list" style="display: none;" %}
+    {% include 'partials/messages_list.html' with list=received_messages id="recieved_list" %}
+    {% include 'partials/messages_list.html' with list=sent_messages id="sent_list" style="display: none;" %}
 </div>
 
 <script defer>
@@ -26,12 +26,14 @@ Mail
     const sentMailBtn = document.querySelector('#sent_mail_btn');
     const recievedList = document.querySelector('#recieved_list');
     const sentList = document.querySelector('#sent_list');
+    const messagesSubtitle = document.querySelector('#messages_subtitle');
 
     recievedMailBtn.addEventListener('click', () => {
         recievedList.style.display = 'block';
         sentList.style.display = 'none';
         recievedMailBtn.className = 'btn btn-secondary';
         sentMailBtn.className = 'btn btn-outline-secondary';
+        messagesSubtitle.innerHTML = 'Recieved Messages';
     });
 
     sentMailBtn.addEventListener('click', () => {
@@ -39,6 +41,7 @@ Mail
         recievedList.style.display = 'none';
         sentMailBtn.className = 'btn btn-secondary';
         recievedMailBtn.className = 'btn btn-outline-secondary';
+        messagesSubtitle.innerHTML = 'Sent Messages';
     });
 </script>
     

@@ -16,9 +16,9 @@ class ManagerContextMixin(ContextMixin):
         return context
     
 
-class MailInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
+class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     model = Message
-    template_name="messaging/mail_overview.html"
+    template_name="messaging/messages_overview.html"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -30,7 +30,7 @@ class MailInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
 
 class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Message
-    template_name = "messages/mail.html"
+    template_name = "messages/message.html"
     context_object_name = "message"
 
     def get_object(self, queryset=None):
@@ -38,8 +38,8 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         return message
     
 
-class NewMailView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
-    template_name = "messaging/new_mail.html"
+class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
+    template_name = "messaging/new_message.html"
     
     def get(self, request):
         form = NewMessageForm()
