@@ -22,12 +22,12 @@ New Message
     {% endfor %}
     <form class="row" action="{% url 'messaging:new_message' %}" method="post" role="form">
         {% csrf_token %}
-        {% if receiver == None %}
+        
         <div class="mb-3">
             {{ form.receiver.label_tag }}
             {{ form.receiver }}
         </div>
-        {% endif %}
+        
         <div class="mb-3">
             {{ form.subject.label_tag }}
             {{ form.subject }}
@@ -47,6 +47,15 @@ New Message
     </form>        
 </div>
 
-    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var receiverInput = document.getElementById('id_receiver');  
+        var receiverId = '{{ receiver.id }}';
+        if (receiverId !== '') {
+            receiverInput.value = receiverId;
+            receiverInput.disabled = true;
+        }
+    });
+</script>
 
 {% endblock %}
