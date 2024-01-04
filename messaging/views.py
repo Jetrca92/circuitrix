@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, View, DetailView
 from django.views.generic.base import ContextMixin
+from django.urls import reverse
 
 from messaging.models import Message
 from messaging.forms import NewMessageForm
@@ -30,7 +33,7 @@ class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
 
 class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Message
-    template_name = "messages/message.html"
+    template_name = "messaging/message.html"
     context_object_name = "message"
 
     def get_object(self, queryset=None):
@@ -53,7 +56,31 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
         return render(request, self.template_name, context)
     
     def post(self, request):
-        pass
+        form = NewMessageForm(request.POST)
+        if form.is_valid():
+            sender = request.user
+            receiver = User.objects.get(id=form.cleaned_data["receiver_id"])
+            subject = form.cleaned_data["subject"]
+            content = form.cleaned_data["content"]
+            message = Message(
+                sender=sender,
+                receiver=receiver,
+                subject=subject,
+                content=content,
+            )
+            message.save()
+            return HttpResponseRedirect(reverse("messaging:messages"))
+        else:
+            context = self.get_context(form)
+            return render(request, self.template_name, context)
+        
+    def get_context(self, form):
+        context = self.get_context_data()
+        context.update({
+            "form": form,
+        })
+        return context
+
 
 
 """

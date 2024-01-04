@@ -22,12 +22,10 @@ New Message
     {% endfor %}
     <form class="row" action="{% url 'messaging:new_message' %}" method="post" role="form">
         {% csrf_token %}
-        
         <div class="mb-3">
-            {{ form.receiver.label_tag }}
-            {{ form.receiver }}
+            {{ form.receiver_id.label_tag }}
+            {{ form.receiver_id }}
         </div>
-        
         <div class="mb-3">
             {{ form.subject.label_tag }}
             {{ form.subject }}
@@ -42,7 +40,7 @@ New Message
         </div>
         {% endif %}
         <div>
-            <button class="btn rounded-3 btn-secondary" type="submit">Create your Team</button>
+            <button class="btn rounded-3 btn-secondary" type="submit">Send</button>
         </div>
     </form>        
 </div>
