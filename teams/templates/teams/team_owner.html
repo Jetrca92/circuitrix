@@ -14,7 +14,7 @@
             <img src="{% static owner.avatar %}" alt="united-kingdom-flag" width="auto" height="35" loading="lazy">
             <span class="text-muted">({{ owner.id }})</span>
             {% if request.user != owner.user %}
-            <a class="nav-link" href="{% url 'messaging:new_message_with_user' owner.user.id %}">
+            <a class="nav-link" href="{% url 'messaging:new_message_with_user' owner.id %}">
                 <div class="sb-nav-link-icon">
                     <i class="fa-solid fa-envelope"></i>
                 </div>

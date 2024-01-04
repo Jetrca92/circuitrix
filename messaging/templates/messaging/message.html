@@ -6,25 +6,31 @@ Message - {{ message.subject }}
 
 {% block main %}
 <div class="container">
-    <h1 class="fw-light">{{ message.topic }}</h1>
+    <div class="d-flex justify-content-between">
+        <h1 class="fw-light">Messages</h1>
+        <a class="btn btn-outline-secondary m-2" href="{% url "messaging:messages_overview" %}">Back</a>
+    </div>
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <a href="{% url 'teams:team_owner' "1" %}" class="text-decoration-none text-dark fw-bold">{{ message.sender.name }}</a>
+            <a href="{% url 'teams:team_owner' message.sender.team.id %}" class="text-decoration-none text-dark fw-bold">{{ message.sender.name }}</a>
             to
-            <a href="{% url 'teams:team_owner' "1" %}" class="text-decoration-none text-dark fw-bold">{{ message.recipient.name }}</a>
+            <a href="{% url 'teams:team_owner' message.receiver.team.id %}" class="text-decoration-none text-dark fw-bold">{{ message.receiver.name }}</a>
         </div>
+        {% if message.receiver == current_user_manager %}
         <form action="{% url 'messaging:message' message.id %}" method="post" role="form">
             {% csrf_token %}
             <input hidden type="text" name="delete_letter_id" value="{{ message.id }}">
             <input class="btn rounded-3 btn-danger" type="submit" value="X">  
         </form>
-    </div>    
+        {% endif %}
+    </div>
+    <h3 class="fw-light">{{ message.subject }}</h3>    
     <hr class="my-1"> 
     <p>
         {{ message.content }}
     </p>
     <div class="d-flex gap-2 align-items-center mb-2">
-        {% if message.sender != request.user %}
+        {% if message.sender != current_user_manager %}
             <button class="btn btn-primary" id="reply_btn">Reply</button>
         {% endif %}
         <a href="{% url 'messaging:messages_overview' %}"><button class="btn btn-secondary">Back</button></a>

@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from messaging.models import Message
 from messaging.forms import NewMessageForm
-from manager.models import Team, User
+from manager.models import Manager
 
 
 class ManagerContextMixin(ContextMixin):
@@ -25,9 +25,8 @@ class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context['sent_messages'] = Message.objects.filter(sender=user)
-        context['received_messages'] = Message.objects.filter(receiver=user)
+        context['sent_messages'] = Message.objects.filter(sender=context["current_user_manager"])
+        context['received_messages'] = Message.objects.filter(receiver=context["current_user_manager"])
         return context
     
 
@@ -37,9 +36,18 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     context_object_name = "message"
 
     def get_object(self, queryset=None):
-        message = Message.objects.get(pk=self.kwargs['id']  )
+        message = Message.objects.get(pk=self.kwargs['id'])
         return message
     
+    def get(self, request, id):
+        response = super().get(request, id)
+        self.object.set_read(Manager.objects.get(user=request.user))
+        return response
+    
+    def post(self, request, id):
+        #TODO DELETE MAIL
+        pass
+
 
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     template_name = "messaging/new_message.html"
@@ -51,15 +59,15 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
 
         if receiver_id is not None:
             # Logic if receiver is known
-            receiver = User.objects.get(id=receiver_id)
+            receiver = Manager.objects.get(id=receiver_id)
             context['receiver'] = receiver
         return render(request, self.template_name, context)
     
     def post(self, request):
         form = NewMessageForm(request.POST)
         if form.is_valid():
-            sender = request.user
-            receiver = User.objects.get(id=form.cleaned_data["receiver_id"])
+            sender = Manager.objects.get(user=request.user)
+            receiver = Manager.objects.get(id=form.cleaned_data["receiver_id"])
             subject = form.cleaned_data["subject"]
             content = form.cleaned_data["content"]
             message = Message(
@@ -69,7 +77,7 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
                 content=content,
             )
             message.save()
-            return HttpResponseRedirect(reverse("messaging:messages"))
+            return HttpResponseRedirect(reverse("messaging:messages_overview"))
         else:
             context = self.get_context(form)
             return render(request, self.template_name, context)
