@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin
 from django.urls import reverse
 
 from messaging.models import Message
-from messaging.forms import NewMessageForm
+from messaging.forms import NewMessageForm, DeleteMessageForm
 from manager.models import Manager
 
 
@@ -42,11 +42,20 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get(self, request, id):
         response = super().get(request, id)
         self.object.set_read(Manager.objects.get(user=request.user))
-        return response
+        form = DeleteMessageForm(id)
+        context = self.get_context_data()
+        context['form'] = form
+        return render(request, self.template_name, context)
     
     def post(self, request, id):
-        #TODO DELETE MAIL
-        pass
+        if "delete_message_id" in request.POST:
+            form = DeleteMessageForm(id, request.POST)
+            if form.is_valid():
+                message = Message.objects.get(id=form.cleaned_data["delete_message_id"])
+                message.delete_message(Manager.objects.get(user=request.user))
+            else:
+                return HttpResponseRedirect(reverse("manager:index"))
+        return HttpResponseRedirect(reverse("messaging:messages_overview"))
 
 
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):

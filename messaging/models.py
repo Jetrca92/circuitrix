@@ -18,3 +18,7 @@ class Message(models.Model):
         if self.sender != manager:
             self.is_read = True
             self.save()
+
+    def delete_message(self, manager):
+        if self.receiver == manager:
+            self.delete()
