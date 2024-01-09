@@ -43,19 +43,41 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         response = super().get(request, id)
         self.object.set_read(Manager.objects.get(user=request.user))
         form = DeleteMessageForm(id)
+        form_reply = NewMessageForm()
         context = self.get_context_data()
         context['form'] = form
+        context['form_reply'] = form_reply
+        context['receiver'] = self.object.sender
         return render(request, self.template_name, context)
     
     def post(self, request, id):
+        # Handle message deletion
         if "delete_message_id" in request.POST:
             form = DeleteMessageForm(id, request.POST)
             if form.is_valid():
                 message = Message.objects.get(id=form.cleaned_data["delete_message_id"])
                 message.delete_message(Manager.objects.get(user=request.user))
+        # Handle message reply
+        if "receiver_id" in request.POST:
+            form = NewMessageForm(request.POST)
+            if form.is_valid():
+                sender = Manager.objects.get(user=request.user)
+                receiver = Manager.objects.get(id=form.cleaned_data["receiver_id"])
+                subject = form.cleaned_data["subject"]
+                content = form.cleaned_data["content"]
+                message = Message(
+                    sender=sender,
+                    receiver=receiver,
+                    subject=subject,
+                    content=content,
+                )
+                message.save()
+                return HttpResponseRedirect(reverse("messaging:messages_overview"))
             else:
-                return HttpResponseRedirect(reverse("manager:index"))
+                context = self.get_context(form)
+                return render(request, self.template_name, context)
         return HttpResponseRedirect(reverse("messaging:messages_overview"))
+    
 
 
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):

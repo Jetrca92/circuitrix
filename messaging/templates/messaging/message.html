@@ -36,24 +36,51 @@ Message - {{ message.subject }}
     </p>
     <div class="d-flex gap-2 align-items-center mb-2">
         {% if message.sender != current_user_manager %}
-            <button class="btn btn-primary" id="reply_btn">Reply</button>
+            <button class="btn btn-secondary" id="reply_btn">Reply</button>
         {% endif %}
         <a href="{% url 'messaging:messages_overview' %}"><button class="btn btn-secondary">Back</button></a>
     </div>
+    {% for error in form_reply.errors.values %}
+        <div class="text-danger fw-bold mb-3">
+            {{ error|join:", " }}
+        </div>
+    {% endfor %}
     <form action="{% url 'messaging:message' message.id %}" style="display: none;" method="post" role="form" id="reply_form">
         {% csrf_token %}
-        <input type="text" class="form-control mb-2" name="topic_reply" value="Re: {{ message.subject }}" maxlength="104">
-        <textarea class="form-control mb-2" id="message_reply" name="message_reply" rows="8" maxlength="1000"></textarea>
-        <input class="btn btn-secondary" type="submit" value="Send">
+        <div class="mb-3">
+            {{ form_reply.receiver_id.label_tag }}
+            {{ form_reply.receiver_id }}
+        </div>
+        <div class="mb-3">
+            {{ form_reply.subject.label_tag }}
+            {{ form_reply.subject }}
+        </div>
+        <div class="mb-3">
+            {{ form_reply.content.label_tag }}
+            {{ form_reply.content }}
+        </div>
+        {% if form_reply.errors %}
+        <div class="mb-3 fw-bold text-danger">
+            {{ message }}
+        </div>
+        {% endif %}
+        <input class="btn btn-secondary" type="submit" value="Reply">
     </form>
 </div>
 
     <script defer>
         const replyBtn = document.querySelector('#reply_btn');
         const replyForm = document.querySelector('#reply_form');
+        const subject = document.querySelector('#id_subject');
+        var receiverInput = document.getElementById('id_receiver');  
+        var receiverId = '{{ receiver.id }}';
+        if (receiverId !== '') {
+            receiverInput.value = receiverId;
+        }
         replyBtn.addEventListener('click', () => {
             replyBtn.style.display = 'none';
             replyForm.style.display = 'block';
+            subject.value = 'Re: {{ message.subject }}';
         })
     </script>
 

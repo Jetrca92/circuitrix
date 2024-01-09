@@ -34,11 +34,6 @@ New Message
             {{ form.content.label_tag }}
             {{ form.content }}
         </div>
-        {% if form.errors or message %}
-        <div class="mb-3 fw-bold text-danger">
-            {{ message }}
-        </div>
-        {% endif %}
         <div>
             <button class="btn rounded-3 btn-secondary" type="submit">Send</button>
         </div>
@@ -51,7 +46,6 @@ New Message
         var receiverId = '{{ receiver.id }}';
         if (receiverId !== '') {
             receiverInput.value = receiverId;
-            receiverInput.disabled = true;
         }
     });
 </script>
