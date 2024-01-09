@@ -22,3 +22,12 @@ class Message(models.Model):
     def delete_message(self, manager):
         if self.receiver == manager:
             self.delete()
+
+    def reply(self, form):
+        message = Message(
+            sender=self.receiver,
+            receiver=Manager.objects.get(id=form.cleaned_data["receiver_id"]),
+            subject=form.cleaned_data["subject"],
+            content=form.cleaned_data["content"],
+        )
+        message.save()

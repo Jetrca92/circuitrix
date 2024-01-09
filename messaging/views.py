@@ -7,6 +7,7 @@ from django.views.generic.base import ContextMixin
 from django.urls import reverse
 
 from messaging.models import Message
+from messaging.helpers import send_message
 from messaging.forms import NewMessageForm, DeleteMessageForm
 from manager.models import Manager
 
@@ -61,24 +62,14 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         if "receiver_id" in request.POST:
             form = NewMessageForm(request.POST)
             if form.is_valid():
-                sender = Manager.objects.get(user=request.user)
-                receiver = Manager.objects.get(id=form.cleaned_data["receiver_id"])
-                subject = form.cleaned_data["subject"]
-                content = form.cleaned_data["content"]
-                message = Message(
-                    sender=sender,
-                    receiver=receiver,
-                    subject=subject,
-                    content=content,
-                )
-                message.save()
+                message = self.get_object()
+                message.reply(form)
                 return HttpResponseRedirect(reverse("messaging:messages_overview"))
             else:
                 context = self.get_context(form)
                 return render(request, self.template_name, context)
         return HttpResponseRedirect(reverse("messaging:messages_overview"))
     
-
 
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     template_name = "messaging/new_message.html"
@@ -97,17 +88,7 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     def post(self, request):
         form = NewMessageForm(request.POST)
         if form.is_valid():
-            sender = Manager.objects.get(user=request.user)
-            receiver = Manager.objects.get(id=form.cleaned_data["receiver_id"])
-            subject = form.cleaned_data["subject"]
-            content = form.cleaned_data["content"]
-            message = Message(
-                sender=sender,
-                receiver=receiver,
-                subject=subject,
-                content=content,
-            )
-            message.save()
+            send_message(Manager.objects.get(user=request.user), form)
             return HttpResponseRedirect(reverse("messaging:messages_overview"))
         else:
             context = self.get_context(form)
@@ -119,53 +100,3 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
             "form": form,
         })
         return context
-
-
-
-"""
-@transaction.atomic
-@login_required
-def letter(request, mail_id):
-    resident = Resident.objects.get(resident_user=request.user)
-    letter = Mail.objects.get(id=mail_id)
-    letter.set_read(resident)
-    # Display letter via get
-    if request.method != "POST":    
-        return render(request, "game/letter.html", {
-            "resident": resident,
-            "letter": letter,
-        })
-    
-    # Form for letter delete sent
-    if "delete_letter_id" in request.POST:
-        letter.delete()
-        return HttpResponseRedirect(reverse("mail"))
-    
-    # Form for reply letter sent
-    if "topic_reply" in request.POST:
-        letter.reply(request.POST["topic_reply"], request.POST["message_reply"])
-        return HttpResponseRedirect(reverse("mail"))
-    
-
-@transaction.atomic
-@login_required
-def new_letter(request, recipient_id):
-    resident = Resident.objects.get(resident_user=request.user)
-    recipient = Resident.objects.get(id=recipient_id)
-    # Display new_letter.html via get
-    if request.method != "POST":
-        return render(request, "game/new_letter.html", {
-            "resident": resident,
-            "user_profile": recipient,
-        })
-    
-    # Letter was sent
-    letter = Mail(
-        recipient=recipient, 
-        sender=resident, 
-        topic=request.POST["topic"], 
-        message=request.POST["message"], 
-    )
-    letter.save()
-    return HttpResponseRedirect(reverse("mail"))
-    """
