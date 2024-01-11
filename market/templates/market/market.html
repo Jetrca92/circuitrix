@@ -1,0 +1,72 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Driver Market
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+    <h1 class="fw-light">Driver Market</h1>
+    <div class="mt-2">
+        Select a filter
+        <hr class="mt-1 mb-3">
+        <div class="d-flex flex-row align-items-center">
+            <select title="Select item" class="form-select" id="item-select">
+                <option value="all">All Drivers</option>
+                <option value="u-21">U-21 Drivers</option>
+                <option value="Weapons">Weapons</option>
+                <option value="Grain">Grain</option>
+                <option value="Iron">Iron</option>
+            </select>
+        </div>   
+    </div>
+    
+        
+    {% if message %}    
+    <div><b>{{ message }}</b></div>
+    {% endif %}
+    <!-- Drivers list -->
+    
+</div>
+
+<script defer>
+    /* market item and quality select */
+    const itemSelect = document.querySelector('#item-select');
+    const qualitySelect = document.querySelector('#quality-select');
+    const qualitySelectDiv = document.querySelector('#quality-select-div');
+    const itemRows = document.querySelectorAll('.item-row');
+
+    itemSelect.addEventListener('change', () => {
+        const selectedItem = itemSelect.value;
+
+        itemRows.forEach(itemRow => {
+            const itemName = itemRow.dataset.name;
+            if (selectedItem === 'all' || itemName === selectedItem) {
+                itemRow.style.display = 'table-row';
+            } else {
+                itemRow.style.display = 'none';
+            }
+            if (selectedItem === 'Grain' || selectedItem === 'Iron' || selectedItem === 'all') {
+                qualitySelectDiv.style.display = 'none';
+            } else {
+                qualitySelectDiv.style.display = 'block';
+            }
+        });
+    });
+
+    qualitySelect.addEventListener('change', () => {
+        const selectedQuality = qualitySelect.value;
+
+        itemRows.forEach(itemRow => {
+            const quality = itemRow.dataset.quality;
+            if (selectedQuality === 'all' || selectedQuality === quality) {
+                itemRow.style.display = 'table-row';
+            } else {
+                itemRow.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock %}
