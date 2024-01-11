@@ -80,7 +80,7 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
         context['form'] = form
 
         if receiver_id is not None:
-            # Logic if receiver is known
+            # If receiver is known, pass it to template
             receiver = Manager.objects.get(id=receiver_id)
             context['receiver'] = receiver
         return render(request, self.template_name, context)

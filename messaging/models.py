@@ -24,6 +24,10 @@ class Message(models.Model):
             self.delete()
 
     def reply(self, form):
+        # Can't reply to yourself
+        if self.receiver.id == form.cleaned_data["receiver_id"]:
+            return
+        
         message = Message(
             sender=self.receiver,
             receiver=Manager.objects.get(id=form.cleaned_data["receiver_id"]),
