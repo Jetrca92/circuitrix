@@ -5,6 +5,7 @@ Driver Market
 {% endblock %}
 
 {% block main %}
+{% load static %}
 
 <div class="container">
     <h1 class="fw-light">Driver Market</h1>
@@ -27,7 +28,32 @@ Driver Market
     <div><b>{{ message }}</b></div>
     {% endif %}
     <!-- Drivers list -->
-    
+    {% for driver in listed_drivers %}
+    <hr class="my-4">
+    <div>
+        <div class="card-header">
+            <h5><a href="{% url 'teams:driver_page' driver.id %}" class="link-dark">{{ driver.driver.name }} {{ driver.driver.surname }}</a></h5>
+        </div>
+        <div class="card-body d-flex gap-5">
+            <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
+            <div>
+                <p class="card-text">Seller: <a href="{% url 'teams:team_overview' driver.driver.team.id %}" class="link-dark">{{ driver.driver.team.name }}</a></p>
+                <p class="card-text">Age: {{ driver.driver.age }}</p>
+                <p class="card-text">Overall: {{ driver.driver.skill_overall }}</p>
+            </div>
+            <div>
+                <p class="card-text">Racecraft: {{ driver.driver.skill_racecraft }}</p>
+                <p class="card-text">Pace: {{ driver.driver.skill_pace }}</p>
+                <p class="card-text">Focus: {{ driver.driver.skill_focus }}</p>
+                <p class="card-text">Car Management: {{ driver.driver.skill_car_management }}</p>
+                <p class="card-text">Feedback: {{ driver.driver.skill_feedback }}</p>
+            </div>
+            <div>
+                <p class="card-text">Price: {{ driver.driver.skill_racecraft }}</p>
+            </div>
+        </div>
+    </div> 
+    {% endfor %} 
 </div>
 
 <script defer>

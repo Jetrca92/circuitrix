@@ -62,24 +62,24 @@
                             <div class="sb-sidenav-menu-heading">My Team</div>
                             {% if current_user_manager.team %}
                             <a class="nav-link" href="{% url 'teams:team_overview' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-industry"></i></div>
                                 Overview
                             </a>
                             
                             <a class="nav-link" href="{% url 'teams:drivers' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-id-card"></i></div>
                                 Drivers
                             </a>
                             <a class="nav-link" href="{% url 'teams:staff' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-person"></i></div>
                                 Staff
                             </a>
                             <a class="nav-link" href="{% url 'teams:car' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-car"></i></div>
                                 Car
                             </a>
                             <a class="nav-link" href="{% url 'teams:race_orders_overview' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-person-chalkboard"></i></div>
                                 Race orders
                             </a>
                             {% if current_user_manager.team.championship %}
@@ -89,11 +89,11 @@
                                 {{ current_user_manager.team.championship.name }}
                             </a>
                             <a class="nav-link" href="{% url 'races:racetracks_overview' current_user_manager.team.championship.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-circle-notch"></i></div>
                                 Racetracks
                             </a>
                             <a class="nav-link" href="{% url 'races:races_overview' current_user_manager.team.championship.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-flag-checkered"></i></div>
                                 Races
                             </a>
                             {% endif %}
