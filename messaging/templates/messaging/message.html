@@ -14,9 +14,9 @@ Message - {{ message.subject }}
         <div>
             <a href="{% url 'teams:team_owner' message.sender.team.id %}" class="text-decoration-none text-dark fw-bold">{{ message.sender.name }}</a>
             to
-            <a href="{% url 'teams:team_owner' message.receiver.team.id %}" class="text-decoration-none text-dark fw-bold">{{ message.receiver.name }}</a>
+            <a href="{% url 'teams:team_owner' message.recipient.team.id %}" class="text-decoration-none text-dark fw-bold">{{ message.recipient.name }}</a>
         </div>
-        {% if message.receiver == current_user_manager %}
+        {% if message.recipient == current_user_manager %}
         {% for error in form.errors.values %}
         <div class="text-danger fw-bold mb-3">
             {{ error|join:", " }}
@@ -48,8 +48,8 @@ Message - {{ message.subject }}
     <form action="{% url 'messaging:message' message.id %}" style="display: none;" method="post" role="form" id="reply_form">
         {% csrf_token %}
         <div class="mb-3">
-            {{ form_reply.receiver_id.label_tag }}
-            {{ form_reply.receiver_id }}
+            {{ form_reply.recipient_id.label_tag }}
+            {{ form_reply.recipient_id }}
         </div>
         <div class="mb-3">
             {{ form_reply.subject.label_tag }}
@@ -72,10 +72,10 @@ Message - {{ message.subject }}
         const replyBtn = document.querySelector('#reply_btn');
         const replyForm = document.querySelector('#reply_form');
         const subject = document.querySelector('#id_subject');
-        var receiverInput = document.getElementById('id_receiver');  
-        var receiverId = '{{ receiver.id }}';
-        if (receiverId !== '') {
-            receiverInput.value = receiverId;
+        var recipientInput = document.getElementById('id_recipient');  
+        var recipientId = '{{ recipient.id }}';
+        if (recipientId !== '') {
+            recipientInput.value = recipientId;
         }
         replyBtn.addEventListener('click', () => {
             replyBtn.style.display = 'none';

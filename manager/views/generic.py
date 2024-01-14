@@ -23,6 +23,7 @@ class IndexView(View):
 
     def get(self, request):
         manager = None
+        unread_messages = False
         if request.user.is_authenticated:
             try:
                 manager = Manager.objects.get(user=request.user)

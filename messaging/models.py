@@ -15,7 +15,7 @@ class Message(models.Model):
     
     def set_read(self, manager):
         # Only set read=True if recipient opens
-        if self.sender != manager:
+        if self.recipient == manager:
             self.read = True
             self.save()
 

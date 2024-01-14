@@ -20,7 +20,7 @@ class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['sent_messages'] = Message.objects.filter(sender=context["current_user_manager"])
-        context['received_messages'] = Message.objects.filter(receiver=context["current_user_manager"])
+        context['received_messages'] = Message.objects.filter(recipient=context["current_user_manager"])
         return context
     
 
@@ -41,7 +41,7 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         context = self.get_context_data()
         context['form'] = form
         context['form_reply'] = form_reply
-        context['receiver'] = self.object.sender
+        context['recipient'] = self.object.sender
         return render(request, self.template_name, context)
     
     def post(self, request, id):
@@ -67,15 +67,15 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
 class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     template_name = "messaging/new_message.html"
     
-    def get(self, request, receiver_id=None):
+    def get(self, request, recipient_id=None):
         form = NewMessageForm()
         context = self.get_context_data()
         context['form'] = form
 
-        if receiver_id is not None:
-            # If receiver is known, pass it to template
-            receiver = Manager.objects.get(id=receiver_id)
-            context['receiver'] = receiver
+        if recipient_id is not None:
+            # If recipient is known, pass it to template
+            recipient = Manager.objects.get(id=recipient_id)
+            context['recipient'] = recipient
         return render(request, self.template_name, context)
     
     def post(self, request):
