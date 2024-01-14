@@ -4,33 +4,33 @@ from manager.models import Manager
 
 class Message(models.Model):
     sender = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name='sent')
-    receiver = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name='received')
+    recipient = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name='received')
     subject = models.CharField(max_length=100)
     content = models.TextField(max_length=1000)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.sender} to {self.receiver} - {self.timestamp}'
+        return f'{self.sender} to {self.recipient} - {self.timestamp}'
     
     def set_read(self, manager):
-        # Only set read=True if receiver opens
+        # Only set read=True if recipient opens
         if self.sender != manager:
             self.is_read = True
             self.save()
 
     def delete_message(self, manager):
-        if self.receiver == manager:
+        if self.recipient == manager:
             self.delete()
 
     def reply(self, form):
         # Can't reply to yourself
-        if self.receiver.id == form.cleaned_data["receiver_id"]:
+        if self.recipient.id == form.cleaned_data["recipient_id"]:
             return
         
         message = Message(
-            sender=self.receiver,
-            receiver=Manager.objects.get(id=form.cleaned_data["receiver_id"]),
+            sender=self.recipient,
+            recipient=Manager.objects.get(id=form.cleaned_data["recipient_id"]),
             subject=form.cleaned_data["subject"],
             content=form.cleaned_data["content"],
         )

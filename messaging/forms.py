@@ -4,7 +4,7 @@ from manager.models import Manager
 from messaging.models import Message
 
 class NewMessageForm(forms.Form):
-    receiver_id = forms.CharField(label="Receiver (id)", widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100", "id": "id_receiver"}))
+    recipient_id = forms.CharField(label="Recipient (id)", widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100", "id": "id_recipient"}))
     subject = forms.CharField(label="Subject", widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100"}))
     content = forms.CharField(label="Content", widget=forms.Textarea(attrs={"class": "form-control", "rows": "16", "maxlength": "1000"}))
 
@@ -14,15 +14,15 @@ class NewMessageForm(forms.Form):
             raise forms.ValidationError("You can't send an empty message!")
         return content
     
-    def clean_receiver_id(self):
-        receiver_id = self.cleaned_data.get("receiver_id")
-        if not receiver_id:
-            raise forms.ValidationError("Please provide the receiver's ID")
+    def clean_recipient_id(self):
+        recipient_id = self.cleaned_data.get("recipient_id")
+        if not recipient_id:
+            raise forms.ValidationError("Please provide the recipient's ID")
         try:
-            receiver = Manager.objects.get(id=receiver_id)
+            recipient = Manager.objects.get(id=recipient_id)
         except Manager.DoesNotExist:
             raise forms.ValidationError("User with that ID does not exist!")
-        return receiver_id
+        return recipient_id
         
 
 class DeleteMessageForm(forms.Form):

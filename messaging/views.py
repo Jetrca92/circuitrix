@@ -52,7 +52,7 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
                 message = Message.objects.get(id=form.cleaned_data["delete_message_id"])
                 message.delete_message(Manager.objects.get(user=request.user))
         # Handle message reply
-        if "receiver_id" in request.POST:
+        if "recipient_id" in request.POST:
             form = NewMessageForm(request.POST)
             if form.is_valid():
                 message = self.get_object()

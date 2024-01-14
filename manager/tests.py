@@ -16,18 +16,18 @@ class UnreadMessagesTest(TestCase):
                 email="sender.email@test.com",
                 ),        
         )
-        receiver = Manager.objects.create(
-            name="receiver",
+        recipient = Manager.objects.create(
+            name="recipient",
             user=User.objects.create(
-                username="receiver_user",
+                username="recipient_user",
                 password="123",
-                email="receiver.email@test.com",
+                email="recipient.email@test.com",
             ),
         )
 
         self.message = Message.objects.create(
             sender=sender,
-            receiver=receiver,
+            recipient=recipient,
             subject="test subject",
             content="test content 123 456",
         )
@@ -37,5 +37,5 @@ class UnreadMessagesTest(TestCase):
         self.assertFalse(self.message.sender.unread_messages())
 
         # Receiver has new unread messages
-        self.assertTrue(self.message.receiver.unread_messages())
+        self.assertTrue(self.message.recipient.unread_messages())
         
