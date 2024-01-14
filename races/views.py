@@ -6,15 +6,8 @@ from django.utils import timezone
 from django.urls import reverse
 
 from manager.models import Championship, Race, Racetrack, RaceResult, RaceOrders
+from manager.views.generic import ManagerContextMixin
 from races.helpers import get_race_drivers, calculate_race_result
-
-
-class ManagerContextMixin(ContextMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        manager = self.request.user.manager
-        context['current_user_manager'] = manager
-        return context
     
 
 class ChampionshipOverviewView(LoginRequiredMixin, ManagerContextMixin, DetailView):

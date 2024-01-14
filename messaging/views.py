@@ -6,18 +6,11 @@ from django.views.generic import TemplateView, View, DetailView
 from django.views.generic.base import ContextMixin
 from django.urls import reverse
 
+from manager.views.generic import ManagerContextMixin
 from messaging.models import Message
 from messaging.helpers import send_message
 from messaging.forms import NewMessageForm, DeleteMessageForm
 from manager.models import Manager
-
-
-class ManagerContextMixin(ContextMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        manager = self.request.user.manager
-        context['current_user_manager'] = manager
-        return context
     
 
 class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):

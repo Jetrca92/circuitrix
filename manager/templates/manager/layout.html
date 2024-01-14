@@ -27,10 +27,10 @@
             <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
                 <a class="nav-link" href="{% url 'messaging:messages_overview' %}">
                     <div class="sb-nav-link-icon">
-                        {% if True %}
-                        <i class="fa-solid fa-envelope"></i>
-                        {% else %}
+                        {% if unread_messages %}
                         <i class="fa-solid fa-envelope-open"></i>
+                        {% else %}
+                        <i class="fa-solid fa-envelope"></i>
                         {% endif %}
                     </div>
                 </a>
