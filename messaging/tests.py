@@ -34,23 +34,23 @@ class MessageModelTestCase(TestCase):
             content="test content 123 456",
         )
 
-    def test_is_read_method(self):
+    def test_read_method(self):
         # Initial state is not read
-        self.assertFalse(self.message.is_read)
+        self.assertFalse(self.message.read)
 
         # Set read and test
         self.message.set_read(self.message.recipient)
         updated_message = Message.objects.get(id=self.message.id)
-        self.assertTrue(updated_message.is_read)
+        self.assertTrue(updated_message.read)
 
-    def test_is_read_method_wrong_manager(self):
+    def test_read_method_wrong_manager(self):
         # Initial state is not read
-        self.assertFalse(self.message.is_read)
+        self.assertFalse(self.message.read)
 
         # Set read with wrong manager and test
         self.message.set_read(self.message.sender)
         updated_message = Message.objects.get(id=self.message.id)
-        self.assertFalse(updated_message.is_read)
+        self.assertFalse(updated_message.read)
 
     def test_delete_message_method(self):
         # Message exists

@@ -49,7 +49,7 @@ class Manager(models.Model):
         return f"{self.id}"
     
     def unread_messages(self):
-        unread_messages = self.received.filter(is_read=False)
+        unread_messages = self.received.filter(read=False)
         if unread_messages.exists():
             return True
         return False
