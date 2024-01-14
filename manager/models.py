@@ -54,7 +54,6 @@ class Manager(models.Model):
             return True
         return False
 
-    
 
 class Team(models.Model):
     owner = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name="team_owner")
