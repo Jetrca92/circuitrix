@@ -70,17 +70,10 @@ Message - {{ message.subject }}
 
     <script defer>
         const replyBtn = document.querySelector('#reply_btn');
-        const replyForm = document.querySelector('#reply_form');
-        const subject = document.querySelector('#id_subject');
-        var recipientInput = document.getElementById('id_recipient');  
-        var recipientId = '{{ recipient.id }}';
-        if (recipientId !== '') {
-            recipientInput.value = recipientId;
-        }
+        const replyForm = document.querySelector('#reply_form');  
         replyBtn.addEventListener('click', () => {
             replyBtn.style.display = 'none';
             replyForm.style.display = 'block';
-            subject.value = 'Re: {{ message.subject }}';
         })
     </script>
 

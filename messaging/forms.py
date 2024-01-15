@@ -4,9 +4,21 @@ from manager.models import Manager
 from messaging.models import Message
 
 class NewMessageForm(forms.Form):
-    recipient_id = forms.CharField(label="Recipient (id)", widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100", "id": "id_recipient"}))
-    subject = forms.CharField(label="Subject", widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100"}))
-    content = forms.CharField(label="Content", widget=forms.Textarea(attrs={"class": "form-control", "rows": "16", "maxlength": "1000"}))
+    recipient_id = forms.ModelChoiceField(
+        queryset=Manager.objects.all(), 
+        label="Recipient",
+        empty_label="(Choose Recipient)", 
+        widget=forms.Select(attrs={"class": "form-select", "id": "id_recipient"}),
+        to_field_name="id",
+    )
+    subject = forms.CharField(
+        label="Subject", 
+        widget=forms.TextInput(attrs={"class": "form-control", "maxlength": "100"}),
+    )
+    content = forms.CharField(
+        label="Content", 
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": "16", "maxlength": "1000"}),
+    )
 
     def clean_content(self):
         content = self.cleaned_data.get("content")
@@ -15,14 +27,15 @@ class NewMessageForm(forms.Form):
         return content
     
     def clean_recipient_id(self):
-        recipient_id = self.cleaned_data.get("recipient_id")
-        if not recipient_id:
-            raise forms.ValidationError("Please provide the recipient's ID")
-        try:
-            recipient = Manager.objects.get(id=recipient_id)
-        except Manager.DoesNotExist:
-            raise forms.ValidationError("User with that ID does not exist!")
-        return recipient_id
+        recipient = self.cleaned_data.get("recipient_id")
+        if not recipient:
+            raise forms.ValidationError("Please provide the recipient")
+        return recipient.id
+    
+    def __init__(self, *args, **kwargs):
+        super(NewMessageForm, self).__init__(*args, **kwargs)
+        # Modify the labels to use the 'name' field
+        self.fields['recipient_id'].label_from_instance = lambda obj: obj.name if obj else self.fields['recipient_id'].empty_label
         
 
 class DeleteMessageForm(forms.Form):

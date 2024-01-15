@@ -37,11 +37,10 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         response = super().get(request, id)
         self.object.set_read(Manager.objects.get(user=request.user))
         form = DeleteMessageForm(id)
-        form_reply = NewMessageForm()
+        form_reply = NewMessageForm(initial={'recipient_id': self.object.sender.id, 'subject': f"Re: {self.object.subject}"})
         context = self.get_context_data()
         context['form'] = form
         context['form_reply'] = form_reply
-        context['recipient'] = self.object.sender
         return render(request, self.template_name, context)
     
     def post(self, request, id):
@@ -58,9 +57,8 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
                 message = self.get_object()
                 message.reply(form)
                 return HttpResponseRedirect(reverse("messaging:messages_overview"))
-            else:
-                context = self.get_context(form)
-                return render(request, self.template_name, context)
+            context = self.get_context(form)
+            return render(request, self.template_name, context)
         return HttpResponseRedirect(reverse("messaging:messages_overview"))
     
 
@@ -71,11 +69,10 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
         form = NewMessageForm()
         context = self.get_context_data()
         context['form'] = form
-
         if recipient_id is not None:
-            # If recipient is known, pass it to template
-            recipient = Manager.objects.get(id=recipient_id)
-            context['recipient'] = recipient
+            # New message with user
+            context['form'] = NewMessageForm(initial={'recipient_id': recipient_id})
+        
         return render(request, self.template_name, context)
     
     def post(self, request):
@@ -83,9 +80,8 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
         if form.is_valid():
             send_message(Manager.objects.get(user=request.user), form)
             return HttpResponseRedirect(reverse("messaging:messages_overview"))
-        else:
-            context = self.get_context(form)
-            return render(request, self.template_name, context)
+        context = self.get_context(form)
+        return render(request, self.template_name, context)
         
     def get_context(self, form):
         context = self.get_context_data()
