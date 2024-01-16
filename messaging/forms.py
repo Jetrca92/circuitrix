@@ -4,7 +4,7 @@ from manager.models import Manager
 from messaging.models import Message
 
 class NewMessageForm(forms.Form):
-    recipient_id = forms.ModelChoiceField(
+    recipient = forms.ModelChoiceField(
         queryset=Manager.objects.all(), 
         label="Recipient",
         empty_label="(Choose Recipient)", 
@@ -26,16 +26,10 @@ class NewMessageForm(forms.Form):
             raise forms.ValidationError("You can't send an empty message!")
         return content
     
-    def clean_recipient_id(self):
-        recipient = self.cleaned_data.get("recipient_id")
-        if not recipient:
-            raise forms.ValidationError("Please provide the recipient")
-        return recipient.id
-    
     def __init__(self, *args, **kwargs):
         super(NewMessageForm, self).__init__(*args, **kwargs)
         # Modify the labels to use the 'name' field
-        self.fields['recipient_id'].label_from_instance = lambda obj: obj.name if obj else self.fields['recipient_id'].empty_label
+        self.fields['recipient'].label_from_instance = lambda obj: obj.name if obj else self.fields['recipient'].empty_label
         
 
 class DeleteMessageForm(forms.Form):

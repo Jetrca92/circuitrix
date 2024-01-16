@@ -23,8 +23,8 @@ New Message
     <form class="row" action="{% url 'messaging:new_message' %}" method="post" role="form">
         {% csrf_token %}
         <div class="mb-3">
-            {{ form.recipient_id.label_tag }}
-            {{ form.recipient_id }}
+            {{ form.recipient.label_tag }}
+            {{ form.recipient }}
         </div>
         <div class="mb-3">
             {{ form.subject.label_tag }}

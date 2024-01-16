@@ -19,8 +19,8 @@ class MessagesInboxView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sent_messages'] = Message.objects.filter(sender=context["current_user_manager"])
-        context['received_messages'] = Message.objects.filter(recipient=context["current_user_manager"])
+        context['sent_messages'] = Message.objects.filter(sender=context["current_user_manager"]).order_by("-timestamp")
+        context['received_messages'] = Message.objects.filter(recipient=context["current_user_manager"]).order_by("-timestamp")
         return context
     
 
@@ -37,7 +37,7 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         response = super().get(request, id)
         self.object.set_read(Manager.objects.get(user=request.user))
         form = DeleteMessageForm(id)
-        form_reply = NewMessageForm(initial={'recipient_id': self.object.sender.id, 'subject': f"Re: {self.object.subject}"})
+        form_reply = NewMessageForm(initial={'recipient': self.object.sender, 'subject': f"Re: {self.object.subject}"})
         context = self.get_context_data()
         context['form'] = form
         context['form_reply'] = form_reply
@@ -51,7 +51,7 @@ class MessageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
                 message = Message.objects.get(id=form.cleaned_data["delete_message_id"])
                 message.delete_message(Manager.objects.get(user=request.user))
         # Handle message reply
-        if "recipient_id" in request.POST:
+        if "recipient" in request.POST:
             form = NewMessageForm(request.POST)
             if form.is_valid():
                 message = self.get_object()
@@ -71,7 +71,7 @@ class NewMessageView(LoginRequiredMixin, ManagerContextMixin, TemplateView):
         context['form'] = form
         if recipient_id is not None:
             # New message with user
-            context['form'] = NewMessageForm(initial={'recipient_id': recipient_id})
+            context['form'] = NewMessageForm(initial={'recipient': Manager.objects.get(id=recipient_id)})
         
         return render(request, self.template_name, context)
     

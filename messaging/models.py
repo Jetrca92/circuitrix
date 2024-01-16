@@ -25,12 +25,12 @@ class Message(models.Model):
 
     def reply(self, form):
         # Can't reply to yourself
-        if self.recipient.id == form.cleaned_data["recipient_id"]:
+        if self.recipient == form.cleaned_data["recipient"]:
             return
         
         message = Message(
             sender=self.recipient,
-            recipient=Manager.objects.get(id=form.cleaned_data["recipient_id"]),
+            recipient=form.cleaned_data["recipient"],
             subject=form.cleaned_data["subject"],
             content=form.cleaned_data["content"],
         )

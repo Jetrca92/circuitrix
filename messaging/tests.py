@@ -70,7 +70,7 @@ class MessageModelTestCase(TestCase):
 
     def test_reply_valid_form(self):
         form_data = {
-            "recipient_id": self.message.sender.id,
+            "recipient": self.message.sender,
             "subject": f"Re: {self.message.subject}",
             "content": "Test reply content 123 456",
         }
@@ -84,7 +84,7 @@ class MessageModelTestCase(TestCase):
 
     def test_reply_invalid_form(self):
         form_data = {
-            "receiver_id": "",
+            "recipient": "",
             "subject": f"Re: {self.message.subject}",
             "content": "Test reply content 123 456",
         }
@@ -93,7 +93,7 @@ class MessageModelTestCase(TestCase):
 
     def test_reply_to_yourself(self):
         form_data = {
-            "recipient_id": self.message.sender.id,
+            "recipient": self.message.sender,
             "subject": f"Re: {self.message.subject}",
             "content": "Test reply content 123 456",
         }
@@ -125,7 +125,7 @@ class SendMessageTestCase(TestCase):
             ),
         )
         form_data = {
-            "recipient_id": self.recipient.id,
+            "recipient": self.recipient,
             "subject": "Test",
             "content": "Test reply content 123 456",
         }
