@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, RaceOrders, Race, RaceOrders
+from market.forms import SellDriverForm
 from races.helpers import assign_championship
 from teams.forms import NewTeamForm, EditCarNameForm, RaceOrdersForm
 from teams.helpers import (
@@ -102,15 +103,22 @@ class DriversView(LoginRequiredMixin, ManagerContextMixin, ListView):
         return context
     
 
-class DriverPageView(LoginRequiredMixin, ManagerContextMixin, DetailView):
+class DriverPageView(LoginRequiredMixin, ManagerContextMixin, View):
     model = Driver
+    form = SellDriverForm()
     template_name = "teams/driver_page.html"
     context_object_name = "driver"
+
+    def get(self, request, id):
+        driver = self.get_object()
+        form = SellDriverForm()
+        context = {"driver": driver, "form": form}
+        return render(request, self.template_name, context)
 
     def get_object(self, queryset=None):
         driver = Driver.objects.get(pk=self.kwargs['id'])  
         return driver
-    
+
 
 class TeamOwnerView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     model = Manager

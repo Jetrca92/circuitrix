@@ -3,8 +3,10 @@ from django.views import View
 from django.shortcuts import render
 
 from manager.models import Driver
+from market.forms import SellDriverForm
 from market.models import DriverListing
 from races.views import ManagerContextMixin
+
 
 class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "market/market.html"
@@ -20,5 +22,12 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
         listed_drivers = DriverListing.objects.all()
         context = {"listed_drivers": listed_drivers}
         return render(request, self.template_name, context)
+    
+
+class SellDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+    form = SellDriverForm()
+
+    def post(self, request, id):
+        pass
     
 
