@@ -32,35 +32,63 @@
                 <div>
                     Owner's actions
                     <hr class="my-1">
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmSell">
-                        Sell
+                    <!-- Fire Button trigger modal -->
+                    <button type="button" class="btn btn-danger mb-1" data-bs-toggle="modal" data-bs-target="#confirmFire">
+                        Fire
                     </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="confirmSell" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <!-- Fire Modal -->
+                    <div class="modal fade" id="confirmFire" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Confirm the fire</h5>
+                                    <h5 class="modal-title" id="staticBackdropLabel">Confirm Contract Termination</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
+                                <form action="{% url 'market:fire_driver' driver.id %}" method="post" role="form">
+                                {% csrf_token %}
                                 <div class="modal-body">
-                                    Are you sure you would like to fire this driver?
+                                    {{ form_fire.confirmation }} I would like to fire {{ driver.name }} {{ driver.surname }}
                                 </div>
-                                <div class="modal-footer">
-                                    <form action="{% url 'market:sell_driver' driver.id %}" method="post" role="form">
-                                        {% csrf_token %}
-                                        {{ form.confirmation }}
-                                        <button type="submit" class="btn btn-success">Sell</button>
-                                    </form>
+                                <div class="modal-footer">  
+                                    <button type="submit" class="btn btn-danger">Fire!</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-danger">Fire!</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <a href="" class="btn btn-danger mb-1">Fire</a>
+                    <!-- Sell Button trigger modal -->
+                    {% if driver.is_market_listed %}
+                    <div>
+                        Driver is listed on the <a class="link-dark" href="{% url 'market:driver_market' %}">Driver Market</a>
+                    </div>
+                    {% else %}
+                    <button type="button" class="btn btn-success mb-1" data-bs-toggle="modal" data-bs-target="#confirmSell">
+                        Sell
+                    </button>
+                    {% endif %}
+                    <!-- Sell Modal -->
+                    <div class="modal fade" id="confirmSell" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Confirm Driver Sale</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'market:sell_driver' driver.id %}" method="post" role="form">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    {{ form_sell.confirmation }} I would like to sell {{ driver.name }} {{ driver.surname }} for (Euro €) {{ form_sell.price }}
+                                </div>
+                                <div class="modal-footer">  
+                                    <button type="submit" class="btn btn-success">Sell!</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

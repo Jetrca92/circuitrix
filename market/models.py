@@ -2,6 +2,7 @@ from django.db import models
 
 from manager.models import Driver, Team
 
+
 class DriverListing(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     seller = models.ForeignKey(Team, on_delete=models.CASCADE)

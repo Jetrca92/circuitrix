@@ -1,9 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
+from django.views import View
 
 from manager.models import Driver
 from market.forms import SellDriverForm
+from market.helpers import list_driver
 from market.models import DriverListing
 from races.views import ManagerContextMixin
 
@@ -25,6 +28,16 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
     
 
 class SellDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+    
+    def post(self, request, id):
+        form = SellDriverForm(request.POST)
+        if form.is_valid():
+            list_driver(id, form.cleaned_data["price"])
+        return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+        
+
+
+class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
     form = SellDriverForm()
 
     def post(self, request, id):

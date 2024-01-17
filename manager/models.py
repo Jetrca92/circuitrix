@@ -3,8 +3,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from races.managers import UpcomingRacesManager
-
 
 # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
 DAYS_IN_A_SEASON = 84
@@ -82,6 +80,7 @@ class Driver(Staff):
     skill_focus = models.PositiveIntegerField()
     skill_car_management = models.PositiveIntegerField()
     skill_feedback = models.PositiveIntegerField()
+    is_market_listed = models.BooleanField(default=False)
     
 
 class LeadDesigner(Staff):
