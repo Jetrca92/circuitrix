@@ -4,11 +4,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import DetailView, ListView
-from django.views.generic.base import ContextMixin
+
 from django.urls import reverse
 from django.utils import timezone
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, RaceOrders, Race, RaceOrders
+from manager.views.generic import ManagerContextMixin
 from races.helpers import assign_championship
 from teams.forms import NewTeamForm, EditCarNameForm, RaceOrdersForm
 from teams.helpers import (
@@ -19,12 +20,7 @@ from teams.helpers import (
 )
 
 
-class ManagerContextMixin(ContextMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        manager = self.request.user.manager
-        context['current_user_manager'] = manager
-        return context
+
     
 
 class CreateTeamView(LoginRequiredMixin, View):

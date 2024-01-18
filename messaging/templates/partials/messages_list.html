@@ -1,0 +1,18 @@
+<ul class="list-group mt-2" id="{{ id }}" style="{{ style }}">
+    {% for message in list %}
+    <a href="{% url 'messaging:message' message.id %}" class="text-decoration-none text-dark">
+    {% if message.read %}
+        <li class="list-group-item">
+    {% else %}
+        <li class="list-group-item active">  
+    {% endif %}
+        <div class="d-flex justify-content-between">
+            <div>
+                <span class="fw-bold me-4">{{ message.sender.name }}</span> {{ message.subject }}
+            </div>
+            <div> 
+                <span class="text-muted">{{ message.timestamp|date:"d/m/Y - G:i" }}</span>
+            </div>
+    </li></a>
+    {% endfor %}
+</ul>
