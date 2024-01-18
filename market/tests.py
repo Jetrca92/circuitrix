@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from market.forms import SellDriverForm
+from market.forms import ListDriverForm, FireDriverForm
 from market.helpers import list_driver
 from market.models import DriverListing
 from manager.models import User, Manager, Country, Team, Driver
@@ -38,11 +38,16 @@ class TestListDriver(TestCase):
         self.driver.save()
 
     def test_driver_listing(self):
+        # Check that no listing exists
+        driver_listings = DriverListing.objects.filter(driver=self.driver, seller=self.driver.team)
+        self.assertEqual(0, driver_listings.count())
+
+        # Add form data and validate form
         form_data = {
             "confirmation": True,
             "price": 100,
         }
-        form = SellDriverForm(data=form_data)
+        form = ListDriverForm(data=form_data)
         self.assertTrue(form.is_valid())
         list_driver(self.driver.id, 100)
 
@@ -51,10 +56,48 @@ class TestListDriver(TestCase):
         self.assertEqual(1, driver_listings.count())
 
     def test_driver_listing_invalid_form(self):
+        # Add form data and validate form
         form_data = {
             "confirmation": False,
             "price": 100,
         }
-        form = SellDriverForm(data=form_data)
+        form = ListDriverForm(data=form_data)
         self.assertFalse(form.is_valid())
+        form2_data = {
+            "confirmation": True,
+            "price": "",
+        }
+        form2 = ListDriverForm(data=form2_data)
+        self.assertFalse(form.is_valid())
+
+    def test_driver_fire(self):
+        # Check that no listing exists
+        driver_listings = DriverListing.objects.filter(driver=self.driver, seller=self.driver.team)
+        self.assertEqual(0, driver_listings.count())
+
+        # Add form data and validate form
+        form_data = {
+            "confirmation": True,
+        }
+        form = FireDriverForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        # Terminate contract and check dl existance
+        self.driver.terminate_contract()
+        list_driver(self.driver.id, 0)
+        driver_listings = DriverListing.objects.filter(price=0, seller__isnull=True)
+        self.assertEqual(driver_listings.count(), 1)
+        self.assertIsNone(self.driver.team)
+        
+        # Check if driver removed from team
+        team_drivers = self.team.drivers.filter(id=self.driver.id)
+        self.assertEqual(team_drivers.count(), 0)
+
+    def test_driver_fire_invalid_form(self):
+        form_data = {
+            "confirmation": False,
+        }
+        form = FireDriverForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        
 

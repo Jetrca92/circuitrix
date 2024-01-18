@@ -81,7 +81,14 @@ class Driver(Staff):
     skill_car_management = models.PositiveIntegerField()
     skill_feedback = models.PositiveIntegerField()
     is_market_listed = models.BooleanField(default=False)
-    
+
+    def terminate_contract(self):
+        self.team.drivers.remove(self)
+        self.team.save()
+        self.team = None
+        self.is_market_listed = True
+        self.save()
+        
 
 class LeadDesigner(Staff):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="lead_designer_team")

@@ -6,7 +6,7 @@ def list_driver(id, price):
     dl = DriverListing(
         driver=Driver.objects.get(id=id),
         seller=driver.team,
-        price=price
+        price=price,
     )
     dl.save()
     driver.is_market_listed = True

@@ -8,14 +8,14 @@
 {% load static %}
 
 <div class="container col-md-11 px-2 py-5">
-    <div class="col-lg-9">
+    
         <div class="d-flex align-items-center mb-3 gap-3">
             <h1 class="display-5 fw-bold lh-1">{{ driver.name }} {{ driver.surname }}</h1>
             <img src="{% static driver.country.logo_location %}" width="auto" height="35" loading="lazy">
             <span class="text-muted">({{ driver.id }})</span>
         </div>
         <div>
-            <div class="card-body d-flex gap-5">
+            <div class="card-body d-flex gap-5 mb-3">
                 <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
                 <div>
                     <p class="card-text">Team: <a href="{% url 'teams:team_overview' driver.team.id %}" class="link-dark">{{ driver.team.name }} </a></p>
@@ -29,6 +29,7 @@
                     <p class="card-text">Car Management: {{ driver.skill_car_management }}</p>
                     <p class="card-text">Feedback: {{ driver.skill_feedback }}</p>
                 </div>
+                {% if current_user_manager.user == request.user %}
                 <div>
                     Owner's actions
                     <hr class="my-1">
@@ -75,7 +76,7 @@
                                     <h5 class="modal-title" id="staticBackdropLabel">Confirm Driver Sale</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form action="{% url 'market:sell_driver' driver.id %}" method="post" role="form">
+                                <form action="{% url 'market:list_driver' driver.id %}" method="post" role="form">
                                 {% csrf_token %}
                                 <div class="modal-body">
                                     {{ form_sell.confirmation }} I would like to sell {{ driver.name }} {{ driver.surname }} for (Euro €) {{ form_sell.price }}
@@ -89,9 +90,31 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
+            {% if driver.is_market_listed %}
+            <div class="h-100 p-5 bg-light border rounded-3">
+                <h5>Listed on Driver Market</h2>
+                <div class="text-muted">
+                    Deadline: 14. 5. 2021
+                </div>
+                <div>
+                    Price: {{ driver.driver_listing.price }}
+                </div>
+                {% if driver.driver_listing.bid.all %}
+                    {% with highest_bid=driver.driver_listing.bid.all|dictsort:'amount'|last %}
+                    <div>
+                        Highest bid: {{ highest_bid.amount }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
+                    </div>
+                {% endwith %}
+                {% else %}
+                <div>No bids yet</div>
+                {% endif %}
+                <button class="btn btn-outline-secondary" type="button">Example button</button>
+            </div>
+            {% endif %}
         </div>
-    </div>
+    
 </div>
 
 {% endblock %}

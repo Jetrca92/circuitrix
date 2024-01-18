@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import View
 
 from manager.models import Driver
-from market.forms import SellDriverForm
+from market.forms import ListDriverForm, FireDriverForm
 from market.helpers import list_driver
 from market.models import DriverListing
 from races.views import ManagerContextMixin
@@ -15,32 +15,29 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "market/market.html"
 
     def get(self, request):
-        driver = Driver.objects.all().first()
-        dl = DriverListing(
-            driver=driver,
-            seller=driver.team,
-            price=100,
-        )
-        dl.save()
         listed_drivers = DriverListing.objects.all()
-        context = {"listed_drivers": listed_drivers}
+        context = super().get_context_data()
+        context["listed_drivers"] = listed_drivers
         return render(request, self.template_name, context)
     
 
-class SellDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+class ListDriverView(LoginRequiredMixin, ManagerContextMixin, View):
     
     def post(self, request, id):
-        form = SellDriverForm(request.POST)
+        form = ListDriverForm(request.POST)
         if form.is_valid():
             list_driver(id, form.cleaned_data["price"])
         return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
         
 
-
 class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
-    form = SellDriverForm()
-
+    
     def post(self, request, id):
-        pass
+        form = FireDriverForm()
+        if form.is_valid():
+            driver = Driver.objects.get(id=id)
+            driver.terminate_contract()
+            list_driver(id, 0)
+        return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
     
 
