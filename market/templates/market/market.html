@@ -37,7 +37,9 @@ Driver Market
         <div class="card-body d-flex gap-5">
             <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
             <div>
+                {% if driver.driver.team %}
                 <p class="card-text">Seller: <a href="{% url 'teams:team_overview' driver.driver.team.id %}" class="link-dark">{{ driver.driver.team.name }}</a></p>
+                {% endif %}
                 <p class="card-text">Age: {{ driver.driver.age }}</p>
                 <p class="card-text">Overall: {{ driver.driver.skill_overall }}</p>
             </div>

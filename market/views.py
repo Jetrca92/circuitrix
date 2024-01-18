@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import View
 
 from manager.models import Driver
-from market.forms import ListDriverForm, FireDriverForm
+from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
 from market.helpers import list_driver
 from market.models import DriverListing
 from races.views import ManagerContextMixin
@@ -29,15 +29,26 @@ class ListDriverView(LoginRequiredMixin, ManagerContextMixin, View):
             list_driver(id, form.cleaned_data["price"])
         return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
         
+        
 
 class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
     
     def post(self, request, id):
-        form = FireDriverForm()
+        form = FireDriverForm(request.POST)
         if form.is_valid():
             driver = Driver.objects.get(id=id)
             driver.terminate_contract()
             list_driver(id, 0)
-        return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+            return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+        return HttpResponseRedirect(reverse("manager:index"))
+    
+
+class DriverBidView(LoginRequiredMixin, ManagerContextMixin, View):
+
+    def post(self, request, id):
+        form = DriverBidForm(request.POST)
+        if form.is_valid():
+            # TO DO
+            pass
     
 
