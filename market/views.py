@@ -4,9 +4,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
 
-from manager.models import Driver
+from manager.models import Driver, Team
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
-from market.helpers import list_driver
+from market.helpers import list_driver, bid_driver
 from market.models import DriverListing
 from races.views import ManagerContextMixin
 
@@ -43,12 +43,14 @@ class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
         return HttpResponseRedirect(reverse("manager:index"))
     
 
-class DriverBidView(LoginRequiredMixin, ManagerContextMixin, View):
+class BidDriverView(LoginRequiredMixin, ManagerContextMixin, View):
 
     def post(self, request, id):
         form = DriverBidForm(request.POST)
         if form.is_valid():
-            # TO DO
-            pass
+            context = super().get_context_data()
+            bidder = Team.objects.get(manager=context["current_user_manager"])
+            bid_driver(id, bidder, form.cleaned_data["amount"])
+            return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
     
 

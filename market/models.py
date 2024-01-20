@@ -10,7 +10,7 @@ class DriverListing(models.Model):
     date_listed = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.driver.surname} ({self.seller.name})"
+        return f"{self.driver.surname}"
 
 
 class Bid(models.Model):

@@ -6,6 +6,7 @@ Driver Market
 
 {% block main %}
 {% load static %}
+{% load humanize %}
 
 <div class="container">
     <h1 class="fw-light">Driver Market</h1>
@@ -51,7 +52,16 @@ Driver Market
                 <p class="card-text">Feedback: {{ driver.driver.skill_feedback }}</p>
             </div>
             <div>
-                <p class="card-text">Price: {{ driver.driver.skill_racecraft }}</p>
+                <p class="card-text">Price: {{ driver.price }}</p>
+                {% if driver.driver.driver_listing.first.bid.all %}
+                {% with highest_bid=driver.driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
+                <p>
+                    Highest bid: {{ highest_bid.amount|intcomma }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
+                </p>
+            {% endwith %}
+            {% else %}
+            <p>No bids yet</p>
+            {% endif %}
             </div>
         </div>
     </div> 

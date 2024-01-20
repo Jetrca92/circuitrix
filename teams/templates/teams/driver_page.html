@@ -6,6 +6,7 @@
 
 {% block main %}
 {% load static %}
+{% load humanize %}
 
 <div class="container col-md-11 px-2 py-5">
     
@@ -101,19 +102,20 @@
                 Deadline: 14. 5. 2021
             </div>
             <div>
-                Price: {{ driver.driver_listing.price }}
+                Price: {{ driver.driver_listing.first.price }}
             </div>
-            {% if driver.driver_listing.bid.all %}
-                {% with highest_bid=driver.driver_listing.bid.all|dictsort:'amount'|last %}
+            {% if driver.driver_listing.first.bid.all %}
+                {% with highest_bid=driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
                 <div>
-                    Highest bid: {{ highest_bid.amount }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
+                    Highest bid: {{ highest_bid.amount|intcomma }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
                 </div>
             {% endwith %}
             {% else %}
             <div class="mb-3">No bids yet</div>
             {% endif %}
-            <form action="{% url 'market:list_driver' driver.id %}" method="post" role="form">
-                <div class="row g-3">
+            <form action="{% url 'market:bid_driver' driver.id %}" method="post" role="form">
+                {% csrf_token %}
+                <div class="row g-3 mb-3">
                     <div class="col fw-bold">
                         Place Bid:
                     </div>
@@ -124,13 +126,36 @@
                         €
                     </div>
                     <div class="col">
-                        <button type="submit" class="btn btn-outline-secondary" type="button">Bid</button>
+                        <button class="btn btn-outline-secondary" type="button" id="bidTrigger">Place Bid</button>
                     </div>
+                </div>
+                <div class="p-3 bg-secondary border rounded-3" style="display: none;" id="bidContent">
+                    <div class="d-flex align-items-center me-2">Do you wish to bid for this driver? The price is<span id="amountValue"></span>€</div>
+                    <button type="submit" class="btn btn-dark me-1" type="button">Bid!</button>
+                    <button class="btn btn-dark" type="button" id="bidCancel">Cancel</button>
                 </div>
             </form>
         </div>
         {% endif %}
     </div>
 </div>
+
+<script defer>
+    const bidBtn = document.querySelector('#bidTrigger');
+    const bidCancelBtn = document.querySelector('#bidCancel');
+    const bidDiv = document.querySelector('#bidContent');
+    const amount = document.querySelector('#id_amount');
+    const amountValue = document.querySelector('#amountValue');
+
+    bidBtn.addEventListener('click', () => {
+        amountValue.innerHTML = `&nbsp;${amount.value}&nbsp;`;
+        bidDiv.style.display = "block";
+        bidTr
+
+    });
+    bidCancelBtn.addEventListener('click', () => {
+        bidDiv.style.display = "none";
+    });
+</script>
 
 {% endblock %}
