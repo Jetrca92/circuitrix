@@ -113,6 +113,11 @@
             {% else %}
             <div class="mb-3">No bids yet</div>
             {% endif %}
+            {% for error in form_bid.errors.values %}
+            <div class="text-danger fw-bold mb-3">
+                {{ error|join:", " }}
+            </div>
+            {% endfor %}
             <form action="{% url 'market:bid_driver' driver.id %}" method="post" role="form">
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
@@ -120,6 +125,7 @@
                         Place Bid:
                     </div>
                     <div class="col">
+                        {{ form_bid.driver_listing }}
                         {{ form_bid.amount }}
                     </div>
                     <div class="col">
