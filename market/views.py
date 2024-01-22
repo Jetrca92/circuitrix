@@ -12,9 +12,6 @@ from races.views import ManagerContextMixin
 from teams.views import DriverPageView
 
 
-class FormHandlingMixin:
-    #TO DO
-    pass
 class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "market/market.html"
 
@@ -25,17 +22,35 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
         return render(request, self.template_name, context)
     
 
-class ListDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+class FormHandlingMixin:
+    # This seems like a lot of work to have BidDriverView seperate from DriverPageView ? it works tho -.-
+    def handle_invalid_form(self, request, id, form_fire=None, form_sell=None, form_bid=None):
+        driver_page_view = DriverPageView()
+        driver_page_view.request = HttpRequest()
+        driver_page_view.request.method = "GET"
+        driver_page_view.request.user = request.user
+        driver_page_view.kwargs = {'id': id}
+        driver = driver_page_view.get_object()
+        form_fire = form_fire or FireDriverForm() 
+        form_sell = form_sell or ListDriverForm()
+        form_bid = form_bid or DriverBidForm(initial={"driver_listing": DriverListing.objects.get(driver=driver)})
+        context = driver_page_view.get_context_data()
+        context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell, "form_bid": form_bid})
+        return render(request, driver_page_view.template_name, context)
+    
+
+class ListDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):
     
     def post(self, request, id):
         form = ListDriverForm(request.POST)
         if form.is_valid():
             list_driver(id, form.cleaned_data["price"])
-        return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+            return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+        self.handle_invalid_form(request, id, form_sell=form)
         
         
 
-class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+class FireDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):
     
     def post(self, request, id):
         form = FireDriverForm(request.POST)
@@ -44,10 +59,11 @@ class FireDriverView(LoginRequiredMixin, ManagerContextMixin, View):
             driver.terminate_contract()
             list_driver(id, 0)
             return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+        self.handle_invalid_form(request, id, form_fire=form)
         return HttpResponseRedirect(reverse("manager:index"))
     
 
-class BidDriverView(LoginRequiredMixin, ManagerContextMixin, View):
+class BidDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):
 
     def post(self, request, id):
         form = DriverBidForm(request.POST)
@@ -56,20 +72,5 @@ class BidDriverView(LoginRequiredMixin, ManagerContextMixin, View):
             bidder = Team.objects.get(manager=context["current_user_manager"])
             bid_driver(id, bidder, form.cleaned_data["amount"])
             return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
-        
-        # Form is not valid, render DriverPageView with the error form
-        # This seems like a lot of work to have BidDriverView seperate from DriverPageView ? it works tho -.-
-        driver_page_view = DriverPageView()
-        driver_page_view.request = HttpRequest()
-        driver_page_view.request.method = "GET"
-        driver_page_view.request.user = request.user
-        driver_page_view.kwargs = {'id': id}
-        driver = driver_page_view.get_object()
-        form_fire = FireDriverForm()
-        form_sell = ListDriverForm()
-        form_bid = DriverBidForm(request.POST, initial={"driver_listing": DriverListing.objects.get(driver=driver)})
-        context = driver_page_view.get_context_data()
-        context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell, "form_bid": form_bid})
-        return render(request, driver_page_view.template_name, context)
-    
-
+        return self.handle_invalid_form(request, id, form_bid=form)
+       
