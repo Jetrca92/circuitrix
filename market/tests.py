@@ -176,6 +176,11 @@ class TestBidDriver(TestCase):
         form_data2 = {"amount": 80, "driver_listing": self.driver_listing}
         form2 = DriverBidForm(data=form_data2)
         self.assertFalse(form2.is_valid())
+
+        # Seller makes a bid
+        form_data3 = {"amount": 1000, "driver_listing": self.driver_listing}
+        form3 = DriverBidForm(bidder=self.team, data=form_data3)
+        self.assertFalse(form3.is_valid())
         
 
 

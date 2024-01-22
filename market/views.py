@@ -66,10 +66,10 @@ class FireDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin,
 class BidDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):
 
     def post(self, request, id):
-        form = DriverBidForm(request.POST)
+        context = super().get_context_data()
+        bidder = Team.objects.get(manager=context["current_user_manager"])
+        form = DriverBidForm(bidder=bidder, data=request.POST)
         if form.is_valid():
-            context = super().get_context_data()
-            bidder = Team.objects.get(manager=context["current_user_manager"])
             bid_driver(id, bidder, form.cleaned_data["amount"])
             return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
         return self.handle_invalid_form(request, id, form_bid=form)
