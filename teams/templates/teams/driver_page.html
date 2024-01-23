@@ -99,7 +99,7 @@
         <div class="h-100 p-5 bg-light border rounded-3">
             <h5>Listed on Driver Market</h2>
             <div class="text-muted">
-                Deadline: 14. 5. 2021
+                Deadline: {{ driver.driver_listing.first.deadline }} <span class="text-danger">({{ driver.driver_listing.first.deadline|timeuntil }})</span>
             </div>
             <div>
                 Price: {{ driver.driver_listing.first.price }}
@@ -118,7 +118,7 @@
                 {{ error|join:", " }}
             </div>
             {% endfor %}
-            
+            {% if current_user_manager.user != request.user %}
             <form action="{% url 'market:bid_driver' driver.id %}" method="post" role="form">
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
@@ -142,7 +142,7 @@
                     <button class="btn btn-dark" type="button" id="bidCancel">Cancel</button>
                 </div>
             </form>
-            
+            {% endif %}
         </div>
         {% endif %}
     </div>
