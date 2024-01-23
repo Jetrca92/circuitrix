@@ -115,11 +115,10 @@ class DriverPageView(LoginRequiredMixin, ManagerContextMixin, View):
         form_fire = FireDriverForm()
         form_sell = ListDriverForm()
         context = self.get_context_data()
+        context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell})
         if driver.is_market_listed:
             form_bid = DriverBidForm(initial={"driver_listing": DriverListing.objects.get(driver=driver)})
-            context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell, "form_bid": form_bid})
-            return render(request, self.template_name, context)
-        context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell})
+            context["form_bid"] = form_bid
         return render(request, self.template_name, context)
 
     def get_object(self, queryset=None):

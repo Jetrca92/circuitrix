@@ -88,6 +88,13 @@ class Driver(Staff):
         self.team = None
         self.is_market_listed = True
         self.save()
+
+    def sell(self, buyer):
+        self.team = buyer
+        self.is_market_listed = False
+        self.save()
+        buyer.drivers.add(self)
+        buyer.save()
         
 
 class LeadDesigner(Staff):

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
+from unittest.mock import MagicMock
 
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
 from market.helpers import list_driver, bid_driver
@@ -21,6 +22,12 @@ class TestListDriver(TestCase):
             total_fans=1000,
         )
         self.team.save()
+        self.buyer = Team.objects.create(
+            owner=self.manager,
+            name="Buyer Team",
+            location=self.country,
+            total_fans=1000,
+        )
 
         # Create a driver
         self.driver = Driver.objects.create(
@@ -100,6 +107,12 @@ class TestListDriver(TestCase):
         form = FireDriverForm(data=form_data)
         self.assertFalse(form.is_valid())
 
+    def test_driver_sell(self):
+        self.driver.sell(self.buyer)
+        self.assertFalse(self.driver.is_market_listed)
+        self.assertEqual(self.driver.team, self.buyer)
+        self.assertEqual(self.buyer.drivers.filter(id=self.driver.id).count(), 1)
+
 
 class TestBidDriver(TestCase):
     
@@ -145,7 +158,6 @@ class TestBidDriver(TestCase):
             seller=self.team,
             price=10,
         )
-        print(self.driver_listing)
 
     def test_bid_driver(self):
         # Check that no bids exist
@@ -181,7 +193,48 @@ class TestBidDriver(TestCase):
         form_data3 = {"amount": 1000, "driver_listing": self.driver_listing}
         form3 = DriverBidForm(bidder=self.team, data=form_data3)
         self.assertFalse(form3.is_valid())
+
+
+class TestDriverListingMethods(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.seller = Manager.objects.create(name="Test Manager", user=self.user)
+        self.country = Country.objects.create(name="Test Country", short_name="TC", logo_location="manager/flags/test.png")
+        self.seller = Team.objects.create(
+            owner=self.seller,
+            name="Test Team",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.driver = Driver.objects.create(
+            name="Test Driver",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            skill_overall=80,
+            skill_racecraft=70,
+            skill_pace=90,
+            skill_focus=80,
+            skill_car_management=75,
+            skill_feedback=85,
+        )
+
+        self.driver_listing = DriverListing.objects.create(
+                driver=self.driver,
+                seller=self.seller,
+                price=100,
+        )
         
+    def test_active_method(self):
+        self.assertTrue(DriverListing.objects.filter(id=self.driver_listing.id).exists())
+        self.assertTrue(self.driver_listing.active())
+        self.assertTrue(self.driver_listing.is_active)
+
+        # Deadline over
+        self.driver_listing.deadline = timezone.now() - timezone.timedelta(days=1)
+        self.driver_listing.save()
+        self.assertFalse(self.driver_listing.active())
+        self.assertFalse(self.driver_listing.is_active)
 
 
         

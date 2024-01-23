@@ -52,7 +52,7 @@ Driver Market
                 <p class="card-text">Feedback: {{ driver.driver.skill_feedback }}</p>
             </div>
             <div>
-                <p class="card-text">Price: {{ driver.price }}</p>
+                <p class="card-text">Price: {{ driver.price }} €</p>
                 {% if driver.driver.driver_listing.first.bid.all %}
                 {% with highest_bid=driver.driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
                 <p>

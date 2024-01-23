@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.views import View
 
 from manager.models import Driver, Team
@@ -70,7 +71,10 @@ class BidDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, 
         bidder = Team.objects.get(manager=context["current_user_manager"])
         form = DriverBidForm(bidder=bidder, data=request.POST)
         if form.is_valid():
-            bid_driver(id, bidder, form.cleaned_data["amount"])
-            return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+            dl = form.cleaned_data["driver_listing"]
+            if dl.active():
+                bid_driver(id, bidder, form.cleaned_data["amount"])
+                return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
+            sell_driver(id, form.cleaned_data["driver_listing"])
         return self.handle_invalid_form(request, id, form_bid=form)
        

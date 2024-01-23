@@ -95,14 +95,14 @@
             </div>
             {% endif %}
         </div>
-        {% if driver.is_market_listed %}
+        {% if driver.is_market_listed and driver.driver_listing.first.is_active %}
         <div class="h-100 p-5 bg-light border rounded-3">
             <h5>Listed on Driver Market</h2>
             <div class="text-muted">
                 Deadline: {{ driver.driver_listing.first.deadline }} <span class="text-danger">({{ driver.driver_listing.first.deadline|timeuntil }})</span>
             </div>
             <div>
-                Price: {{ driver.driver_listing.first.price }}
+                Price: {{ driver.driver_listing.first.price }} €
             </div>
             {% if driver.driver_listing.first.bid.all %}
                 {% with highest_bid=driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
@@ -118,7 +118,7 @@
                 {{ error|join:", " }}
             </div>
             {% endfor %}
-            {% if current_user_manager.user != request.user %}
+            {% if current_user_manager.user != driver.team.owner %}
             <form action="{% url 'market:bid_driver' driver.id %}" method="post" role="form">
                 {% csrf_token %}
                 <div class="row g-3 mb-3">

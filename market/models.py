@@ -11,6 +11,7 @@ class DriverListing(models.Model):
     price = models.IntegerField()
     date_listed = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.driver.surname}"
@@ -21,6 +22,21 @@ class DriverListing(models.Model):
             self.deadline = timezone.now() + timezone.timedelta(days=TIME_ON_MARKET_IN_DAYS)
         super().save(*args, **kwargs)
 
+    def active(self):
+        # Check if deadline hasn't passed
+        if self.deadline:
+            if timezone.now() < self.deadline:
+                return True
+            self.is_active = False
+            self.save()
+            return False
+        
+    def close(self):
+        # Close listing after deadline
+        if timezone.now() > self.deadline:
+            self.is_active = False
+            self.save()
+        
 
 class Bid(models.Model):
     driver_listing = models.ForeignKey(DriverListing, on_delete=models.CASCADE, related_name="bid")
