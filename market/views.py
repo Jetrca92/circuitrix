@@ -7,7 +7,7 @@ from django.views import View
 
 from manager.models import Driver, Team
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
-from market.helpers import list_driver, bid_driver
+from market.helpers import list_driver, bid_driver, sell_driver
 from market.models import DriverListing
 from races.views import ManagerContextMixin
 from teams.views import DriverPageView

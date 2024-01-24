@@ -3,8 +3,9 @@ from django.utils import timezone
 from unittest.mock import MagicMock
 
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
-from market.helpers import list_driver, bid_driver
+from market.helpers import list_driver, bid_driver, sell_driver
 from market.models import DriverListing, Bid
+from market.models import TIME_ON_MARKET_IN_DAYS
 from manager.models import User, Manager, Country, Team, Driver
 
 
@@ -61,6 +62,8 @@ class TestListDriver(TestCase):
         # Check if driver listing exists
         driver_listings = DriverListing.objects.filter(driver=self.driver, seller=self.driver.team)
         self.assertEqual(1, driver_listings.count())
+        driver = Driver.objects.get(id=self.driver.id)
+        self.assertTrue(driver.is_market_listed)
 
     def test_driver_listing_invalid_form(self):
         # Add form data and validate form
@@ -106,12 +109,6 @@ class TestListDriver(TestCase):
         }
         form = FireDriverForm(data=form_data)
         self.assertFalse(form.is_valid())
-
-    def test_driver_sell(self):
-        self.driver.sell(self.buyer)
-        self.assertFalse(self.driver.is_market_listed)
-        self.assertEqual(self.driver.team, self.buyer)
-        self.assertEqual(self.buyer.drivers.filter(id=self.driver.id).count(), 1)
 
 
 class TestBidDriver(TestCase):
@@ -236,6 +233,114 @@ class TestDriverListingMethods(TestCase):
         self.assertFalse(self.driver_listing.active())
         self.assertFalse(self.driver_listing.is_active)
 
+    def test_close_method(self):
+        self.assertTrue(DriverListing.objects.filter(id=self.driver_listing.id).exists())
+        self.assertTrue(self.driver_listing.active())
+        self.assertTrue(self.driver_listing.is_active)
 
+        # Didn't close after deadline not over
+        self.driver_listing.deadline = timezone.now() + timezone.timedelta(days=1)
+        self.driver_listing.save()
+        self.driver_listing.close()
+        self.assertTrue(self.driver_listing.is_active)
+
+        # Close after deadline over
+        self.driver_listing.deadline = timezone.now() - timezone.timedelta(days=1)
+        self.driver_listing.save()
+        self.driver_listing.close()
+        self.assertFalse(self.driver_listing.is_active)
+
+    def test_save_method_sets_deadline(self):
+
+        # Deadline is set and correctly calculated
+        self.assertIsNotNone(self.driver_listing.deadline)
+        expected_deadline = timezone.now() + timezone.timedelta(days=TIME_ON_MARKET_IN_DAYS)
+        self.assertAlmostEqual(self.driver_listing.deadline, expected_deadline, delta=timezone.timedelta(seconds=1))
+
+
+class TestSellDriver(TestCase):
+
+    def setUp(self):
+        self.country = Country.objects.create(name="Test Country", short_name="TC", logo_location="manager/flags/test.png")
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.manager = Manager.objects.create(name="Test Manager", user=self.user)
+        self.team = Team.objects.create(
+            owner=self.manager,
+            name="Test Team",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.team.save()
+
+        self.bid_user = User.objects.create_user(username="bid_user", password="bid_password", email="bid@test.com")
+        self.bid_manager = Manager.objects.create(name="Bid Manager", user=self.bid_user)
+        self.buyer = Team.objects.create(
+            owner=self.bid_manager,
+            name="Bid Team",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.buyer.save()
+        self.buyer1 = Team.objects.create(
+            owner=self.bid_manager,
+            name="Bid Team1",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.buyer.save()
+
+        self.driver = Driver.objects.create(
+            team=self.team,
+            name="Test Driver",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            skill_overall=80,
+            skill_racecraft=70,
+            skill_pace=90,
+            skill_focus=80,
+            skill_car_management=75,
+            skill_feedback=85,
+        )
+
+    def test_driver_sell_method(self):
+        # Check if everything set up
+        list_driver(self.driver.id, 5)
+        driver = Driver.objects.get(id=self.driver.id)
+        self.assertTrue(driver.is_market_listed)
+        self.assertEqual(driver.team, self.team)
+        self.assertEqual(self.buyer.drivers.filter(id=self.driver.id).count(), 0)
+        driver.sell(self.buyer)
+        # Check function
+        
+        self.assertFalse(driver.is_market_listed)
+        self.assertEqual(driver.team, self.buyer)
+        self.assertEqual(self.buyer.drivers.filter(id=self.driver.id).count(), 1)
+
+    def test_sell_driver_helper(self):
+        # Set driver listing and 2 bids and call function
+        driver = Driver.objects.get(id=self.driver.id)
+        self.assertFalse(driver.is_market_listed)
+        list_driver(self.driver.id, 10)
+        driver_listing = DriverListing.objects.get(driver=driver)
+        bid1 = Bid.objects.create(
+            driver_listing=driver_listing,
+            bidder=self.buyer,
+            amount=2000,
+        )
+        bid2 = Bid.objects.create(
+            driver_listing=driver_listing,
+            bidder=self.buyer1,
+            amount=1500,
+        )
+        driver_listing.deadline = timezone.now() - timezone.timedelta(days=1)
+        driver_listing.save()
+        sell_driver(driver.id, driver_listing)
+
+        # Reload driver
+        driver = Driver.objects.get(id=self.driver.id)
+        # Highest bidder owns driver
+        self.assertEqual(self.buyer.drivers.filter(id=driver.id).count(), 1)
+        self.assertEqual(self.buyer, driver.team)
+        self.assertFalse(driver_listing.is_active)
         
 

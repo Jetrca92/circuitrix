@@ -95,6 +95,10 @@ class Driver(Staff):
         self.save()
         buyer.drivers.add(self)
         buyer.save()
+
+    def list(self):
+        self.is_market_listed = True
+        self.save()
         
 
 class LeadDesigner(Staff):

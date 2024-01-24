@@ -11,8 +11,8 @@ def list_driver(id, price):
         price=price,
     )
     dl.save()
-    driver.is_market_listed = True
-    driver.save()
+    driver.list()
+
 
 def bid_driver(id, bidder, bid):
     dl = DriverListing.objects.get(driver=Driver.objects.get(id=id))
@@ -23,16 +23,10 @@ def bid_driver(id, bidder, bid):
     )
     bid.save()
 
+
 def sell_driver(id, driver_listing):
-    highest_bid = Bid.objects.filter(driver_listing=driver_listing).aggregate(Max('amount'))['amount__max']
+    highest_bid = Bid.objects.filter(driver_listing=driver_listing).order_by('-amount').first()
     driver = Driver.objects.get(id=id)
-    # Set driver_listing to inactive
-    driver_listing.is_active = False
-    driver_listing.save()
-    driver.is_market_listed = False
-    driver.save()
-
-    # Change driver_owner
-    
-
-
+    # Change driver owner, unlist driver, unactivate driver_listing
+    driver.sell(highest_bid.bidder)
+    driver_listing.close()
