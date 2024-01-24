@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from manager.models import Manager, Team, Country, Driver, RaceMechanic, RaceOrders, Race, RaceOrders
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
+from market.helpers import sell_driver
 from market.models import DriverListing
 from races.helpers import assign_championship
 from teams.forms import NewTeamForm, EditCarNameForm, RaceOrdersForm
@@ -117,7 +118,11 @@ class DriverPageView(LoginRequiredMixin, ManagerContextMixin, View):
         context = self.get_context_data()
         context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell})
         if driver.is_market_listed:
-            form_bid = DriverBidForm(initial={"driver_listing": DriverListing.objects.get(driver=driver)})
+            # Check if listing active
+            driver_listing = DriverListing.objects.get(driver=driver)
+            if not driver_listing.active():
+                sell_driver(driver.id, driver_listing)
+            form_bid = DriverBidForm(initial={"driver_listing": driver_listing})
             context["form_bid"] = form_bid
         return render(request, self.template_name, context)
 

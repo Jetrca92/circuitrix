@@ -99,6 +99,10 @@ class Driver(Staff):
     def list(self):
         self.is_market_listed = True
         self.save()
+
+    def unlist(self):
+        self.is_market_listed = False
+        self.save()
         
 
 class LeadDesigner(Staff):

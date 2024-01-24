@@ -17,7 +17,12 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
     template_name = "market/market.html"
 
     def get(self, request):
-        listed_drivers = DriverListing.objects.all()
+        # Get all listings and check if still active, else set is_active to false
+        all_listed_drivers = DriverListing.objects.all()
+        for listing in all_listed_drivers:
+            if not listing.active():
+                sell_driver(listing.driver.id, listing)
+        listed_drivers = DriverListing.objects.filter(is_active=True)
         context = super().get_context_data()
         context["listed_drivers"] = listed_drivers
         return render(request, self.template_name, context)
@@ -49,7 +54,6 @@ class ListDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin,
             return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
         self.handle_invalid_form(request, id, form_sell=form)
         
-        
 
 class FireDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):
     
@@ -61,7 +65,6 @@ class FireDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin,
             list_driver(id, 0)
             return HttpResponseRedirect(reverse("teams:driver_page", kwargs={'id': id}))
         self.handle_invalid_form(request, id, form_fire=form)
-        return HttpResponseRedirect(reverse("manager:index"))
     
 
 class BidDriverView(LoginRequiredMixin, ManagerContextMixin, FormHandlingMixin, View):

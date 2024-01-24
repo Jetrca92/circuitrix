@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.utils import timezone
-from unittest.mock import MagicMock
 
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
 from market.helpers import list_driver, bid_driver, sell_driver
@@ -80,7 +79,7 @@ class TestListDriver(TestCase):
         form2 = ListDriverForm(data=form2_data)
         self.assertFalse(form.is_valid())
 
-    def test_driver_fire(self):
+    def test_driver_terminate_contract_method(self):
         # Check that no listing exists
         driver_listings = DriverListing.objects.filter(driver=self.driver, seller=self.driver.team)
         self.assertEqual(0, driver_listings.count())
@@ -102,6 +101,15 @@ class TestListDriver(TestCase):
         # Check if driver removed from team
         team_drivers = self.team.drivers.filter(id=self.driver.id)
         self.assertEqual(team_drivers.count(), 0)
+
+    def test_driver_list_unlist_method(self):
+        # Check if driver listed
+        driver = Driver.objects.get(id=self.driver.id)
+        self.assertFalse(driver.is_market_listed)
+        driver.list()
+        self.assertTrue(driver.is_market_listed)
+        driver.unlist()
+        self.assertFalse(driver.is_market_listed)
 
     def test_driver_fire_invalid_form(self):
         form_data = {
@@ -319,7 +327,6 @@ class TestSellDriver(TestCase):
     def test_sell_driver_helper(self):
         # Set driver listing and 2 bids and call function
         driver = Driver.objects.get(id=self.driver.id)
-        self.assertFalse(driver.is_market_listed)
         list_driver(self.driver.id, 10)
         driver_listing = DriverListing.objects.get(driver=driver)
         bid1 = Bid.objects.create(
@@ -342,5 +349,19 @@ class TestSellDriver(TestCase):
         self.assertEqual(self.buyer.drivers.filter(id=driver.id).count(), 1)
         self.assertEqual(self.buyer, driver.team)
         self.assertFalse(driver_listing.is_active)
+        self.assertFalse(driver.is_market_listed)
         
+    def sell_driver_helper_no_bids(self):
+        # Set driver listing and call function
+        driver = Driver.objects.get(id=self.driver.id)
+        list_driver(self.driver.id, 10)
+        driver_listing = DriverListing.objects.get(driver=driver)
+        driver_listing.deadline = timezone.now() - timezone.timedelta(days=1)
+        driver_listing.save()
+        sell_driver(driver.id, driver_listing)
 
+        # Reload driver, no changes to team
+        driver = Driver.objects.get(id=self.driver.id)
+        self.assertFalse(driver_listing.is_active)
+        self.assertFalse(driver.is_market_listed)
+        self.assertEqual(driver.team, self.team)

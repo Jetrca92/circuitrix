@@ -28,5 +28,8 @@ def sell_driver(id, driver_listing):
     highest_bid = Bid.objects.filter(driver_listing=driver_listing).order_by('-amount').first()
     driver = Driver.objects.get(id=id)
     # Change driver owner, unlist driver, unactivate driver_listing
-    driver.sell(highest_bid.bidder)
     driver_listing.close()
+    if highest_bid:
+        driver.sell(highest_bid.bidder)
+        return
+    driver.unlist()
