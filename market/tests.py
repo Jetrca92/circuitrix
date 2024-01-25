@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
-from market.helpers import list_driver, bid_driver, sell_driver
+from market.helpers import list_driver, bid_driver, sell_driver, get_u21_driver_listings
 from market.models import DriverListing, Bid
 from market.models import TIME_ON_MARKET_IN_DAYS
 from manager.models import User, Manager, Country, Team, Driver

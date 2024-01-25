@@ -1,6 +1,8 @@
 from django.db.models import Max
+from django.utils import timezone
 
 from manager.models import Driver
+from manager.models import DAYS_IN_A_SEASON
 from market.models import DriverListing, Bid
 
 def list_driver(id, price):
@@ -33,3 +35,9 @@ def sell_driver(id, driver_listing):
         driver.sell(highest_bid.bidder)
         return
     driver.unlist()
+
+
+def get_u21_driver_listings():
+    twenty_one_game_years_ago = timezone.now() - timezone.timedelta(days=21 * DAYS_IN_A_SEASON)
+    u_21_driver_listings = DriverListing.objects.filter(is_active=True, driver__date_of_birth__gt=twenty_one_game_years_ago)
+    return u_21_driver_listings

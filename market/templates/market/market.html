@@ -5,8 +5,7 @@ Driver Market
 {% endblock %}
 
 {% block main %}
-{% load static %}
-{% load humanize %}
+
 
 <div class="container">
     <h1 class="fw-light">Driver Market</h1>
@@ -14,96 +13,29 @@ Driver Market
         Select a filter
         <hr class="mt-1 mb-3">
         <div class="d-flex flex-row align-items-center">
-            <select title="Select item" class="form-select" id="item-select">
+            <select title="Select item" class="form-select" id="driver-filter-select">
                 <option value="all">All Drivers</option>
-                <option value="u-21">U-21 Drivers</option>
-                <option value="Weapons">Weapons</option>
-                <option value="Grain">Grain</option>
-                <option value="Iron">Iron</option>
+                <option value="u">U-21 Drivers</option>
+                <option value="free-agent">Free Agents</option>
             </select>
         </div>   
     </div>
     
-        
-    {% if message %}    
-    <div><b>{{ message }}</b></div>
-    {% endif %}
     <!-- Drivers list -->
-    {% for driver in listed_drivers %}
-    <hr class="my-4">
-    <div>
-        <div class="card-header">
-            <h5><a href="{% url 'teams:driver_page' driver.driver.id %}" class="link-dark">{{ driver.driver.name }} {{ driver.driver.surname }}</a></h5>
-        </div>
-        <div class="card-body d-flex gap-5">
-            <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
-            <div>
-                {% if driver.driver.team %}
-                <p class="card-text">Seller: <a href="{% url 'teams:team_overview' driver.driver.team.id %}" class="link-dark">{{ driver.driver.team.name }}</a></p>
-                {% endif %}
-                <p class="card-text">Age: {{ driver.driver.age }}</p>
-                <p class="card-text">Overall: {{ driver.driver.skill_overall }}</p>
-            </div>
-            <div>
-                <p class="card-text">Racecraft: {{ driver.driver.skill_racecraft }}</p>
-                <p class="card-text">Pace: {{ driver.driver.skill_pace }}</p>
-                <p class="card-text">Focus: {{ driver.driver.skill_focus }}</p>
-                <p class="card-text">Car Management: {{ driver.driver.skill_car_management }}</p>
-                <p class="card-text">Feedback: {{ driver.driver.skill_feedback }}</p>
-            </div>
-            <div>
-                <p class="card-text">Price: {{ driver.price }} €</p>
-                {% if driver.driver.driver_listing.first.bid.all %}
-                {% with highest_bid=driver.driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
-                <p>
-                    Highest bid: {{ highest_bid.amount|intcomma }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
-                </p>
-            {% endwith %}
-            {% else %}
-            <p>No bids yet</p>
-            {% endif %}
-            </div>
-        </div>
-    </div> 
-    {% endfor %} 
+    {% include 'partials/market_drivers_list.html' with listed_drivers=listed_drivers id="all-drivers" style="block" %}
+    {% include 'partials/market_drivers_list.html' with listed_drivers=u21_listed_drivers id="u-drivers" style="none" %}
+    {% include 'partials/market_drivers_list.html' with listed_drivers=free_agent_drivers id="free-agent-drivers" style="none" %}
+
 </div>
 
 <script defer>
-    /* market item and quality select */
-    const itemSelect = document.querySelector('#item-select');
-    const qualitySelect = document.querySelector('#quality-select');
-    const qualitySelectDiv = document.querySelector('#quality-select-div');
-    const itemRows = document.querySelectorAll('.item-row');
-
-    itemSelect.addEventListener('change', () => {
-        const selectedItem = itemSelect.value;
-
-        itemRows.forEach(itemRow => {
-            const itemName = itemRow.dataset.name;
-            if (selectedItem === 'all' || itemName === selectedItem) {
-                itemRow.style.display = 'table-row';
-            } else {
-                itemRow.style.display = 'none';
-            }
-            if (selectedItem === 'Grain' || selectedItem === 'Iron' || selectedItem === 'all') {
-                qualitySelectDiv.style.display = 'none';
-            } else {
-                qualitySelectDiv.style.display = 'block';
-            }
-        });
-    });
-
-    qualitySelect.addEventListener('change', () => {
-        const selectedQuality = qualitySelect.value;
-
-        itemRows.forEach(itemRow => {
-            const quality = itemRow.dataset.quality;
-            if (selectedQuality === 'all' || selectedQuality === quality) {
-                itemRow.style.display = 'table-row';
-            } else {
-                itemRow.style.display = 'none';
-            }
-        });
+    /* market driver filter select */
+    document.getElementById('driver-filter-select').addEventListener('change', function () {
+        var selectedValue = this.value;
+        document.getElementById('all-drivers').style.display = 'none';
+        document.getElementById('u-drivers').style.display = 'none';
+        document.getElementById('free-agent-drivers').style.display = 'none';
+        document.getElementById(selectedValue + '-drivers').style.display = 'block';
     });
 </script>
 

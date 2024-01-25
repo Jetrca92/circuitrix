@@ -7,7 +7,7 @@ from django.views import View
 
 from manager.models import Driver, Team
 from market.forms import ListDriverForm, FireDriverForm, DriverBidForm
-from market.helpers import list_driver, bid_driver, sell_driver
+from market.helpers import list_driver, bid_driver, sell_driver, get_u21_driver_listings
 from market.models import DriverListing
 from races.views import ManagerContextMixin
 from teams.views import DriverPageView
@@ -22,9 +22,15 @@ class DriverMarketView(LoginRequiredMixin, ManagerContextMixin, View):
         for listing in all_listed_drivers:
             if not listing.active():
                 sell_driver(listing.driver.id, listing)
-        listed_drivers = DriverListing.objects.filter(is_active=True)
+        listed_drivers = DriverListing.objects.filter(is_active=True).order_by("-deadline")
+        u21_listed_drivers = get_u21_driver_listings()
+        free_agent_drivers = DriverListing.objects.filter(is_active=True, driver__team=None)
         context = super().get_context_data()
-        context["listed_drivers"] = listed_drivers
+        context.update({
+            "listed_drivers": listed_drivers, 
+            "u21_listed_drivers": u21_listed_drivers, 
+            "free_agent_drivers": free_agent_drivers, 
+        })
         return render(request, self.template_name, context)
     
 
@@ -41,7 +47,12 @@ class FormHandlingMixin:
         form_sell = form_sell or ListDriverForm()
         form_bid = form_bid or DriverBidForm(initial={"driver_listing": DriverListing.objects.get(driver=driver)})
         context = driver_page_view.get_context_data()
-        context.update({"driver": driver, "form_fire": form_fire, "form_sell": form_sell, "form_bid": form_bid})
+        context.update({
+            "driver": driver, 
+            "form_fire": form_fire, 
+            "form_sell": form_sell, 
+            "form_bid": form_bid
+        })
         return render(request, driver_page_view.template_name, context)
     
 
