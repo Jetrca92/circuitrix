@@ -230,18 +230,34 @@ class Lap(models.Model):
     lap_number = models.PositiveIntegerField()
     race_result = models.ForeignKey(RaceResult, blank=True, null=True, on_delete=models.CASCADE, related_name="results_laps")
     position = models.PositiveIntegerField(blank=True, null=True)  
-
-
-class Points(models.Model):
-    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="points_race")
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="points_team")
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="points_driver")
-    points = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.race.name} - {self.driver.name} - {self.points} points"
     
 
+class TeamPoints(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_points")
+    championship = models.ForeignKey(Championship, on_delete=models.CASCADE, related_name="team_championship_points")
+    points = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.team.name} - {self.points} points"
+    
+    def add_points(self, points):
+        self.points += points
+        self.save()
+
+
+class DriverPoints(models.Model):
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="driver_points")
+    championship = models.ForeignKey(Championship, on_delete=models.CASCADE, related_name="driver_championship_points")
+    points = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.driver.surname} - {self.points} points"
+    
+    def add_points(self, points):
+        self.points += points
+        self.save()
+
+        
 class RaceOrders(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="orders_team", )
     race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name="orders_race")
