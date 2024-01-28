@@ -410,22 +410,42 @@ class TestPointsMethods(TestCase):
             location=self.country,
             total_fans=1000,
         )
+        generate_drivers(self.team)
         self.season = Season.objects.create(number=1)
         self.championship = Championship.objects.create(
             name="test123",
             season=self.season,
         )
-        generate_drivers(self.team)
+        self.racetrack = Racetrack.objects.create(
+            name="Test racetrack",
+            location = self.country,
+            description = "test",
+            lap_length_km = 5,
+            total_laps = 65,
+            straights = 33,
+            slow_corners = 33,
+            fast_corners = 34,
+        )
+        self.race = Race.objects.create(
+            name="test_race",
+            season=self.season,
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=50,
+        )
+        self.race.teams.add(self.team)
+        self.race.save()
+            
 
     def test_team_points_add_points_method(self):
-        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, championship=self.championship)
+        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, race=self.race)
         self.assertEqual(team_points.points, 0)
         team_points.add_points(5)
         self.assertEqual(team_points.points, 5)
 
     def test_driver_points_add_points_method(self):
         driver = Driver.objects.filter(team=self.team).first()
-        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, championship=self.championship)
+        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, race=self.race)
         driver_points.add_points(7)
         self.assertEqual(driver_points.points, 7)
 
