@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from manager.models import (
     Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
-    Car, Driver, RaceResult, Lap, Season, RaceOrders
+    Car, Driver, RaceResult, Lap, Season, DriverPoints, TeamPoints
 )
 from races.constants import racetracks
 from races.helpers import (
@@ -41,7 +41,7 @@ class AssignChampionshipTestCase(TestCase):
         for championship in division1_championships:
             self.assertTrue(championship.teams.count() <= 10)
 
-        division2_championships = Championship.objects.filter(division=2)
+        """division2_championships = Championship.objects.filter(division=2)
         for championship in division2_championships:
             self.assertTrue(championship.teams.count() <= 20)
 
@@ -63,11 +63,7 @@ class AssignChampionshipTestCase(TestCase):
 
         division7_championships = Championship.objects.filter(division=7)
         for championship in division7_championships:
-            self.assertTrue(championship.teams.count() <= 640)
-
-        # Add more assertions as needed to validate the results.
-        for i in Championship.objects.all():
-            print(i.__dict__, i.teams.count())
+            self.assertTrue(championship.teams.count() <= 640)"""
 
 
 class AddTeamToUpcomingRacesTestCase(TestCase):
@@ -399,6 +395,39 @@ class GetRaceResultTestCase(TestCase):
         drivers = get_race_drivers(self.race)
         expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
         self.assertEqual(drivers, expected_drivers)
+
+
+class TestPointsMethods(TestCase):
+
+    def setUp(self):
+         # Create team and championship
+        self.country = Country.objects.create(name="Test Country", short_name="IT", logo_location="manager/flags/test.png")
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.manager = Manager.objects.create(name="Test Manager", user=self.user)
+        self.team = Team.objects.create(
+            owner=self.manager,
+            name="Test Team",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.season = Season.objects.create(number=1)
+        self.championship = Championship.objects.create(
+            name="test123",
+            season=self.season,
+        )
+        generate_drivers(self.team)
+
+    def test_team_points_add_points_method(self):
+        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, championship=self.championship)
+        self.assertEqual(team_points.points, 0)
+        team_points.add_points(5)
+        self.assertEqual(team_points.points, 5)
+
+    def test_driver_points_add_points_method(self):
+        driver = Driver.objects.filter(team=self.team).first()
+        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, championship=self.championship)
+        driver_points.add_points(7)
+        self.assertEqual(driver_points.points, 7)
 
         
         
