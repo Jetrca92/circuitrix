@@ -212,7 +212,9 @@ class Championship(models.Model):
         for result in results:
             if result.position <= 10:
                 driver_points, _created = DriverPoints.objects.get_or_create(driver=result.driver, championship=self)
+                team_points, _created = TeamPoints.objects.get_or_create(team=result.team, championship=self)
                 driver_points.add_points(POINTS_SYSTEM[result.position])
+                team_points.add_points(POINTS_SYSTEM[result.position])
         
 
 class Race(models.Model):

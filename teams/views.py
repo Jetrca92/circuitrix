@@ -178,15 +178,17 @@ class RaceOrdersOverviewView(LoginRequiredMixin, ManagerContextMixin, ListView):
 
     def get_queryset(self):
         team = Team.objects.get(pk=self.kwargs['id'])
-        return team.championship.races.all()
+        if team.championship:
+            return team.championship.races.all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(pk=self.kwargs['id'])
         context['team'] = team
-        context['upcoming_races'] = team.championship.upcoming_races()
-        context['completed_races'] = team.championship.completed_races()
-        context['ongoing_races'] = team.championship.ongoing_races()
+        if team.championship:
+            context['upcoming_races'] = team.championship.upcoming_races()
+            context['completed_races'] = team.championship.completed_races()
+            context['ongoing_races'] = team.championship.ongoing_races()
         return context
 
 

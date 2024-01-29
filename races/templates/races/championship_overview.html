@@ -28,12 +28,35 @@
                 <tr>
                     <th scope="row">{{ forloop.counter }}.</th>
                     <td><a href="{% url 'teams:team_overview' team.id %}" class="link-dark">{{ team.name }}</a></td>
-                    <td>1</td>
+                    <td>{{ team.team_points.first.points|default:"0" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>    
+    </div>
+    <div>
+        <h4 class="fw-bold lh-1">Driver standings</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Driver</th>
+                    <th scope="col">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in championship.teams.all %}
+                    {% for driver in team.drivers.all %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}.</th>
+                        <td><a href="{% url 'teams:driver_page' driver.id %}" class="link-dark">{{ driver.name }} {{ driver.surname }}</a></td>
+                        <td>{{ driver.driver_points.first.points|default:"0" }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>        
 </div>
 
 {% endblock %}

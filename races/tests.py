@@ -41,7 +41,7 @@ class AssignChampionshipTestCase(TestCase):
         for championship in division1_championships:
             self.assertTrue(championship.teams.count() <= 10)
 
-        """division2_championships = Championship.objects.filter(division=2)
+        division2_championships = Championship.objects.filter(division=2)
         for championship in division2_championships:
             self.assertTrue(championship.teams.count() <= 20)
 
@@ -63,7 +63,7 @@ class AssignChampionshipTestCase(TestCase):
 
         division7_championships = Championship.objects.filter(division=7)
         for championship in division7_championships:
-            self.assertTrue(championship.teams.count() <= 640)"""
+            self.assertTrue(championship.teams.count() <= 640)
 
 
 class AddTeamToUpcomingRacesTestCase(TestCase):
