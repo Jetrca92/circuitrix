@@ -8,6 +8,18 @@ from races.managers import UpcomingRacesManager
 
 # One year equals to 84 days (12 weeks) - season lasts 12 weeks, 10 weeks for races and 2 weeks for season break
 DAYS_IN_A_SEASON = 84
+POINTS_SYSTEM = {
+    1: 25,
+    2: 18,
+    3: 15,
+    4: 12,
+    5: 10,
+    6: 8,
+    7: 6,
+    8: 4,
+    9: 2,
+    10: 1,
+}
 
 
 class User(AbstractUser):
@@ -194,11 +206,19 @@ class Championship(models.Model):
     
     def ongoing_races(self):
         return self.races.filter(date=timezone.now())
+    
+    def award_points(self, race):
+        results = RaceResult.objects.filter(race=race)
+        for result in results:
+            if result.position <= 10:
+                driver_points, _created = DriverPoints.objects.get_or_create(driver=result.driver, championship=self)
+                driver_points.add_points(POINTS_SYSTEM[result.position])
         
 
 class Race(models.Model):
     name = models.CharField(max_length=60)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="race_season")
+    championship = models.ForeignKey(Championship, on_delete=models.CASCADE, null=True, blank=True, related_name="race_championship")
     date = models.DateTimeField()
     location = models.ForeignKey(Racetrack, on_delete=models.CASCADE)
     laps = models.PositiveIntegerField()
@@ -206,10 +226,6 @@ class Race(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.date})"
-    
-    def award_points(self):
-        for result in self.results.all():
-            driver_points = DriverPoints.objects.get_or_create(driver=result.driver, )
     
 
 class RaceResult(models.Model):
@@ -238,7 +254,7 @@ class Lap(models.Model):
 
 class TeamPoints(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_points")
-    race = models.ForeignKey(Race, on_delete=models.CASCADE, null=True, blank=True, related_name="team_race_points")
+    championship = models.ForeignKey(Championship, on_delete=models.CASCADE, null=True, blank=True, related_name="team_championship_points")
     points = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -251,7 +267,7 @@ class TeamPoints(models.Model):
 
 class DriverPoints(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="driver_points")
-    race = models.ForeignKey(Race, on_delete=models.CASCADE, null=True, blank=True, related_name="driver_race_points")
+    championship = models.ForeignKey(Championship, on_delete=models.CASCADE, null=True, blank=True, related_name="driver_championship_points")
     points = models.PositiveIntegerField(default=0)
 
     def __str__(self):

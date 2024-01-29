@@ -18,7 +18,7 @@ from races.helpers import (
     get_race_drivers
 )
 from teams.constants import countries
-from teams.helpers import generate_drivers
+from teams.helpers import generate_drivers, generate_car
 
 
 
@@ -411,6 +411,7 @@ class TestPointsMethods(TestCase):
             total_fans=1000,
         )
         generate_drivers(self.team)
+        generate_car(self.team)
         self.season = Season.objects.create(number=1)
         self.championship = Championship.objects.create(
             name="test123",
@@ -429,26 +430,34 @@ class TestPointsMethods(TestCase):
         self.race = Race.objects.create(
             name="test_race",
             season=self.season,
+            championship=self.championship,
             date=timezone.now(),
             location=self.racetrack,
-            laps=50,
+            laps=65,
         )
         self.race.teams.add(self.team)
         self.race.save()
             
 
     def test_team_points_add_points_method(self):
-        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, race=self.race)
+        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, championship=self.race.championship)
         self.assertEqual(team_points.points, 0)
         team_points.add_points(5)
         self.assertEqual(team_points.points, 5)
 
     def test_driver_points_add_points_method(self):
         driver = Driver.objects.filter(team=self.team).first()
-        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, race=self.race)
+        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, championship=self.race.championship)
         driver_points.add_points(7)
         self.assertEqual(driver_points.points, 7)
 
+    def test_award_points_method(self):
+        calculate_race_result(self.race)
+        winner = RaceResult.objects.get(race=self.race, team=self.team, position=1)
+        self.assertEqual(winner.position, 1)
+        self.race.championship.award_points(self.race)
+        winner_points = DriverPoints.objects.get(championship=self.race.championship, driver=winner.driver)
+        self.assertEqual(winner_points.points, 25)
         
         
         

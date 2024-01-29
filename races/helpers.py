@@ -20,6 +20,7 @@ def create_races(championship):
         r = Race(
             name=racetrack["name"] + " Grand Prix",
             season=championship.season,
+            championship=championship,
             date=date,
             location=location,
             laps=racetrack["total_laps"],
