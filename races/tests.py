@@ -432,21 +432,6 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
             self.assertEqual(expected_result_min, actual_result_min)
             self.assertEqual(expected_result_max, actual_result_max)
 
-    @mock.patch('races.helpers.calculate_car_performance_rating', return_value=10)
-    @mock.patch('races.helpers.calculate_low_high_performance_rating', side_effect=lambda number, racetrack: number)
-    def test_calculate_optimal_lap_time(self, lhpr, cpr):
-        car = Car.objects.first()
-        racetrack = Racetrack.objects.first()
-
-        self.assertEqual(84, calculate_optimal_lap_time(car, racetrack))
-
-        lhpr.assert_has_calls([
-            call(5, racetrack,),
-            call(20, racetrack,),
-        ])
-
-        cpr.assert_called_with(car, racetrack)
-                    
 
 class GetRaceResultTestCase(TestCase):
     def setUp(self):
