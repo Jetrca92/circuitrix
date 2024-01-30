@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from manager.models import (
     User, Manager, Team, Country, RaceMechanic, LeadDesigner, Driver, Car, 
-    Championship, Racetrack, Race, RaceResult, RaceOrders, TeamPoints, DriverPoints
+    Championship, Racetrack, Race, RaceResult, RaceOrders, TeamPoints, DriverPoints, Lap
 )
 
 
@@ -21,3 +21,4 @@ admin.site.register(RaceResult)
 admin.site.register(RaceOrders)
 admin.site.register(TeamPoints)
 admin.site.register(DriverPoints)
+admin.site.register(Lap)

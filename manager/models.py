@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -236,7 +238,6 @@ class RaceResult(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     position = models.PositiveIntegerField(blank=True, null=True)
     best_lap = models.DurationField(blank=True, null=True)
-    laps = models.ManyToManyField('Lap', blank=True, related_name="lap_race")
 
     class Meta:
         constraints = [
@@ -244,7 +245,13 @@ class RaceResult(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.race.name} - {self.driver.name} - {self.position}"  
+        return f"{self.race.name} - {self.driver.name} - {self.position}" 
+
+    def total_time(self):
+        total_time = 0
+        for lap in self.results_laps.all():
+            total_time += lap.time
+        return datetime.timedelta(seconds=total_time)
 
 
 class Lap(models.Model):

@@ -1,4 +1,5 @@
 import random
+import datetime
 from datetime import timedelta
 from unittest import mock
 from unittest.mock import call, MagicMock
@@ -19,7 +20,6 @@ from races.helpers import (
 )
 from teams.constants import countries
 from teams.helpers import generate_drivers, generate_car
-
 
 
 class AssignChampionshipTestCase(TestCase):
@@ -378,24 +378,39 @@ class GetRaceResultTestCase(TestCase):
             slow_corners = 33,
             fast_corners = 34,
         )
+        self.race = Race.objects.create(
+            name="Test Race",
+            season=self.season,
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=10,
+        )
         for i in range(10):
             user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
             manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
             team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=Country.objects.filter(short_name="IT").first())
-            self.race = Race.objects.create(
-                name="Test Race",
-                season=self.season,
-                date=timezone.now(),
-                location=self.racetrack,
-                laps=1,
-            )
             generate_drivers(team)
+            generate_car(team)
+            self.race.teams.add(team)
+            self.race.save()
+        
 
     def test_driver_list_no_race_orders(self):
         drivers = get_race_drivers(self.race)
         expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
         self.assertEqual(drivers, expected_drivers)
 
+    def test_race_result_method(self):
+        test_race = Race.objects.get(location=self.racetrack)
+        calculate_race_result(test_race)
+        test_race = Race.objects.get(location=self.racetrack)
+        race_result = RaceResult.objects.filter(race=test_race).first()
+        expected_time = 0
+        for lap in race_result.results_laps.all():
+            expected_time += lap.time
+        self.assertEqual(datetime.timedelta(seconds=expected_time), race_result.total_time())
+        print(race_result.total_time())
+        
 
 class TestPointsMethods(TestCase):
 
