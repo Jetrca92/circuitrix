@@ -125,7 +125,8 @@ def calculate_low_high_performance_rating(low_high_rating_number, racetrack):
         (low_high_rating_number * racetrack.fast_corners)
 
 
-def calculate_optimal_lap_time(car, racetrack) -> int:
+def calculate_optimal_lap_time(driver, racetrack) -> int:
+    car = driver.team.car
     rating_low = calculate_low_high_performance_rating(5, racetrack)
     rating_high = calculate_low_high_performance_rating(20, racetrack)
     rating = calculate_car_performance_rating(car, racetrack)
@@ -137,7 +138,19 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
     # Linear interpolation to determine the constant for the specific rating
     constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
     
-    return int(constant / rating)
+    # Calculate car's optimal lap time
+    base_lap_time = constant / rating
+
+    # Decrease optimal time based on drivers overall skill for max 30 %
+    skill_factor = (driver.skill_overall - 25) / 75  # Normalize skill rating to a value between 0 and 1
+    reduction_percentage = skill_factor * 30  # 30% reduction for 100 skill
+
+    adjusted_lap_time = base_lap_time - (base_lap_time * reduction_percentage / 100)
+
+    # Randomize final lap time within the range [0%, 2%]
+    random_percentage = random.uniform(0, 2)
+    randomized_lap_time = adjusted_lap_time + (adjusted_lap_time * random_percentage / 100)
+    return int(randomized_lap_time)
 
 
 @transaction.atomic
@@ -148,7 +161,7 @@ def calculate_race_result(race):
             "team_name": driver.team.name,
             "team_id": driver.team.id,
             "rank": i + 1,
-            "lap_time": calculate_optimal_lap_time(driver.team.car, race.location),
+            "lap_time": calculate_optimal_lap_time(driver, race.location),
             "driver_id": driver.id
         }
         for i, (driver) in enumerate(drivers, start=0)

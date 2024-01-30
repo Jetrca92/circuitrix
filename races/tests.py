@@ -253,6 +253,97 @@ class CalculateRaceResultTestCase(TestCase):
             self.assertEqual(result.position, driver["rank"])
 
 
+class TestOptimalLapTime(TestCase):
+    def setUp(self):
+        
+        self.country = Country.objects.create(name="Test Country", short_name="ES", logo_location="manager/flags/test.png")
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.manager = Manager.objects.create(name="Test Manager", user=self.user)
+        self.user1 = User.objects.create_user(username="test_user1", password="test_password", email="test1@example.com")
+        self.manager1 = Manager.objects.create(name="Test Manager1", user=self.user1)
+        self.racetrack = Racetrack.objects.create(
+            name="Test Monza Racetrack",
+            location=self.country,
+            image_location="manager/circuits/test.png",
+            description="A test racetrack",
+            lap_length_km=4.5,
+            total_laps=50,
+            straights=70.0,
+            slow_corners=10.0,
+            fast_corners=20.0,
+        )
+
+        self.team5 = Team.objects.create(
+            owner=self.manager,
+            name="Test Team5",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.team15 = Team.objects.create(
+            owner=self.manager1,
+            name="Test Team15",
+            location=self.country,
+            total_fans=1000,
+        )
+        car5 = Car.objects.create(
+            owner=self.team5,
+            engine=15,
+            gearbox=15,
+            brakes=15,
+            front_wing=15,
+            suspension=15,
+            rear_wing=15,
+        )
+        car15 = Car.objects.create(
+            owner=self.team15,
+            engine=15,
+            gearbox=15,
+            brakes=15,
+            front_wing=15,
+            suspension=15,
+            rear_wing=15,
+        )
+        self.driver5 = Driver.objects.create(
+            name="driver5",
+            surname="5",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            team=self.team5,
+            skill_overall=25,
+            skill_racecraft=5,
+            skill_pace=5,
+            skill_focus=5,
+            skill_car_management=5,
+            skill_feedback=5,
+        )
+        self.driver15 = Driver.objects.create(
+            name="driver15",
+            surname="15",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            team=self.team15,
+            skill_overall=25,
+            skill_racecraft=5,
+            skill_pace=5,
+            skill_focus=5,
+            skill_car_management=5,
+            skill_feedback=5,
+        )
+        self.team5.car = car5
+        self.team5.drivers.add(self.driver5)
+        self.team5.save()
+        self.team15.car = car15
+        self.team15.drivers.add(self.driver15)
+        self.team15.save()
+
+    def test_time(self):
+        time5 = calculate_optimal_lap_time(self.driver5, self.racetrack)
+        time15 = calculate_optimal_lap_time(self.driver15, self.racetrack)
+        print(f"5: {time5}")
+        print(f"15: {time15}")
+
+
+
 class CalculateCarPerformanceRatingTestCase(TestCase):
     def setUp(self):
 
