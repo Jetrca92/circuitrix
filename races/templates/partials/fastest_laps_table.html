@@ -4,9 +4,8 @@
         <tr>
             <th scope="col">Position</th>
             <th scope="col">Driver</th>
-            <th scope="col">Nationality</th>
+            <th scope="col">Lap</th>
             <th scope="col">Time</th>
-            <th scope="col">Points</th>
         </tr>
     </thead>
     <tbody>
@@ -14,9 +13,8 @@
         <tr>
             <th scope="row">{{ forloop.counter }}.</th>
             <td><a href="{% url 'teams:driver_page' result.driver.id %}" class="link-dark">{{ result.driver.name }} {{ result.driver.surname }}</a></td>
-            <td><img src="{% static result.driver.country.logo_location %}" alt="flag" width="auto" height="20" loading="lazy"></td>
-            <td>{{ result.total_time }}</td>
-            <td>+ {{ result.points }}</td>
+            <td>{{ result.fastest_lap.lap_number }}</td>
+            <td>{{ result.fastest_lap.time }}</td>
         </tr>
         {% endfor %}
     </tbody>

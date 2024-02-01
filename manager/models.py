@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F
 from django.utils import timezone
 
 from races.managers import UpcomingRacesManager
@@ -252,6 +253,12 @@ class RaceResult(models.Model):
         for lap in self.results_laps.all():
             total_time += lap.time
         return datetime.timedelta(seconds=total_time)
+    
+    def fastest_lap(self):
+        return self.results_laps.order_by(F('time').asc(nulls_last=True)).first()
+    
+    def points(self):
+        return POINTS_SYSTEM[self.position]
 
 
 class Lap(models.Model):
