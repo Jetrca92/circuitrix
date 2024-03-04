@@ -67,24 +67,24 @@
                             <div class="sb-sidenav-menu-heading">My Team</div>
                             {% if current_user_manager.team %}
                             <a class="nav-link" href="{% url 'teams:team_overview' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-industry"></i></div>
                                 Overview
                             </a>
                             
                             <a class="nav-link" href="{% url 'teams:drivers' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-id-card"></i></div>
                                 Drivers
                             </a>
                             <a class="nav-link" href="{% url 'teams:staff' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-person"></i></div>
                                 Staff
                             </a>
                             <a class="nav-link" href="{% url 'teams:car' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-car"></i></div>
                                 Car
                             </a>
                             <a class="nav-link" href="{% url 'teams:race_orders_overview' current_user_manager.team.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-person-chalkboard"></i></div>
                                 Race orders
                             </a>
                             {% if current_user_manager.team.championship %}
@@ -94,31 +94,20 @@
                                 {{ current_user_manager.team.championship.name }}
                             </a>
                             <a class="nav-link" href="{% url 'races:racetracks_overview' current_user_manager.team.championship.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-circle-notch"></i></div>
                                 Racetracks
                             </a>
                             <a class="nav-link" href="{% url 'races:races_overview' current_user_manager.team.championship.id %}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-flag-checkered"></i></div>
                                 Races
                             </a>
                             {% endif %}
+                            <div class="sb-sidenav-menu-heading">Market</div>
+                            <a class="nav-link" href="{% url 'market:driver_market' %}">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-shop"></i></div>
+                                Driver Market
+                            </a>
                             {% endif %}
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Layouts
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">Static Navigation</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a>
-                                </nav>
-                            </div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                                Pages
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
                             <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">

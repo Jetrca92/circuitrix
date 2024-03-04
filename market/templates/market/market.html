@@ -1,0 +1,41 @@
+{% extends "manager/layout.html" %}
+
+{% block title %}
+Driver Market
+{% endblock %}
+
+{% block main %}
+
+
+<div class="container">
+    <h1 class="fw-light">Driver Market</h1>
+    <div class="mt-2">
+        Select a filter
+        <hr class="mt-1 mb-3">
+        <div class="d-flex flex-row align-items-center">
+            <select title="Select item" class="form-select" id="driver-filter-select">
+                <option value="all">All Drivers</option>
+                <option value="u">U-21 Drivers</option>
+                <option value="free-agent">Free Agents</option>
+            </select>
+        </div>   
+    </div>
+    
+    <!-- Drivers list -->
+    {% include 'partials/market_drivers_list.html' with listed_drivers=listed_drivers id="all-drivers" style="block" %}
+    {% include 'partials/market_drivers_list.html' with listed_drivers=u21_listed_drivers id="u-drivers" style="none" %}
+    {% include 'partials/market_drivers_list.html' with listed_drivers=free_agent_drivers id="free-agent-drivers" style="none" %}
+
+</div>
+
+<script defer>
+    /* market driver filter select */
+    document.getElementById('driver-filter-select').addEventListener('change', function () {
+        document.getElementById('all-drivers').style.display = 'none';
+        document.getElementById('u-drivers').style.display = 'none';
+        document.getElementById('free-agent-drivers').style.display = 'none';
+        document.getElementById(`${this.value}-drivers`).style.display = 'block';
+    });
+</script>
+
+{% endblock %}

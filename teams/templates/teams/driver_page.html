@@ -6,32 +6,164 @@
 
 {% block main %}
 {% load static %}
+{% load humanize %}
 
 <div class="container col-md-11 px-2 py-5">
-    <div class="col-lg-9">
-        <div class="d-flex align-items-center mb-3 gap-3">
-            <h1 class="display-5 fw-bold lh-1">{{ driver.name }} {{ driver.surname }}</h1>
-            <img src="{% static driver.country.logo_location %}" width="auto" height="35" loading="lazy">
-            <span class="text-muted">({{ driver.id }})</span>
-        </div>
-        <div>
-            <div class="card-body d-flex gap-5">
-                <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
-                <div>
-                    <p class="card-text">Team: <a href="{% url 'teams:team_overview' driver.team.id %}" class="link-dark">{{ driver.team.name }} </a></p>
-                    <p class="card-text">Age: {{ driver.age }}</p>
-                    <p class="card-text">Overall: {{ driver.skill_overall }}</p>
-                </div>
-                <div>
-                    <p class="card-text">Racecraft: {{ driver.skill_racecraft }}</p>
-                    <p class="card-text">Pace: {{ driver.skill_pace }}</p>
-                    <p class="card-text">Focus: {{ driver.skill_focus }}</p>
-                    <p class="card-text">Car Management: {{ driver.skill_car_management }}</p>
-                    <p class="card-text">Feedback: {{ driver.skill_feedback }}</p>
+    
+    <div class="d-flex align-items-center mb-3 gap-3">
+        <h1 class="display-5 fw-bold lh-1">{{ driver.name }} {{ driver.surname }}</h1>
+        <img src="{% static driver.country.logo_location %}" width="auto" height="35" loading="lazy">
+        <span class="text-muted">({{ driver.id }})</span>
+    </div>
+    <div>
+        <div class="card-body d-flex gap-5 mb-3">
+            <img class="card-img-top" src="{% static "manager/driver.png" %}" alt="Driver Image" style="width:150px;height:150px;">
+            <div>
+                {% if driver.team %}
+                <p class="card-text">Team: <a href="{% url 'teams:team_overview' driver.team.id %}" class="link-dark">{{ driver.team.name }} </a></p>
+                {% endif %}
+                <p class="card-text">Age: {{ driver.age }}</p>
+                <p class="card-text">Overall: {{ driver.skill_overall }}</p>
+            </div>
+            <div>
+                <p class="card-text">Racecraft: {{ driver.skill_racecraft }}</p>
+                <p class="card-text">Pace: {{ driver.skill_pace }}</p>
+                <p class="card-text">Focus: {{ driver.skill_focus }}</p>
+                <p class="card-text">Car Management: {{ driver.skill_car_management }}</p>
+                <p class="card-text">Feedback: {{ driver.skill_feedback }}</p>
+            </div>
+            {% if current_user_manager.user == request.user %}
+            {% if driver.is_market_listed %}
+            <div>
+                Driver is listed on the <a class="link-dark" href="{% url 'market:driver_market' %}">Driver Market</a>
+            </div>
+            {% else %}
+            <div>
+                Owner's actions
+                <hr class="my-1">
+                <!-- Fire Button trigger modal -->
+                <button type="button" class="btn btn-danger mb-1" data-bs-toggle="modal" data-bs-target="#confirmFire">
+                    Fire
+                </button>
+                <!-- List Button trigger modal -->
+                <button type="button" class="btn btn-success mb-1" data-bs-toggle="modal" data-bs-target="#confirmSell">
+                    Sell
+                </button>
+            </div>
+            {% endif %}
+            <!-- Fire Modal -->
+            <div class="modal fade" id="confirmFire" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Confirm Contract Termination</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{% url 'market:fire_driver' driver.id %}" method="post" role="form">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                {{ form_fire.confirmation }} I would like to fire {{ driver.name }} {{ driver.surname }}
+                            </div>
+                            <div class="modal-footer">  
+                                <button type="submit" class="btn btn-danger">Fire!</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
+            <!-- List Modal -->
+            <div class="modal fade" id="confirmSell" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Confirm Driver Sale</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{% url 'market:list_driver' driver.id %}" method="post" role="form">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                {{ form_sell.confirmation }} I would like to sell {{ driver.name }} {{ driver.surname }} for (Euro €) {{ form_sell.price }}
+                            </div>
+                            <div class="modal-footer">  
+                                <button type="submit" class="btn btn-success">Sell!</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
+        {% if driver.is_market_listed and driver.driver_listing.first.is_active %}
+        <div class="h-100 p-5 bg-light border rounded-3">
+            <h5>Listed on Driver Market</h2>
+            <div class="text-muted">
+                Deadline: {{ driver.driver_listing.first.deadline }} <span class="text-danger">({{ driver.driver_listing.first.deadline|timeuntil }})</span>
+            </div>
+            <div>
+                Price: {{ driver.driver_listing.first.price }} €
+            </div>
+            {% if driver.driver_listing.first.bid.all %}
+                {% with highest_bid=driver.driver_listing.first.bid.all|dictsort:'amount'|last %}
+                <div>
+                    Highest bid: {{ highest_bid.amount|intcomma }} from <a class="link-dark" href="{% url 'teams:team_overview' highest_bid.bidder.id %}">{{ highest_bid.bidder.name }}</a>
+                </div>
+            {% endwith %}
+            {% else %}
+            <div class="mb-3">No bids yet</div>
+            {% endif %}
+            {% for error in form_bid.errors.values %}
+            <div class="text-danger fw-bold mb-3">
+                {{ error|join:", " }}
+            </div>
+            {% endfor %}
+            {% if current_user_manager.user != driver.team.owner %}
+            <form action="{% url 'market:bid_driver' driver.id %}" method="post" role="form">
+                {% csrf_token %}
+                <div class="row g-3 mb-3">
+                    <div class="col fw-bold">
+                        Place Bid:
+                    </div>
+                    <div class="col">
+                        {{ form_bid.driver_listing }}
+                        {{ form_bid.amount }}
+                    </div>
+                    <div class="col">
+                        €
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-outline-secondary" type="button" id="bidTrigger">Place Bid</button>
+                    </div>
+                </div>
+                <div class="p-3 bg-secondary border rounded-3" style="display: none;" id="bidContent">
+                    <div class="d-flex align-items-center me-2">Do you wish to bid for this driver? The price is<span id="amountValue"></span>€</div>
+                    <button type="submit" class="btn btn-dark me-1" type="button">Bid!</button>
+                    <button class="btn btn-dark" type="button" id="bidCancel">Cancel</button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<script defer>
+    const bidBtn = document.querySelector('#bidTrigger');
+    const bidCancelBtn = document.querySelector('#bidCancel');
+    const bidDiv = document.querySelector('#bidContent');
+    const amount = document.querySelector('#id_amount');
+    const amountValue = document.querySelector('#amountValue');
+
+    bidBtn.addEventListener('click', () => {
+        amountValue.innerHTML = `&nbsp;${amount.value}&nbsp;`;
+        bidDiv.style.display = "block";
+        bidTr
+
+    });
+    bidCancelBtn.addEventListener('click', () => {
+        bidDiv.style.display = "none";
+    });
+</script>
 
 {% endblock %}
