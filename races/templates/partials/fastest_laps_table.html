@@ -1,0 +1,21 @@
+{% load static %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Position</th>
+            <th scope="col">Driver</th>
+            <th scope="col">Lap</th>
+            <th scope="col">Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in race_results %} 
+        <tr>
+            <th scope="row">{{ forloop.counter }}.</th>
+            <td><a href="{% url 'teams:driver_page' result.driver.id %}" class="link-dark">{{ result.driver.name }} {{ result.driver.surname }}</a></td>
+            <td>{{ result.fastest_lap.lap_number }}</td>
+            <td>{{ result.fastest_lap.time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

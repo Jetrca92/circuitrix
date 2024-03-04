@@ -20,6 +20,7 @@ def create_races(championship):
         r = Race(
             name=racetrack["name"] + " Grand Prix",
             season=championship.season,
+            championship=championship,
             date=date,
             location=location,
             laps=racetrack["total_laps"],
@@ -124,7 +125,8 @@ def calculate_low_high_performance_rating(low_high_rating_number, racetrack):
         (low_high_rating_number * racetrack.fast_corners)
 
 
-def calculate_optimal_lap_time(car, racetrack) -> int:
+def calculate_optimal_lap_time(driver, racetrack) -> int:
+    car = driver.team.car
     rating_low = calculate_low_high_performance_rating(5, racetrack)
     rating_high = calculate_low_high_performance_rating(20, racetrack)
     rating = calculate_car_performance_rating(car, racetrack)
@@ -136,7 +138,19 @@ def calculate_optimal_lap_time(car, racetrack) -> int:
     # Linear interpolation to determine the constant for the specific rating
     constant = constant_low + ((rating - rating_low) / (rating_high - rating_low)) * (constant_high - constant_low)
     
-    return int(constant / rating)
+    # Calculate car's optimal lap time
+    base_lap_time = constant / rating
+
+    # Decrease optimal time based on drivers overall skill for max 30 %
+    skill_factor = (driver.skill_overall - 25) / 75  # Normalize skill rating to a value between 0 and 1
+    reduction_percentage = skill_factor * 30  # 30% reduction for 100 skill
+
+    adjusted_lap_time = base_lap_time - (base_lap_time * reduction_percentage / 100)
+
+    # Randomize final lap time within the range [0%, 2%]
+    random_percentage = random.uniform(0, 2)
+    randomized_lap_time = adjusted_lap_time + (adjusted_lap_time * random_percentage / 100)
+    return int(randomized_lap_time)
 
 
 @transaction.atomic
@@ -147,7 +161,7 @@ def calculate_race_result(race):
             "team_name": driver.team.name,
             "team_id": driver.team.id,
             "rank": i + 1,
-            "lap_time": calculate_optimal_lap_time(driver.team.car, race.location),
+            "lap_time": calculate_optimal_lap_time(driver, race.location),
             "driver_id": driver.id
         }
         for i, (driver) in enumerate(drivers, start=0)
@@ -170,16 +184,18 @@ def calculate_race_result(race):
             # Get max difference between adjacent cars
             driver_1 = sorted_drivers[i]
             driver_2 = sorted_drivers[i + 1]
+            driver_1_laptime = calculate_optimal_lap_time(Driver.objects.get(id=driver_1["driver_id"]), race.location)
+            driver_2_laptime = calculate_optimal_lap_time(Driver.objects.get(id=driver_2["driver_id"]), race.location)
 
-            rating_diff = driver_2["lap_time"] - driver_1["lap_time"]
+            time_diff = driver_2_laptime - driver_1_laptime
 
-            if rating_diff < max_diff and rating_diff < 0:
-                max_diff = rating_diff
+            if time_diff < max_diff and time_diff < 0:
+                max_diff = time_diff
                 drivers_with_max_diff = (driver_1, driver_2)
 
             # Add result to model
             lap = Lap(
-                time=driver_1["lap_time"],
+                time=driver_1_laptime,
                 lap_number=lap_number,
                 race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_1["driver_id"]), race=race),
                 position=driver_1["rank"],
@@ -188,7 +204,7 @@ def calculate_race_result(race):
             # Process the last driver explicitly
             if i == len(sorted_drivers) - 2:
                 lap = Lap(
-                    time=driver_2["lap_time"],
+                    time=driver_2_laptime,
                     lap_number=lap_number,
                     race_result=RaceResult.objects.get(driver=Driver.objects.get(id=driver_2["driver_id"]), race=race),
                     position=driver_2["rank"],

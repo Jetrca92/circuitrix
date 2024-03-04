@@ -50,7 +50,8 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
         if race.date < timezone.now():
             results = RaceResult.objects.filter(race=race).first()
             if results is None:
-                calculate_race_result(race)      
+                calculate_race_result(race)
+                race.championship.award_points(race)      
         return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -60,7 +61,7 @@ class RaceView(LoginRequiredMixin, ManagerContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         race = Race.objects.get(pk=self.kwargs['id'])
-        race_results = race.results.all()
+        race_results = race.results.all().order_by("position")
         context['race_results'] = race_results
         return context
 

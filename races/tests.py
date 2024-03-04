@@ -1,4 +1,5 @@
 import random
+import datetime
 from datetime import timedelta
 from unittest import mock
 from unittest.mock import call, MagicMock
@@ -8,7 +9,7 @@ from django.utils import timezone
 
 from manager.models import (
     Championship, Team, Manager, User, Racetrack, Race, Country, LeadDesigner, RaceMechanic,
-    Car, Driver, RaceResult, Lap, Season, RaceOrders
+    Car, Driver, RaceResult, Lap, Season, DriverPoints, TeamPoints
 )
 from races.constants import racetracks
 from races.helpers import (
@@ -18,8 +19,7 @@ from races.helpers import (
     get_race_drivers
 )
 from teams.constants import countries
-from teams.helpers import generate_drivers
-
+from teams.helpers import generate_drivers, generate_car
 
 
 class AssignChampionshipTestCase(TestCase):
@@ -64,10 +64,6 @@ class AssignChampionshipTestCase(TestCase):
         division7_championships = Championship.objects.filter(division=7)
         for championship in division7_championships:
             self.assertTrue(championship.teams.count() <= 640)
-
-        # Add more assertions as needed to validate the results.
-        for i in Championship.objects.all():
-            print(i.__dict__, i.teams.count())
 
 
 class AddTeamToUpcomingRacesTestCase(TestCase):
@@ -233,14 +229,6 @@ class CalculateRaceResultTestCase(TestCase):
         drivers = Driver.objects.all()
         updated_drivers = calculate_race_result(self.race)
         sorted_updated_drivers = sorted(updated_drivers, key=lambda x: x['rank'])
-
-        # After 1000 laps, cars should be sorted based on lap_time ascending
-        for i in range(len(sorted_updated_drivers) - 1):
-            current_driver = sorted_updated_drivers[i]
-            next_driver = sorted_updated_drivers[i + 1]
-
-            self.assertLessEqual(current_driver['lap_time'], next_driver['lap_time'])
-            self.assertLessEqual(current_driver['rank'], next_driver['rank'])
             
         # Test object creation
         for driver in updated_drivers:
@@ -255,6 +243,97 @@ class CalculateRaceResultTestCase(TestCase):
         for driver in updated_drivers:
             result = RaceResult.objects.get(driver=Driver.objects.get(id=driver["driver_id"]))
             self.assertEqual(result.position, driver["rank"])
+
+
+class TestOptimalLapTime(TestCase):
+    def setUp(self):
+        
+        self.country = Country.objects.create(name="Test Country", short_name="ES", logo_location="manager/flags/test.png")
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.manager = Manager.objects.create(name="Test Manager", user=self.user)
+        self.user1 = User.objects.create_user(username="test_user1", password="test_password", email="test1@example.com")
+        self.manager1 = Manager.objects.create(name="Test Manager1", user=self.user1)
+        self.racetrack = Racetrack.objects.create(
+            name="Test Monza Racetrack",
+            location=self.country,
+            image_location="manager/circuits/test.png",
+            description="A test racetrack",
+            lap_length_km=4.5,
+            total_laps=50,
+            straights=70.0,
+            slow_corners=10.0,
+            fast_corners=20.0,
+        )
+
+        self.team5 = Team.objects.create(
+            owner=self.manager,
+            name="Test Team5",
+            location=self.country,
+            total_fans=1000,
+        )
+        self.team15 = Team.objects.create(
+            owner=self.manager1,
+            name="Test Team15",
+            location=self.country,
+            total_fans=1000,
+        )
+        car5 = Car.objects.create(
+            owner=self.team5,
+            engine=15,
+            gearbox=15,
+            brakes=15,
+            front_wing=15,
+            suspension=15,
+            rear_wing=15,
+        )
+        car15 = Car.objects.create(
+            owner=self.team15,
+            engine=15,
+            gearbox=15,
+            brakes=15,
+            front_wing=15,
+            suspension=15,
+            rear_wing=15,
+        )
+        self.driver5 = Driver.objects.create(
+            name="driver5",
+            surname="5",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            team=self.team5,
+            skill_overall=25,
+            skill_racecraft=5,
+            skill_pace=5,
+            skill_focus=5,
+            skill_car_management=5,
+            skill_feedback=5,
+        )
+        self.driver15 = Driver.objects.create(
+            name="driver15",
+            surname="15",
+            country=self.country,
+            date_of_birth=timezone.now(),
+            team=self.team15,
+            skill_overall=25,
+            skill_racecraft=5,
+            skill_pace=5,
+            skill_focus=5,
+            skill_car_management=5,
+            skill_feedback=5,
+        )
+        self.team5.car = car5
+        self.team5.drivers.add(self.driver5)
+        self.team5.save()
+        self.team15.car = car15
+        self.team15.drivers.add(self.driver15)
+        self.team15.save()
+
+    def test_time(self):
+        for i in range(10):
+            time5 = calculate_optimal_lap_time(self.driver5, self.racetrack)
+            time15 = calculate_optimal_lap_time(self.driver15, self.racetrack)
+            print(time5)
+            print(time15)
 
 
 class CalculateCarPerformanceRatingTestCase(TestCase):
@@ -345,21 +424,6 @@ class CalculateCarPerformanceRatingTestCase(TestCase):
             self.assertEqual(expected_result_min, actual_result_min)
             self.assertEqual(expected_result_max, actual_result_max)
 
-    @mock.patch('races.helpers.calculate_car_performance_rating', return_value=10)
-    @mock.patch('races.helpers.calculate_low_high_performance_rating', side_effect=lambda number, racetrack: number)
-    def test_calculate_optimal_lap_time(self, lhpr, cpr):
-        car = Car.objects.first()
-        racetrack = Racetrack.objects.first()
-
-        self.assertEqual(84, calculate_optimal_lap_time(car, racetrack))
-
-        lhpr.assert_has_calls([
-            call(5, racetrack,),
-            call(20, racetrack,),
-        ])
-
-        cpr.assert_called_with(car, racetrack)
-                    
 
 class GetRaceResultTestCase(TestCase):
     def setUp(self):
@@ -382,24 +446,101 @@ class GetRaceResultTestCase(TestCase):
             slow_corners = 33,
             fast_corners = 34,
         )
+        self.race = Race.objects.create(
+            name="Test Race",
+            season=self.season,
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=10,
+        )
         for i in range(10):
             user = User.objects.create(username=f"user{i + 1}_test", password="password", email=f"user{i + 1}@gmail.com")
             manager = Manager.objects.create(name=f"Manager {i + 1}", user=user)
             team = Team.objects.create(name=f"Team {i + 1}", owner=manager, location=Country.objects.filter(short_name="IT").first())
-            self.race = Race.objects.create(
-                name="Test Race",
-                season=self.season,
-                date=timezone.now(),
-                location=self.racetrack,
-                laps=1,
-            )
             generate_drivers(team)
+            generate_car(team)
+            self.race.teams.add(team)
+            self.race.save()
+        
 
     def test_driver_list_no_race_orders(self):
         drivers = get_race_drivers(self.race)
         expected_drivers = [driver for team in self.race.teams.all() for driver in team.drivers.all()]
         self.assertEqual(drivers, expected_drivers)
 
+    def test_race_result_method(self):
+        test_race = Race.objects.get(location=self.racetrack)
+        calculate_race_result(test_race)
+        test_race = Race.objects.get(location=self.racetrack)
+        race_result = RaceResult.objects.filter(race=test_race).first()
+        expected_time = 0
+        for lap in race_result.results_laps.all():
+            expected_time += lap.time
+        self.assertEqual(datetime.timedelta(seconds=expected_time), race_result.total_time())
+        print(race_result.total_time())
+        
+
+class TestPointsMethods(TestCase):
+
+    def setUp(self):
+         # Create team and championship
+        self.country = Country.objects.create(name="Test Country", short_name="IT", logo_location="manager/flags/test.png")
+        self.user = User.objects.create_user(username="test_user", password="test_password", email="test@example.com")
+        self.manager = Manager.objects.create(name="Test Manager", user=self.user)
+        self.team = Team.objects.create(
+            owner=self.manager,
+            name="Test Team",
+            location=self.country,
+            total_fans=1000,
+        )
+        generate_drivers(self.team)
+        generate_car(self.team)
+        self.season = Season.objects.create(number=1)
+        self.championship = Championship.objects.create(
+            name="test123",
+            season=self.season,
+        )
+        self.racetrack = Racetrack.objects.create(
+            name="Test racetrack",
+            location = self.country,
+            description = "test",
+            lap_length_km = 5,
+            total_laps = 65,
+            straights = 33,
+            slow_corners = 33,
+            fast_corners = 34,
+        )
+        self.race = Race.objects.create(
+            name="test_race",
+            season=self.season,
+            championship=self.championship,
+            date=timezone.now(),
+            location=self.racetrack,
+            laps=65,
+        )
+        self.race.teams.add(self.team)
+        self.race.save()
+            
+
+    def test_team_points_add_points_method(self):
+        team_points, _created = TeamPoints.objects.get_or_create(team=self.team, championship=self.race.championship)
+        self.assertEqual(team_points.points, 0)
+        team_points.add_points(5)
+        self.assertEqual(team_points.points, 5)
+
+    def test_driver_points_add_points_method(self):
+        driver = Driver.objects.filter(team=self.team).first()
+        driver_points, _created = DriverPoints.objects.get_or_create(driver=driver, championship=self.race.championship)
+        driver_points.add_points(7)
+        self.assertEqual(driver_points.points, 7)
+
+    def test_award_points_method(self):
+        calculate_race_result(self.race)
+        winner = RaceResult.objects.get(race=self.race, team=self.team, position=1)
+        self.assertEqual(winner.position, 1)
+        self.race.championship.award_points(self.race)
+        winner_points = DriverPoints.objects.get(championship=self.race.championship, driver=winner.driver)
+        self.assertEqual(winner_points.points, 25)
         
         
         
