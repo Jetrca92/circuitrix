@@ -31,11 +31,10 @@ Driver Market
 <script defer>
     /* market driver filter select */
     document.getElementById('driver-filter-select').addEventListener('change', function () {
-        var selectedValue = this.value;
         document.getElementById('all-drivers').style.display = 'none';
         document.getElementById('u-drivers').style.display = 'none';
         document.getElementById('free-agent-drivers').style.display = 'none';
-        document.getElementById(selectedValue + '-drivers').style.display = 'block';
+        document.getElementById(`${this.value}-drivers`).style.display = 'block';
     });
 </script>
 

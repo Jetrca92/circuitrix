@@ -29,7 +29,7 @@ def bid_driver(id, bidder, bid):
 def sell_driver(id, driver_listing):
     highest_bid = Bid.objects.filter(driver_listing=driver_listing).order_by('-amount').first()
     driver = Driver.objects.get(id=id)
-    # Change driver owner, unlist driver, unactivate driver_listing
+    # Change driver owner, unlist driver, deactivate driver_listing
     driver_listing.close()
     if highest_bid:
         driver.sell(highest_bid.bidder)
@@ -39,5 +39,4 @@ def sell_driver(id, driver_listing):
 
 def get_u21_driver_listings():
     twenty_one_game_years_ago = timezone.now() - timezone.timedelta(days=21 * DAYS_IN_A_SEASON)
-    u_21_driver_listings = DriverListing.objects.filter(is_active=True, driver__date_of_birth__gt=twenty_one_game_years_ago)
-    return u_21_driver_listings
+    return DriverListing.objects.filter(is_active=True, driver__date_of_birth__gt=twenty_one_game_years_ago)

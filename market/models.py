@@ -7,10 +7,10 @@ TIME_ON_MARKET_IN_DAYS = 3
 
 class DriverListing(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="driver_listing")
-    seller = models.ForeignKey(Team, blank=True, null=True, on_delete=models.CASCADE)
+    seller = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
     price = models.IntegerField()
     date_listed = models.DateTimeField(auto_now_add=True)
-    deadline = models.DateTimeField(null=True)
+    deadline = models.DateTimeField()
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

@@ -351,7 +351,7 @@ class TestSellDriver(TestCase):
         self.assertFalse(driver_listing.is_active)
         self.assertFalse(driver.is_market_listed)
         
-    def sell_driver_helper_no_bids(self):
+    def test_sell_driver_helper_no_bids(self):
         # Set driver listing and call function
         driver = Driver.objects.get(id=self.driver.id)
         list_driver(self.driver.id, 10)
