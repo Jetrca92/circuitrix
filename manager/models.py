@@ -46,6 +46,12 @@ class Manager(models.Model):
     def __str__(self):
         return f"{self.id}"
     
+    def unread_messages(self):
+        unread_messages = self.received.filter(read=False)
+        if unread_messages.exists():
+            return True
+        return False
+
 
 class Team(models.Model):
     owner = models.ForeignKey(Manager, on_delete=models.CASCADE, related_name="team_owner")
